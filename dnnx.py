@@ -64,6 +64,10 @@ class FindHuman:
     
     def FromCamera(self, video_device, confidence):
         cam = cv2.VideoCapture(video_device)
+        width = cam.get(cv2.CAP_PROP_FRAME_WIDTH )   # float
+        height = cam.get(cv2.CAP_PROP_FRAME_HEIGHT ) # float
+        print 'Camera picture size {}x{}'.format(width,height)
+        
         while True:
             ret, img = cam.read()
             img = self.Process(img, True, confidence)
