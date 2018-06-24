@@ -6,8 +6,6 @@ Created on Jun 8, 2018
 '''
 import numpy as np
 import cv2
-import sys
-import os
 import argparse
 import glob
 from datetime import datetime
@@ -40,11 +38,10 @@ class FindHuman:
             # extract the confidence (i.e., probability) associated with the
             # prediction
             print '********** ' + str(file) + ' ************'
-            start = datetime.now()
             confidence = detections[0, 0, i, 2]
 
-		# filter out weak detections by ensuring the `confidence` is
-		# greater than the minimum confidence
+            # filter out weak detections by ensuring the `confidence` is
+            # greater than the minimum confidence
             if confidence > set_confidence:
                 # extract the index of the class label from the `detections`,
                 # then compute the (x, y)-coordinates of the bounding box for
@@ -86,13 +83,13 @@ class FindHuman:
         cam.release()
         
 def main ():
-	# construct the argument parse and parse the arguments
+    # construct the argument parse and parse the arguments
     ap = argparse.ArgumentParser()
     ap.add_argument("-i", "--image", required=True,help="path to input image")
     ap.add_argument("-s", "--show", required=False, default=False, action='store_true',help="Whether to show the processed image")
     ap.add_argument("-c", "--confidence", type=float, default=0.2, help="minimum probability to filter weak detections")
     args = vars(ap.parse_args())
-	
+
     if args["show"] == True:
         cv2.namedWindow("detect")
     
@@ -102,10 +99,10 @@ def main ():
         fu.FromCamera(0, 0.2)
     else:
         filelist = glob.glob(args["image"]) 
-        for file in filelist:
-            print '********** ' + str(file) + ' ************'
+        for img_file in filelist:
+            print '********** ' + str(img_file) + ' ************'
             start = datetime.now()
-            img = cv2.imread(file)
+            img = cv2.imread(img_file)
             img = fu.Process(img, args["show"], args["confidence"])
             if args["show"] == True:
                 cv2.imshow('detect',img)
