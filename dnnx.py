@@ -9,6 +9,8 @@ import cv2
 import argparse
 import glob
 from datetime import datetime
+from matplotlib import pyplot as plt
+
 
 class FindHuman:
     def __init__(self):
@@ -25,11 +27,48 @@ class FindHuman:
     
     def Process(self, image, show, set_confidence):
         (h, w) = image.shape[:2]
-        blob = cv2.dnn.blobFromImage(cv2.resize(image, (300, 300)), 0.007843, (300, 300), 127.5)
+        gray_image = cv2.cvtColor(image, cv2.COLOR_RGB2GRAY)
+        gray_image = cv2.cvtColor(gray_image, cv2.COLOR_GRAY2RGB)
+        
+       
+        blob = cv2.dnn.blobFromImage(cv2.resize(gray_image, (300, 300)), 0.007843, (300, 300), 127.5)
+        
+        histr = []
+        color = ('b','g','r')
+        for i,col in enumerate(color):
+            histr = cv2.calcHist([gray_image],[i],None,[16],[0,256])
+            plt.plot(histr,color = col)
+            plt.xlim([0,16])
+            
+        plt.show(False)
+        plt.pause(0.05)
+        plt.clf()
+        print np.std(histr, axis=0)
+        
+        '''
+        hist = cv2.calcHist([image],[0],None,[16],[0,256])
+        
+        high_sum = 0;
+        low_sum = 0;
+        for i in range(6,15):
+            high_sum += hist[i]
+        
+        for i in range(0,5):
+            low_sum += hist[i]
+        
+        if (low_sum > high_sum):
+            print '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>'
 
+       
+        print hist[0], hist[1], hist[2], hist[3], hist[4], hist[5], hist[6], hist[7] 
+        
+        if (hist[7] < 1000):
+            print '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>'
+        '''
         # pass the blob through the network and obtain the detections and
         # predictions
-        print("[INFO] computing object detections...")
+        if (not show):
+            print("[INFO] computing object detections...")
         self.net.setInput(blob)
         detections = self.net.forward()
 
@@ -37,7 +76,6 @@ class FindHuman:
         for i in np.arange(0, detections.shape[2]):
             # extract the confidence (i.e., probability) associated with the
             # prediction
-            print '********** ' + str(file) + ' ************'
             confidence = detections[0, 0, i, 2]
 
             # filter out weak detections by ensuring the `confidence` is
@@ -51,13 +89,15 @@ class FindHuman:
                 (startX, startY, endX, endY) = box.astype("int")
                 # display the prediction
                 label = "{}: {:.2f}%".format(self.CLASSES[idx], confidence * 100)
-                print("[INFO] {}".format(label))
+
                 if show == True:
-                    cv2.rectangle(image, (startX, startY), (endX, endY),
+                    cv2.rectangle(gray_image, (startX, startY), (endX, endY),
                     self.COLORS[idx], 2)
-                y = startY - 15 if startY - 15 > 15 else startY + 15
-                cv2.putText(image, label, (startX, y), cv2.FONT_HERSHEY_SIMPLEX, 0.5, self.COLORS[idx], 2)
-        return image
+                    y = startY - 15 if startY - 15 > 15 else startY + 15
+                    cv2.putText(gray_image, label, (startX, y), cv2.FONT_HERSHEY_SIMPLEX, 0.5, self.COLORS[idx], 2)
+                else:
+                    print("[INFO] {}".format(label))                
+        return gray_image
     
     def FromCamera(self, video_device, confidence):
         cam = cv2.VideoCapture(video_device)
