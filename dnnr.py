@@ -38,7 +38,7 @@ class FindHuman:
         print("[INFO] loading model...")
         self.net = cv2.dnn.readNetFromCaffe('MobileNetSSD_deploy.prototxt.txt', 'MobileNetSSD_deploy.caffemodel')                
         self.ser = serial.Serial( #ttyS0
-               port='/dev/ttyUSB0',
+               port='/dev/ttyS0',
                baudrate = BAUD_RATE,
                parity=serial.PARITY_NONE,
                stopbits=serial.STOPBITS_ONE,
