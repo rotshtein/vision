@@ -24,8 +24,8 @@ class ObstructionDetector(object):
         self.rows = rows
         self.columns = columns
         # define constants
-        self.pixels_in_a_row = self.height / self.rows
-        self.pixels_in_a_col = self.width / self.columns
+        self.pixels_in_a_tile_row = self.height / self.rows
+        self.pixels_in_a_tile_col = self.width / self.columns
         self.num_of_frames = num_of_frames
         self.last_frames_obstructed = [False] * num_of_frames  # type:[bool]
         self.index = 0
@@ -54,13 +54,13 @@ class ObstructionDetector(object):
         return False
 
     def __get_center_coordinate_of_tile(self, row, col):
-        return self.pixels_in_a_row * (0.5 + row), self.pixels_in_a_col * (0.5 + col)
+        return int(self.pixels_in_a_tile_row * (0.5 + row)), int(self.pixels_in_a_tile_col * (0.5 + col))
 
     @staticmethod
     def __is_pixel_obstructed(image, x, y):
-        intensity = image[x, y]
+        intensity = image[x, y] # type:[]
         print "intensity={} of x,y={},{}".format(intensity, x, y)
-        if LOW_INTENSITY_THRESHOLD > intensity:   # todo also add the sun --> if intensity > HIGH_INTENSITY_THRESHOLD:
+        if all(rgb < LOW_INTENSITY_THRESHOLD for rgb in intensity):  # todo also add the sun --> if intensity > HIGH_INTENSITY_THRESHOLD:
             return True
         return False
 
