@@ -16,6 +16,8 @@ from datetime import datetime
 import time
 import serial
 
+from obstruction_detector import ObstructionDetector
+
 BAUD_RATE = 19200
 MAX_HEIGHT = 480
 HEIGHT_THR = 150
@@ -37,7 +39,7 @@ class FindHuman:
         # load our serialized model from disk
         print("[INFO] loading model...")
         self.net = cv2.dnn.readNetFromCaffe('MobileNetSSD_deploy.prototxt.txt', 'MobileNetSSD_deploy.caffemodel')                
-        self.ser = serial.Serial( #ttyS0
+        self.ser = serial.Serial( #ttyUSB0
                port='/dev/ttyS0',
                baudrate = BAUD_RATE,
                parity=serial.PARITY_NONE,
@@ -113,6 +115,9 @@ class FindHuman:
         
         time.sleep(0.1)
         #cam = cv2.VideoCapture(video_device)
+
+        obs_detector = ObstructionDetector()
+
         while True:
             #ret, img = cam.read()
             temp_time = start_time = datetime.now()
@@ -121,6 +126,8 @@ class FindHuman:
             print_info("Capturing image. Duration= " + str(datetime.now() - temp_time))
             img=rawCapture.array
             img = self.Process(img, True, confidence, debug)
+            if obs_detector.is_last_frames_obstructed(img):
+                print_info("Detected an Obstruction!")
             if show:
                 show_start = datetime.now()
                 cv2.imshow('detect',img)
