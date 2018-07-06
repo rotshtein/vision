@@ -12,6 +12,8 @@ import glob
 from datetime import datetime
 from matplotlib import pyplot as plt
 
+from obstruction_detector import ObstructionDetector
+
 
 class FindHuman:
     def __init__(self):
@@ -105,10 +107,13 @@ class FindHuman:
         width = cam.get(cv2.CAP_PROP_FRAME_WIDTH )   # float
         height = cam.get(cv2.CAP_PROP_FRAME_HEIGHT ) # float
         print 'Camera picture size {}x{}'.format(width,height)
-        
+        obs_detector = ObstructionDetector()
+
         while True:
             ret, img = cam.read()
             img = self.Process(img, True, confidence)
+            if obs_detector.is_last_frames_obstructed(img):
+                print("WARNING! Camera is being Obstructed")
             cv2.imshow('detect',img)
             if not ret:
                 break

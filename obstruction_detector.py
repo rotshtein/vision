@@ -5,7 +5,7 @@ Created on Jul 4, 2018
 @author: ziv
 '''
 
-LOW_INTENSITY_THRESHOLD = 5
+LOW_INTENSITY_THRESHOLD = 110
 HIGH_INTENSITY_THRESHOLD = 250
 
 
@@ -49,9 +49,9 @@ class ObstructionDetector(object):
         for row in range(self.rows):
             for col in range(self.columns):
                 x, y = self.__get_center_coordinate_of_tile(row, col)
-                if self.__is_pixel_obstructed(image, x, y):
-                    return True
-        return False
+                if not self.__is_pixel_obstructed(image, x, y):
+                    return False
+        return True
 
     def __get_center_coordinate_of_tile(self, row, col):
         return int(self.pixels_in_a_tile_row * (0.5 + row)), int(self.pixels_in_a_tile_col * (0.5 + col))
