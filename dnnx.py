@@ -9,7 +9,7 @@ import cv2
 import argparse
 import glob
 from datetime import datetime
-from matplotlib import pyplot as plt
+#from matplotlib import pyplot as plt
 
 
 class FindHuman:
@@ -32,7 +32,7 @@ class FindHuman:
         
        
         blob = cv2.dnn.blobFromImage(cv2.resize(gray_image, (300, 300)), 0.007843, (300, 300), 127.5)
-        
+        '''
         histr = []
         color = ('b','g','r')
         for i,col in enumerate(color):
@@ -45,7 +45,7 @@ class FindHuman:
         plt.clf()
         print np.std(histr, axis=0)
         
-        '''
+        
         hist = cv2.calcHist([image],[0],None,[16],[0,256])
         
         high_sum = 0;
