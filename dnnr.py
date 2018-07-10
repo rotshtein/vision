@@ -126,8 +126,12 @@ class FindHuman:
             print_info("Capturing image. Duration= " + str(datetime.now() - temp_time))
             img=rawCapture.array
             img = self.Process(img, True, confidence, debug)
+
+            temp_time = datetime.now()
             if obs_detector.is_last_frames_obstructed(img):
                 print_info("WARNING! Camera is being Obstructed")
+            print_info("Obstruction Detection Duration= " + str(datetime.now() - temp_time))
+
             if show:
                 show_start = datetime.now()
                 cv2.imshow('detect',img)

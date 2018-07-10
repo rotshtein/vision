@@ -59,7 +59,7 @@ class ObstructionDetector(object):
             for col in range(self.columns):
                 center_row, center_col = self.__get_center_coordinate_of_tile(row, col)
                 intensity = image[center_row, center_col]  # type:[]
-                print "intensity={} of point=[{},{}]".format(intensity, center_col, center_row)
+                # print "intensity={} of point=[{},{}]".format(intensity, center_col, center_row)
                 variance_temp_list.append(intensity)
                 intensity_below_threshold_temp_list.append(self.__is_pixel_intensity_below_threshold(intensity))
 
