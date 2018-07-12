@@ -103,7 +103,7 @@ class FindHuman:
         cam = cv2.VideoCapture(video_device)
         width = cam.get(cv2.CAP_PROP_FRAME_WIDTH )   # float
         height = cam.get(cv2.CAP_PROP_FRAME_HEIGHT ) # float
-        print 'Camera picture size {}x{}'.format(width,height)
+        print ('Camera picture size {}x{}'.format(width,height))
         
         while True:
             ret, img = cam.read()
@@ -140,7 +140,7 @@ def main ():
     else:
         filelist = glob.glob(args["image"]) 
         for img_file in filelist:
-            print '********** ' + str(img_file) + ' ************'
+            print ('********** ' + str(img_file) + ' ************')
             start = datetime.now()
             img = cv2.imread(img_file)
             img = fu.Process(img, args["show"], args["confidence"])
@@ -153,7 +153,7 @@ def main ():
                             break;
                 except:
                     pass
-            print datetime.now()- start
+            print (datetime.now()- start)
     cv2.destroyAllWindows()
     
 main()
