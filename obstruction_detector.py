@@ -71,7 +71,7 @@ class ObstructionDetector(object):
 
     def __is_all_points_intensity_below_variance_threshold(self, variance_temp_list):
         var = np.var(variance_temp_list, axis=0)  # axis=0 for calculating the arrays vertically [r, g, b]
-        print "variance=" + str(var)
+        print("variance=" + str(var))
         return all(var_color < INTENSITY_VARIANCE_THRESHOLD for var_color in var)
 
     def __is_all_points_intensity_below_threshold(self, intensity_below_threshold_temp_list):

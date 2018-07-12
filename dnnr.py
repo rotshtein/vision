@@ -39,7 +39,7 @@ class FindHuman:
         # load our serialized model from disk
         print("[INFO] loading model...")
         self.net = cv2.dnn.readNetFromCaffe('MobileNetSSD_deploy.prototxt.txt', 'MobileNetSSD_deploy.caffemodel')                
-        self.ser = serial.Serial( #ttyUSB0
+        self.ser = serial.Serial( #ttyUSB0 for USB port / ttyS0 for IO
                port='/dev/ttyS0',
                baudrate = BAUD_RATE,
                parity=serial.PARITY_NONE,
@@ -88,17 +88,18 @@ class FindHuman:
                     print_info("Send Stop Message to Robot")
                     # stop robot
                     #self.ser.write(ROBOT_STOP_MESSAGE_HEX_STR.decode("hex"))
-                    self.ser.write(ROBOT_STOP_MESSAGE_HEX)
+                    # self.ser.write(ROBOT_STOP_MESSAGE_HEX)
                     #time.sleep(0.1)
                     if debug == True:
                         try:
                             ret_value = self.ser.readline()
                             # TODO - add ACK handling ?
                             print(str(datetime.now()) + " - [INFO] Received Ack Message from Robot: " + ret_value.encode("hex"))
-                        except Exception, e:
+                        except Exception as e:
                             print(str(datetime.now()) + " - [INFO] Received Exception: " + str(e))
                 else:
-                    self.ser.write(ROBOT_STATUS_MESSAGE_HEX)
+                    pass
+                    # self.ser.write(ROBOT_STATUS_MESSAGE_HEX)
                     
                 if show == True:
                     cv2.rectangle(image, (startX, startY), (endX, endY),
@@ -111,6 +112,7 @@ class FindHuman:
     def FromCamera(self, video_device, confidence, show, debug):
         global start_time
         camera = PiCamera()
+        camera.resolution = (300, 300)
         rawCapture = PiRGBArray(camera)
         
         time.sleep(0.1)
@@ -122,7 +124,7 @@ class FindHuman:
             #ret, img = cam.read()
             temp_time = start_time = datetime.now()
             print_info("************ FromCamera - Start.")
-            camera.capture(rawCapture, format="bgr")
+            camera.capture(rawCapture, format="bgr", use_video_port=True)
             print_info("Capturing image. Duration= " + str(datetime.now() - temp_time))
             img=rawCapture.array
             img = self.Process(img, True, confidence, debug)
@@ -167,7 +169,7 @@ def main ():
 	
     if args["show"] == True:
         cv2.namedWindow("detect")
-    print "Debug_Mode=" + str(args["debug"])
+    print("Debug_Mode=" + str(args["debug"]))
     
     fu=FindHuman()
     
@@ -176,7 +178,7 @@ def main ():
     else:
         filelist = glob.glob(args["image"]) 
         for file in filelist:
-            print '********** ' + str(file) + ' ************'
+            print('********** ' + str(file) + ' ************')
             start_time = datetime.now()
             img = cv2.imread(file)
             img = fu.Process(img, args["show"], args["confidence"], args["debug"])
@@ -189,7 +191,7 @@ def main ():
                             break;
                 except:
                     pass
-            print datetime.now()- start_time
+            print(datetime.now()- start_time)
     cv2.destroyAllWindows()
     
 main()
