@@ -4,15 +4,14 @@ Created on Jun 8, 2018
 
 @author: uri
 '''
-
 import numpy as np
 import cv2
 import argparse
 import glob
 from datetime import datetime
-from matplotlib import pyplot as plt
+#from matplotlib import pyplot as plt
 
-from obstruction_detector import ObstructionDetector
+#from obstruction_detector import ObstructionDetector
 
 
 class FindHuman:
@@ -35,7 +34,7 @@ class FindHuman:
         
        
         blob = cv2.dnn.blobFromImage(cv2.resize(gray_image, (300, 300)), 0.007843, (300, 300), 127.5)
-        
+        '''
         histr = []
         color = ('b','g','r')
         for i,col in enumerate(color):
@@ -46,9 +45,9 @@ class FindHuman:
         plt.show(False)
         plt.pause(0.05)
         plt.clf()
-        print np.std(histr, axis=0)
+        print (np.std(histr, axis=0))
         
-        '''
+        
         hist = cv2.calcHist([image],[0],None,[16],[0,256])
         
         high_sum = 0;
@@ -106,14 +105,16 @@ class FindHuman:
         cam = cv2.VideoCapture(video_device)
         width = cam.get(cv2.CAP_PROP_FRAME_WIDTH )   # float
         height = cam.get(cv2.CAP_PROP_FRAME_HEIGHT ) # float
-        print 'Camera picture size {}x{}'.format(width,height)
-        obs_detector = ObstructionDetector()
+        print ('Camera picture size {}x{}'.format(width,height))
+        #obs_detector = ObstructionDetector()
 
         while True:
             ret, img = cam.read()
             img = self.Process(img, True, confidence)
+            '''
             if obs_detector.is_last_frames_obstructed(img):
                 print("WARNING! Camera is being Obstructed")
+            '''
             cv2.imshow('detect',img)
             if not ret:
                 break
@@ -146,7 +147,8 @@ def main ():
     else:
         filelist = glob.glob(args["image"]) 
         for img_file in filelist:
-            print '********** ' + str(img_file) + ' ************'
+
+            print ('********** ' + str(img_file) + ' ************')
             start = datetime.now()
             img = cv2.imread(img_file)
             img = fu.Process(img, args["show"], args["confidence"])
@@ -159,7 +161,8 @@ def main ():
                             break;
                 except:
                     pass
-            print datetime.now()- start
+
+            print (datetime.now()- start)
     cv2.destroyAllWindows()
     
 main()
