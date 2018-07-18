@@ -15,6 +15,7 @@ import glob
 from datetime import datetime
 import time
 import serial
+import logging
 
 from obstruction_detector import ObstructionDetector
 
@@ -37,7 +38,7 @@ class FindHuman:
 	       "sofa", "train", "tvmonitor"]
         self.COLORS = np.random.uniform(0, 255, size=(len(self.CLASSES), 3))
         # load our serialized model from disk
-        print("[INFO] loading model...")
+        print_info("loading model...")
         self.net = cv2.dnn.readNetFromCaffe('MobileNetSSD_deploy.prototxt.txt', 'MobileNetSSD_deploy.caffemodel')                
         self.ser = serial.Serial( #ttyUSB0 for USB port / ttyS0 for IO
                port='/dev/ttyS0',
@@ -94,9 +95,9 @@ class FindHuman:
                         try:
                             ret_value = self.ser.readline()
                             # TODO - add ACK handling ?
-                            print(str(datetime.now()) + " - [INFO] Received Ack Message from Robot: " + ret_value.encode("hex"))
+                            print_info("Received Ack Message from Robot: " + ret_value.encode("hex"))
                         except Exception as e:
-                            print(str(datetime.now()) + " - [INFO] Received Exception: " + str(e))
+                            print_info("Received Exception: " + str(e))
                 else:
                     pass
                     # self.ser.write(ROBOT_STATUS_MESSAGE_HEX)
@@ -146,7 +147,7 @@ class FindHuman:
     
             if k%256 == 27:
                 # ESC pressed
-                print("Escape hit, closing...")
+                print_info("Escape hit, closing...")
                 break
             print_info("************ FromCamera - End. Total Duration=" + str(datetime.now() - start_time))
 
@@ -155,11 +156,33 @@ class FindHuman:
         #cam.release()
             
 def print_info(message):
-    print(str(datetime.now()) + " - [INFO] " + message)
+    logging.info(message)
+    # print(str(datetime.now()) + " - [INFO] " + message)
 
+
+def is_point_in_polygon(point, polygon):
+    polygonLength = polygon.size, i = 0
+    inside = False
+    pointX = point.X, pointY = point.Y
+    endPoint = polygon[polygonLength - 1]
+    endX = endPoint.X
+    endY = endPoint.Y
+    while i < polygonLength:
+        startX = endX
+        startY = endY
+        endPoint = polygon[i]
+        i+=1
+        endX = endPoint.X
+        endY = endPoint.Y
+        pointY_inside_segment = (endY > pointY ^ startY > pointY)  # ? pointY inside[startY; endY] segment ?
+        under_segment = ((pointX - endX) < (pointY - endY) * (startX - endX) / (startY - endY))  # is under the segment?
+        _inside = pointY_inside_segment and under_segment
+        inside ^= _inside
+    return inside
         
-def main ():
+def main():
 	# construct the argument parse and parse the arguments
+    logging.basicConfig(level=logging.INFO, format='%(asctime)s: %(message)s')
     ap = argparse.ArgumentParser()
     ap.add_argument("-i", "--image", required=True,help="path to input image")
     ap.add_argument("-s", "--show", required=False, default=False, action='store_true',help="Whether to show the processed image")
@@ -169,7 +192,7 @@ def main ():
 	
     if args["show"] == True:
         cv2.namedWindow("detect")
-    print("Debug_Mode=" + str(args["debug"]))
+    print_info("Debug_Mode=" + str(args["debug"]))
     
     fu=FindHuman()
     
@@ -178,7 +201,7 @@ def main ():
     else:
         filelist = glob.glob(args["image"]) 
         for file in filelist:
-            print('********** ' + str(file) + ' ************')
+            print_info('********** ' + str(file) + ' ************')
             start_time = datetime.now()
             img = cv2.imread(file)
             img = fu.Process(img, args["show"], args["confidence"], args["debug"])
@@ -191,7 +214,7 @@ def main ():
                             break;
                 except:
                     pass
-            print(datetime.now()- start_time)
+            print_info(datetime.now()- start_time)
     cv2.destroyAllWindows()
     
 main()
