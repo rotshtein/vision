@@ -52,7 +52,7 @@ class ObstructionDetector(object):
         self.tile_relative_coordinates = self.__get_coordinates_of_tile()
 
         # handle current frame - do validation
-        self.logging.info("Started Obstruction detection. Tiles to ignore:{}".format(tiles_to_ignore))
+        # self.logging.info("Vision - Started Obstruction detection. Tiles to ignore:{}".format(tiles_to_ignore))
         self.__validate_frame_and_add_result_to_list(image)
 
         # check if any tile is consecutively obstructed in the last n frames
@@ -65,11 +65,10 @@ class ObstructionDetector(object):
                 debug_all_obstructed_result.append(_tile_index)
                 if _tile_index not in self.tiles_to_ignore:
                     obstructed_tiles_not_ignored.append(_tile_index)
-                    self.logging.debug("Tile #{} is obstructed".format(_tile_index))
             _tile_index += 1
 
         self.index = (self.index + 1) % self.num_of_frames_to_validate
-        self.logging.info("Result: Obstructed Tiles Not to ignore:{}. All Obstructed Tiles including ignored:{}.".format(obstructed_tiles_not_ignored, debug_all_obstructed_result))
+        self.logging.info("Vision - Result: Obstructed Tiles Not to ignore:{}. All Obstructed Tiles including ignored:{}.".format(obstructed_tiles_not_ignored, debug_all_obstructed_result))
         return obstructed_tiles_not_ignored
 
     def __validate_frame_and_add_result_to_list(self, image):
@@ -78,11 +77,11 @@ class ObstructionDetector(object):
             for main_col in range(self.columns):
                 result = self.__is_tile_obstructed(image, main_row, main_col, tile_index)
                 self.last_tiles_obstructed_matrix[tile_index][self.index] = result
-                self.logging.debug(self.last_tiles_obstructed_matrix)
+                # self.logging.debug(self.last_tiles_obstructed_matrix)
                 tile_index += 1
 
     def __is_tile_obstructed(self, image, row, col, tile_index):
-        self.logging.debug("Tile [{}][{}]".format(row, col) + " (Index={}".format(tile_index) + ")")
+        # self.logging.debug("Tile [{}][{}]".format(row, col) + " (Index={}".format(tile_index) + ")")
         variance_temp_list = []
         for x, y in self.tile_relative_coordinates:
             abs_tile_y = self.height / self.rows * row
@@ -93,7 +92,7 @@ class ObstructionDetector(object):
 
             # note - intensity from image is backwards img[y,x] !!!
             intensity = image[abs_y, abs_x]  # type:[]
-            self.logging.debug("intensity={} of point=[{},{}]".format(intensity, abs_x, abs_y))
+            # self.logging.debug("intensity={} of point=[{},{}]".format(intensity, abs_x, abs_y))
             variance_temp_list.append(intensity)
         is_tile_below_variance_threshold = self.__is_all_points_intensity_below_variance_threshold(variance_temp_list)
         return is_tile_below_variance_threshold
