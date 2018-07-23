@@ -4,7 +4,6 @@ Created on Jun 8, 2018
 
 @author: uri
 '''
-import queue
 import threading
 
 import numpy as np
@@ -20,7 +19,6 @@ import time
 import serial
 import logging
 
-from hd_thread import HDThread
 from obstruction_detector import ObstructionDetector
 
 HEIGHT_THR = 150
@@ -53,23 +51,21 @@ class FindHuman:
             timeout=0.1
         )
 
-    def dnn(self, show, set_confidence, debug, image):
-        logging.info("DNN - Start ")
-        process_start = temp_time = datetime.now()
+    def Process(self, image, show, set_confidence, debug):
+        global start_time
         (h, w) = image.shape[:2]
+        logging.info("Process - Start ")
+        process_start = temp_time = datetime.now()
         blob = cv2.dnn.blobFromImage(cv2.resize(image, (300, 300)), 0.007843, (300, 300), 127.5)
-        logging.debug("DNN - blobFromImage Resize. Duration= " + str(datetime.now() - temp_time))
+        logging.info("Process - blobFromImage Resize. Duration= " + str(datetime.now() - temp_time))
 
         # pass the blob through the network and obtain the detections and
         # predictions
-        logging.debug("DNN - Computing object detections...")
+        logging.info("Process - Computing object detections...")
         temp_time = datetime.now()
         self.net.setInput(blob)
         detections = self.net.forward()
-        logging.info("DNN - setInput() + forward(). Duration=" + str(datetime.now() - temp_time))
-
-        if show:
-            cv2.imshow('detect', image)
+        logging.info("Process - setInput() + forward(). Duration=" + str(datetime.now() - temp_time))
 
         # loop over the detections
         for i in np.arange(0, detections.shape[2]):
@@ -89,71 +85,79 @@ class FindHuman:
                 (startX, startY, endX, endY) = box.astype("int")
                 # display the prediction
                 label = "{}: {:.2f}% {} {}".format(self.CLASSES[idx], confidence * 100, startX, startY)
-                logging.info("DNN - {}".format(label))
-
-                # TODO - add result to protocol to ROBOT
+                logging.info("{}".format(label))
+                # todo - uri - take thresholds (height) from configuration file
                 if self.CLASSES[idx] == "person" and (h - endY) < HEIGHT_THR:
-                    logging.info("DNN - Send Stop Message to Robot")
+                    logging.info("Send Stop Message to Robot")
                     # stop robot
                     # self.ser.write(ROBOT_STOP_MESSAGE_HEX_STR.decode("hex"))
                     # self.ser.write(ROBOT_STOP_MESSAGE_HEX)
                     # time.sleep(0.1)
-                    # if debug == True:
-                    #     try:
-                    #         ret_value = self.ser.readline()
-                    #         # TODO - add ACK handling ?
-                    #         logging.info("DNN - Received Ack Message from Robot: " + ret_value.encode("hex"))
-                    #     except Exception as e:
-                    #         logging.info("DNN - Received Exception: " + str(e))
+                    if debug == True:
+                        try:
+                            ret_value = self.ser.readline()
+                            # TODO - add ACK handling ?
+                            logging.info("Received Ack Message from Robot: " + ret_value.encode("hex"))
+                        except Exception as e:
+                            logging.info("Received Exception: " + str(e))
                 else:
                     pass
                     # self.ser.write(ROBOT_STATUS_MESSAGE_HEX)
 
-                if show:
-                    show_start = datetime.now()
+                if show == True:
                     cv2.rectangle(image, (startX, startY), (endX, endY),
                                   self.COLORS[idx], 2)
-                    y = startY - 15 if startY - 15 > 15 else startY + 15
-                    cv2.putText(image, label, (startX, y), cv2.FONT_HERSHEY_SIMPLEX, 0.5, self.COLORS[idx], 2)
-                    k = cv2.waitKey(1)
-                    if k % 256 == 27:
-                        # ESC pressed
-                        logging.info("FromCamera - Escape hit, closing...")
-                        return
-                    logging.info("DNN - Show Window Duration= " + str(datetime.now() - show_start))
-                    logging.info("DNN - getWindowProperty={}".format(cv2.getWindowProperty('detect', 0) < 0))
+                y = startY - 15 if startY - 15 > 15 else startY + 15
+                cv2.putText(image, label, (startX, y), cv2.FONT_HERSHEY_SIMPLEX, 0.5, self.COLORS[idx], 2)
+        logging.info("Process End. Duration=" + str(datetime.now() - process_start))
+        return image
 
-        logging.info("DNN - End. Duration=" + str(datetime.now() - process_start))
+    def FromCamera(self, video_device, confidence, show, debug):
+        global start_time
+        camera = PiCamera()
+        camera.resolution = (300, 300)
+        rawCapture = PiRGBArray(camera)
 
-    def vision(self, obs_detector, img):
-        gray_image = cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)
-        tiles_to_ignore = [0, 1, 2, 6, 7, 8]
-        obstructed_tiles = obs_detector.is_last_frames_obstructed(gray_image, tiles_to_ignore)
-        if obstructed_tiles.__len__() != 0:
-            logging.info("Vision - WARNING! Camera is being Obstructed by Tiles:{}.".format(obstructed_tiles))
+        time.sleep(0.1)
+        # cam = cv2.VideoCapture(video_device)
 
-    def fromCamera(self, show, camera, rawCapture):
-        # while True:
-        temp_time = start_time = datetime.now()
-        logging.info("FromCamera - Start.")
+        obs_detector = ObstructionDetector(logging)
+        logging.info("Obstruction Detector. Variance={}.".format(obs_detector.variance))
 
-        camera.capture(rawCapture, format="bgr", use_video_port=True)
-        logging.info("FromCamera - Capturing image. Duration= " + str(datetime.now() - temp_time))
-        img = rawCapture.array
+        while True:
+            # ret, img = cam.read()
+            temp_time = start_time = datetime.now()
+            logging.info("************ FromCamera - Start.")
+            camera.capture(rawCapture, format="bgr", use_video_port=True)
+            logging.info("Capturing image. Duration= " + str(datetime.now() - temp_time))
+            img = rawCapture.array
+            img = self.Process(img, True, confidence, debug)
 
-        # img = self.Process(img, True, confidence, debug)
+            temp_time = datetime.now()
 
-        # temp_time = datetime.now()
-        # logging.info("Obstruction Detection Duration= {}".format(str(datetime.now() - temp_time)))
+            gray_image = cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)
 
-        temp_time = datetime.now()
-        rawCapture.truncate(0)
-        logging.info("FromCamera - Capturing truncate Duration= " + str(datetime.now() - temp_time))
+            tiles_to_ignore = [0,1,2,6,7,8]
+            obstructed_tiles = obs_detector.is_last_frames_obstructed(gray_image, tiles_to_ignore)
+            if obstructed_tiles.__len__() != 0:
+                logging.info("WARNING! Camera is being Obstructed by Tiles:{}.".format(obstructed_tiles))
+            logging.info("Obstruction Detection Duration= {}".format(str(datetime.now() - temp_time)))
 
-        logging.info("FromCamera - End. Total Duration=" + str(datetime.now() - start_time))
-        return img
-    # cam.release()
-
+            if show:
+                show_start = datetime.now()
+                cv2.imshow('detect', img)
+                logging.debug("Show Window Duration= " + str(datetime.now() - show_start))
+                k = cv2.waitKey(1)        
+                if k % 256 == 27:
+                  # ESC pressed
+                  logging.info("Escape hit, closing...")
+                  break
+                  if (show) & (cv2.getWindowProperty('detect', 0) < 0):
+                    break
+            temp_time = datetime.now()
+            rawCapture.truncate(0)
+            logging.info("Capturing truncate Duration= " + str(datetime.now() - temp_time))
+            logging.info("************ FromCamera - End. Total Duration=" + str(datetime.now() - start_time))
 
 def is_point_in_polygon(point, polygon):
     polygonLength = polygon.size, i = 0
@@ -175,60 +179,6 @@ def is_point_in_polygon(point, polygon):
         inside ^= _inside
     return inside
 
-
-def start_threads(fu, show, debug):
-    thread_names = ["Thread_FromCamera", "Thread_DNN", "Thread_Vision"]
-    # max size = 2 - we don't want old images!
-    img_queue = queue.Queue(2)
-    threads = []
-    thread_id = 1
-    confidence = 0.2
-    for tName in thread_names:
-        if thread_id == 1:
-            # "Thread Capture" - PUT IN QUEUE
-            is_get_from_queue = False
-            # best optimization - thread_sleep_sec = 0.2
-            thread_sleep_sec = 0.1
-            camera = PiCamera()
-            # camera.resolution = (300, 300)
-            rawCapture = PiRGBArray(camera)
-            args = [show, camera, rawCapture]
-            thread = HDThread(logging, thread_id, tName, img_queue, thread_sleep_sec, is_get_from_queue, fu, "fromCamera", args)
-
-        elif thread_id == 2:
-            # "Thread DNN" - GET FROM QUEUE
-            is_get_from_queue = True
-            thread_sleep_sec = 0.01
-            args = [show, confidence, debug]
-            thread = HDThread(logging, thread_id, tName, img_queue, thread_sleep_sec, is_get_from_queue, fu, "dnn", args)
-
-        elif thread_id == 3:
-            # "Thread Vision" - GET FROM QUEUE
-            is_get_from_queue = True
-            # best optimization - thread_sleep_sec = 0.3
-            thread_sleep_sec = 0.1
-            obs_detector = ObstructionDetector(logging)
-            logging.info("Starting Obstruction Detector . Variance Threshold={}.".format(obs_detector.variance))
-            args = [obs_detector]
-            thread = HDThread(logging, thread_id, tName, img_queue, thread_sleep_sec, is_get_from_queue, fu, "vision", args)
-
-        thread.start()
-        threads.append(thread)
-        thread_id += 1
-
-    # Wait for queue to empty
-    # while not img_queue.empty():
-    #     pass
-
-    # Notify threads it's time to exit
-    # exitFlag = 1
-
-    # Wait for all threads to complete
-    for t in threads:
-        t.join()
-    print("Exiting Main Thread")
-
-
 def main():
     # construct the argument parse and parse the arguments
     ap = argparse.ArgumentParser()
@@ -236,18 +186,12 @@ def main():
     ap.add_argument("-s", "--show", required=False, default=False, action='store_true',
                     help="Whether to show the processed image")
     ap.add_argument("-c", "--confidence", type=float, default=0.2, help="minimum probability to filter weak detections")
-    ap.add_argument("-d", "--debug", required=False, default=False, action='store_true',
-                    help="change log level to DEBUG")
+    ap.add_argument("-d", "--debug", required=False, default=False, action='store_true', help="change log level to DEBUG")
     ap.add_argument("-l", "--loggingFileName", required=False, default="", help="change log level to DEBUG")
     args = vars(ap.parse_args())
 
     debug_level = logging.INFO
-    args_debug = args["debug"]
-    args_show = args["show"]
-    args_image = args["image"]
-    args_confidence = args["confidence"]
-
-    if args_debug:
+    if args["debug"] == True:
         debug_level = logging.DEBUG
 
     logging_file_name = args["loggingFileName"]
@@ -262,22 +206,22 @@ def main():
     logging.info("************************************************")
     logging.info("Application Arguments: {}".format(args))
 
-    if args_show:
+    if args["show"] == True:
         cv2.namedWindow("detect")
 
     fu = FindHuman()
 
-    if args_image == 'c':
-        start_threads(fu, args_show, args_debug)
-        # fu.FromCamera(0, 0.2, args["show"], args["debug"])
+    if (args["image"] == 'c'):
+        #threading.Thread(target=fu.FromCamera, args=(0, 0.2, args["show"], args["debug"]),).start()
+        fu.FromCamera(0, 0.2, args["show"], args["debug"])
     else:
-        filelist = glob.glob(args_image)
+        filelist = glob.glob(args["image"])
         for file in filelist:
             logging.info('********** ' + str(file) + ' ************')
             start_time = datetime.now()
             img = cv2.imread(file)
-            img = fu.dnn(args_show, args_confidence, args_debug, img)
-            if args_show == True:
+            img = fu.Process(img, args["show"], args["confidence"], args["debug"])
+            if args["show"] == True:
                 cv2.imshow('detect', img)
                 try:
                     while cv2.getWindowProperty('detect', 0) >= 0:
