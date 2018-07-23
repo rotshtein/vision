@@ -63,9 +63,10 @@ class HDThread(threading.Thread):
         if self.fps_statistics.__len__() > 100:
             # remove first value since it's not correct
             self.fps_statistics.pop(0)
-            self.logging.info("FPS Summary of {} - avg={}. max={}. min={}".format(self.thread_name, numpy.mean(self.fps_statistics),
+            self.logging.info("FPS Summary of {} - avg={}. max={}. min={}. queue_size={}".format(self.thread_name, numpy.mean(self.fps_statistics),
                                                                             numpy.max(self.fps_statistics),
-                                                                            numpy.min(self.fps_statistics)))
+                                                                            numpy.min(self.fps_statistics),
+                                                                            self.working_queue.qsize()))
             self.fps_statistics.clear()
         time.sleep(self.sleep_time)
 
@@ -91,14 +92,15 @@ class HDThread(threading.Thread):
             self.last_working_time = now
         else:
             self.queue_lock.release()
-            self.logging.info("{} - queue is full. going to sleep... {}".format(self.thread_name, self.sleep_time))
+            self.logging.info("{} - queue is empty. going to sleep... {}".format(self.thread_name, self.sleep_time))
 
         if self.fps_statistics.__len__() > 100:
             # remove first value since it's not correct
             self.fps_statistics.pop(0)
-            self.logging.info("FPS Summary of {} - avg={}. max={}. min={}".format(self.thread_name, numpy.mean(self.fps_statistics),
+            self.logging.info("FPS Summary of {} - avg={}. max={}. min={}. queue_size={}".format(self.thread_name, numpy.mean(self.fps_statistics),
                                                                             numpy.max(self.fps_statistics),
-                                                                            numpy.min(self.fps_statistics)))
+                                                                            numpy.min(self.fps_statistics),
+                                                                            self.working_queue.qsize()))
             self.fps_statistics.clear()
         time.sleep(self.sleep_time)
 

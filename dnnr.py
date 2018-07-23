@@ -178,7 +178,7 @@ def is_point_in_polygon(point, polygon):
 
 def start_threads(fu, show, debug):
     thread_names = ["Thread_FromCamera", "Thread_DNN", "Thread_Vision"]
-    # max size = 3 - due to
+    # max size = 2 - we don't want old images!
     img_queue = queue.Queue(2)
     threads = []
     thread_id = 1
@@ -187,7 +187,7 @@ def start_threads(fu, show, debug):
         if thread_id == 1:
             # "Thread Capture" - PUT IN QUEUE
             is_get_from_queue = False
-            thread_sleep_sec = 0.1
+            thread_sleep_sec = 0.2
             camera = PiCamera()
             # camera.resolution = (300, 300)
             rawCapture = PiRGBArray(camera)
@@ -204,7 +204,7 @@ def start_threads(fu, show, debug):
         elif thread_id == 3:
             # "Thread Vision" - GET FROM QUEUE
             is_get_from_queue = True
-            thread_sleep_sec = 0.1
+            thread_sleep_sec = 0.3
             obs_detector = ObstructionDetector(logging)
             logging.info("Starting Obstruction Detector . Variance Threshold={}.".format(obs_detector.variance))
             args = [obs_detector]
