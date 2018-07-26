@@ -71,10 +71,12 @@ class FindHuman:
 
         if self.rotate_counter >= num_of_frames_to_rotate:
             logging.info("DNN - Rotating image by 90 deg...")
+            temp_time = datetime.now()
             image_rotator = ImageRotator()
             image_rotated = image_rotator.rotate_image(image, 90)
             image = image_rotator.crop_around_center(image_rotated, *image_rotator.largest_rotated_rect(w, h, math.radians(90)))
             self.rotate_counter = 0
+            logging.info("DNN - Rotating image Duration=" + str(datetime.now() - temp_time))
 
         # pass the blob through the network and obtain the detections and predictions
         logging.debug("DNN - Computing object detections...")
