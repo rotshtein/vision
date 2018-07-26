@@ -9,7 +9,7 @@ exitFlag = 0
 
 
 class HDThread(threading.Thread):
-    def __init__(self, logging, thread_id, thread_name, working_queue, sleep_time, is_fetch_data, target_object,
+    def __init__(self, logging, thread_id, thread_name, working_queue, queue_lock, sleep_time, is_fetch_data, target_object,
                  target_method_name, method_args):
         threading.Thread.__init__(self)
         self.logging = logging
@@ -22,7 +22,7 @@ class HDThread(threading.Thread):
         self.target_method_name = target_method_name
         self.method_args = method_args
         self.exit_flag = exitFlag
-        self.queue_lock = threading.Lock()
+        self.queue_lock = queue_lock
         self.last_working_time = datetime.now()
 
         self.fps_statistics = []
@@ -64,9 +64,9 @@ class HDThread(threading.Thread):
             # remove first value since it's not correct
             self.fps_statistics.pop(0)
             self.logging.info("FPS Summary of {} - avg={}. max={}. min={}. queue_size={}".format(self.thread_name, numpy.mean(self.fps_statistics),
-                                                                            numpy.max(self.fps_statistics),
-                                                                            numpy.min(self.fps_statistics),
-                                                                            self.working_queue.qsize()))
+                                                                                                 numpy.max(self.fps_statistics),
+                                                                                                 numpy.min(self.fps_statistics),
+                                                                                                 self.working_queue.qsize()))
             self.fps_statistics.clear()
         time.sleep(self.sleep_time)
 
@@ -124,6 +124,7 @@ class Foo:
 if __name__ == '__main__':
     threadList = ["Thread Capture", "Thread DNN", "Thread Vision"]
     workQueue = queue.Queue(10)
+    queue_lock = threading.Lock()
     threads = []
     threadID = 1
     is_get_from_queue = True
@@ -138,21 +139,20 @@ if __name__ == '__main__':
             # PUT IN QUEUE
             is_get_from_queue = False
             process_thread_sleep_sec = 1
-            thread = HDThread(logging, threadID, tName, workQueue, process_thread_sleep_sec, is_get_from_queue, foo,
-                              "capture_image",
-                              ['1', '2'])
+            thread = HDThread(logging, threadID, tName, workQueue, queue_lock, process_thread_sleep_sec, is_get_from_queue,
+                              foo, "capture_image", ['1', '2'])
         elif threadID == 2:
             # GET FROM QUEUE
             is_get_from_queue = True
             process_thread_sleep_sec = 10
-            thread = HDThread(logging, threadID, tName, workQueue, process_thread_sleep_sec, is_get_from_queue, foo,
-                              "do_dnn_detection", ['1', '2'])
+            thread = HDThread(logging, threadID, tName, workQueue, queue_lock, process_thread_sleep_sec, is_get_from_queue,
+                              foo, "do_dnn_detection", ['1', '2'])
         elif threadID == 3:
             # GET FROM QUEUE
             is_get_from_queue = True
             process_thread_sleep_sec = 5
-            thread = HDThread(logging, threadID, tName, workQueue, process_thread_sleep_sec, is_get_from_queue, foo,
-                              "do_vision_detection", ['1', '2'])
+            thread = HDThread(logging, threadID, tName, workQueue, queue_lock, process_thread_sleep_sec, is_get_from_queue,
+                              foo, "do_vision_detection", ['1', '2'])
         thread.start()
         threads.append(thread)
         threadID += 1

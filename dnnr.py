@@ -4,6 +4,7 @@ Created on Jun 8, 2018
 
 @author: uri
 '''
+import math
 import queue
 import threading
 
@@ -21,6 +22,7 @@ import serial
 import logging
 
 from hd_thread import HDThread
+from image_rotator import ImageRotator
 from obstruction_detector import ObstructionDetector
 
 HEIGHT_THR = 150
@@ -29,6 +31,10 @@ HEIGHT_THR = 150
 BAUD_RATE = 19200
 ROBOT_STOP_MESSAGE_HEX = "\xAA\x09\x1E\x15\x0F\xAA\x00\xFF\x61"
 ROBOT_STATUS_MESSAGE_HEX = "\xAA\x09\x1E\x16\x0F\xA7\x00\x04\x5E"
+
+FROM_CAMERA_TH_SLEEP_SEC = 0.12
+DNN_TH_SLEEP_SEC = 0.01
+VISION_TH_SLEEP_SEC = 0.12
 
 start_time = datetime.now()
 
@@ -44,6 +50,8 @@ class FindHuman:
         logging.info("loading model...")
         self.net = cv2.dnn.readNetFromCaffe('MobileNetSSD_deploy.prototxt.txt', 'MobileNetSSD_deploy.caffemodel')
 
+        self.rotate_counter = 0
+
         self.ser = serial.Serial(  # ttyUSB0 for USB port / ttyS0 for IO
             port='/dev/ttyS0',
             baudrate=BAUD_RATE,
@@ -53,33 +61,34 @@ class FindHuman:
             timeout=0.1
         )
 
-    def dnn(self, show, set_confidence, debug, image):
+    # Warning!! do not change order of 'image' argument - it must be last!
+    def dnn(self, show, set_confidence, debug, num_of_frames_to_rotate, image):
         logging.info("DNN - Start ")
         process_start = temp_time = datetime.now()
         (h, w) = image.shape[:2]
         blob = cv2.dnn.blobFromImage(cv2.resize(image, (300, 300)), 0.007843, (300, 300), 127.5)
         logging.debug("DNN - blobFromImage Resize. Duration= " + str(datetime.now() - temp_time))
 
-        # pass the blob through the network and obtain the detections and
-        # predictions
+        if self.rotate_counter >= num_of_frames_to_rotate:
+            logging.info("DNN - Rotating image by 90 deg...")
+            image_rotator = ImageRotator()
+            image_rotated = image_rotator.rotate_image(image, 90)
+            image = image_rotator.crop_around_center(image_rotated, *image_rotator.largest_rotated_rect(w, h, math.radians(90)))
+            self.rotate_counter = 0
+
+        # pass the blob through the network and obtain the detections and predictions
         logging.debug("DNN - Computing object detections...")
         temp_time = datetime.now()
         self.net.setInput(blob)
         detections = self.net.forward()
         logging.info("DNN - setInput() + forward(). Duration=" + str(datetime.now() - temp_time))
 
-        if show:
-            cv2.imshow('detect', image)
-
         # loop over the detections
         for i in np.arange(0, detections.shape[2]):
-            # extract the confidence (i.e., probability) associated with the
-            # prediction
-            # print '********** ' + str(file) + ' ************'
+            # extract the confidence (i.e., probability) associated with the prediction
             confidence = detections[0, 0, i, 2]
 
-            # filter out weak detections by ensuring the `confidence` is
-            # greater than the minimum confidence
+            # filter out weak detections by ensuring the `confidence` is greater than the minimum confidence
             if confidence > set_confidence:
                 # extract the index of the class label from the `detections`,
                 # then compute the (x, y)-coordinates of the bounding box for
@@ -97,9 +106,9 @@ class FindHuman:
                     # stop robot
                     # self.ser.write(ROBOT_STOP_MESSAGE_HEX_STR.decode("hex"))
                     # self.ser.write(ROBOT_STOP_MESSAGE_HEX)
-                    # time.sleep(0.1)
                     # if debug == True:
                     #     try:
+                    #         time.sleep(0.1)
                     #         ret_value = self.ser.readline()
                     #         # TODO - add ACK handling ?
                     #         logging.info("DNN - Received Ack Message from Robot: " + ret_value.encode("hex"))
@@ -110,20 +119,21 @@ class FindHuman:
                     # self.ser.write(ROBOT_STATUS_MESSAGE_HEX)
 
                 if show:
-                    show_start = datetime.now()
                     cv2.rectangle(image, (startX, startY), (endX, endY),
                                   self.COLORS[idx], 2)
                     y = startY - 15 if startY - 15 > 15 else startY + 15
                     cv2.putText(image, label, (startX, y), cv2.FONT_HERSHEY_SIMPLEX, 0.5, self.COLORS[idx], 2)
-                    k = cv2.waitKey(1)
-                    if k % 256 == 27:
-                        # ESC pressed
-                        logging.info("FromCamera - Escape hit, closing...")
-                        return
-                    logging.info("DNN - Show Window Duration= " + str(datetime.now() - show_start))
-                    logging.info("DNN - getWindowProperty={}".format(cv2.getWindowProperty('detect', 0) < 0))
+
+        if show:
+            cv2.imshow('detect', image)
+            k = cv2.waitKey(1)
+            if k % 256 == 27:
+                # ESC pressed
+                logging.info("FromCamera - Escape hit, closing...")
+                return
 
         logging.info("DNN - End. Duration=" + str(datetime.now() - process_start))
+        self.rotate_counter += 1
 
     def vision(self, obs_detector, img):
         gray_image = cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)
@@ -132,19 +142,12 @@ class FindHuman:
         if obstructed_tiles.__len__() != 0:
             logging.info("Vision - WARNING! Camera is being Obstructed by Tiles:{}.".format(obstructed_tiles))
 
-    def fromCamera(self, show, camera, rawCapture):
-        # while True:
+    def fromCamera(self, camera, rawCapture):
         temp_time = start_time = datetime.now()
         logging.info("FromCamera - Start.")
-
         camera.capture(rawCapture, format="bgr", use_video_port=True)
         logging.info("FromCamera - Capturing image. Duration= " + str(datetime.now() - temp_time))
         img = rawCapture.array
-
-        # img = self.Process(img, True, confidence, debug)
-
-        # temp_time = datetime.now()
-        # logging.info("Obstruction Detection Duration= {}".format(str(datetime.now() - temp_time)))
 
         temp_time = datetime.now()
         rawCapture.truncate(0)
@@ -152,7 +155,6 @@ class FindHuman:
 
         logging.info("FromCamera - End. Total Duration=" + str(datetime.now() - start_time))
         return img
-    # cam.release()
 
 
 def is_point_in_polygon(point, polygon):
@@ -180,6 +182,7 @@ def start_threads(fu, show, debug):
     thread_names = ["Thread_FromCamera", "Thread_DNN", "Thread_Vision"]
     # max size = 2 - we don't want old images!
     img_queue = queue.Queue(2)
+    queue_lock = threading.Lock()
     threads = []
     thread_id = 1
     confidence = 0.2
@@ -187,30 +190,32 @@ def start_threads(fu, show, debug):
         if thread_id == 1:
             # "Thread Capture" - PUT IN QUEUE
             is_get_from_queue = False
-            # best optimization - thread_sleep_sec = 0.2
-            thread_sleep_sec = 0.1
             camera = PiCamera()
             # camera.resolution = (300, 300)
             rawCapture = PiRGBArray(camera)
-            args = [show, camera, rawCapture]
-            thread = HDThread(logging, thread_id, tName, img_queue, thread_sleep_sec, is_get_from_queue, fu, "fromCamera", args)
+            # set fromCamera args
+            args = [camera, rawCapture]
+            thread = HDThread(logging, thread_id, tName, img_queue, queue_lock, FROM_CAMERA_TH_SLEEP_SEC, is_get_from_queue, fu,
+                              "fromCamera", args)
 
         elif thread_id == 2:
             # "Thread DNN" - GET FROM QUEUE
             is_get_from_queue = True
-            thread_sleep_sec = 0.01
-            args = [show, confidence, debug]
-            thread = HDThread(logging, thread_id, tName, img_queue, thread_sleep_sec, is_get_from_queue, fu, "dnn", args)
+            num_of_frames_to_rotate = 9
+            # set dnn args
+            args = [show, confidence, debug, num_of_frames_to_rotate]
+            thread = HDThread(logging, thread_id, tName, img_queue, queue_lock, DNN_TH_SLEEP_SEC, is_get_from_queue, fu,
+                              "dnn", args)
 
         elif thread_id == 3:
             # "Thread Vision" - GET FROM QUEUE
             is_get_from_queue = True
-            # best optimization - thread_sleep_sec = 0.3
-            thread_sleep_sec = 0.1
             obs_detector = ObstructionDetector(logging)
             logging.info("Starting Obstruction Detector . Variance Threshold={}.".format(obs_detector.variance))
+            # set vision args
             args = [obs_detector]
-            thread = HDThread(logging, thread_id, tName, img_queue, thread_sleep_sec, is_get_from_queue, fu, "vision", args)
+            thread = HDThread(logging, thread_id, tName, img_queue, queue_lock, VISION_TH_SLEEP_SEC, is_get_from_queue, fu,
+                              "vision", args)
 
         thread.start()
         threads.append(thread)
@@ -261,6 +266,7 @@ def main():
     logging.info("******  STARTED Human Detection  ***************")
     logging.info("************************************************")
     logging.info("Application Arguments: {}".format(args))
+    logging.info("Threads sleep [sec]: FromCamera={}, DNN={}, VISION={}".format(FROM_CAMERA_TH_SLEEP_SEC, DNN_TH_SLEEP_SEC, VISION_TH_SLEEP_SEC))
 
     if args_show:
         cv2.namedWindow("detect")

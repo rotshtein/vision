@@ -4,6 +4,8 @@ Created on Jun 8, 2018
 
 @author: uri
 '''
+import math
+
 import numpy as np
 import cv2
 import argparse
@@ -12,6 +14,7 @@ from datetime import datetime
 #from matplotlib import pyplot as plt
 
 #from obstruction_detector import ObstructionDetector
+from image_rotator import ImageRotator
 
 
 class FindHuman:
@@ -110,12 +113,24 @@ class FindHuman:
 
         while True:
             ret, img = cam.read()
-            img = self.Process(img, True, confidence)
             '''
             if obs_detector.is_last_frames_obstructed(img):
                 print("WARNING! Camera is being Obstructed")
             '''
+            if False:
+                (height, width) = img.shape[:2]
+                image_rotator = ImageRotator()
+                image_rotated = image_rotator.rotate_image(img, 90)
+                image_rotated_cropped = image_rotator.crop_around_center(
+                    image_rotated,
+                    *image_rotator.largest_rotated_rect(width, height, math.radians(90))
+                )
+                image_rotated_cropped = self.Process(image_rotated_cropped, True, confidence)
+                cv2.imshow('detect2',image_rotated_cropped)
+
+            img = self.Process(img, True, confidence)
             cv2.imshow('detect',img)
+
             if not ret:
                 break
             k = cv2.waitKey(1)
