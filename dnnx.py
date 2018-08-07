@@ -14,7 +14,7 @@ from datetime import datetime
 #from matplotlib import pyplot as plt
 
 #from obstruction_detector import ObstructionDetector
-from image_rotator import ImageRotator
+from utils.image_rotator import ImageRotator
 
 
 class FindHuman:
@@ -24,12 +24,10 @@ class FindHuman:
 	        "dog", "horse", "motorbike", "person", "pottedplant", "sheep",
 	       "sofa", "train", "tvmonitor"]
         self.COLORS = np.random.uniform(0, 255, size=(len(self.CLASSES), 3))
-        # load our serialized model from disk
-        print("[INFO] loading model...")
-        self.net = cv2.dnn.readNetFromCaffe('MobileNetSSD_deploy.prototxt.txt', 'MobileNetSSD_deploy.caffemodel')
-    
-    
-    
+        # load our serialized protocol from disk
+        print("[INFO] loading protocol...")
+        self.net = cv2.dnn.readNetFromCaffe('data/caffemodels/MobileNetSSD_deploy.prototxt.txt', 'data/caffemodels/MobileNetSSD_deploy.caffemodel')
+
     def Process(self, image, show, set_confidence):
         (h, w) = image.shape[:2]
         gray_image = cv2.cvtColor(image, cv2.COLOR_RGB2GRAY)
@@ -74,8 +72,10 @@ class FindHuman:
         # predictions
         if (not show):
             print("[INFO] computing object detections...")
+        start = datetime.now()
         self.net.setInput(blob)
         detections = self.net.forward()
+        print("[INFO] classification took {} seconds".format(datetime.now() - start))
 
         # loop over the detections
         for i in np.arange(0, detections.shape[2]):

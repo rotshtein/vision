@@ -12,31 +12,81 @@ import numpy as np
 from picamera.array import PiRGBArray
 from picamera import PiCamera
 import cv2
-import sys
-import os
 import argparse
 import glob
 from datetime import datetime
-import time
 import serial
 import logging
 
-from hd_thread import HDThread
-from image_rotator import ImageRotator
-from obstruction_detector import ObstructionDetector
-
-HEIGHT_THR = 150
+from protocol.bytes_converter import calc_checksum
+from utils.hd_thread import HDThread
+from utils.image_rotator import ImageRotator
+from utils.obstruction_detector import ObstructionDetector
 
 # SERIAL CONSTANTS
+PREAMBLE_PREFIX = b'xAA'
+
+OPCODE_SETUP_MSG = b'xB1'
+OPCODE_SET_WARNING_MSG = b'0xB2'
+OPCODE_CLEAR_ALL_WARNINGS_MSG = b'xB3'
+OPCODE_SET_POWER_MSG = b'xB4'
+OPCODE_GET_WARNING_MSG = b'xB5'
+
+OPCODE_GET_WARNING_RESPONSE = b'xC1'
+OPCODE_ACK_RESPONSE = b'xD1'
+OPCODE_NACK_RESPONSE = b'xD2'
+
 BAUD_RATE = 19200
-ROBOT_STOP_MESSAGE_HEX = "\xAA\x09\x1E\x15\x0F\xAA\x00\xFF\x61"
-ROBOT_STATUS_MESSAGE_HEX = "\xAA\x09\x1E\x16\x0F\xA7\x00\x04\x5E"
+# ROBOT_STOP_MESSAGE_HEX = "\xAA\x09\x1E\x15\x0F\xAA\x00\xFF\x61"
+# ROBOT_STATUS_MESSAGE_HEX = "\xAA\x09\x1E\x16\x0F\xA7\x00\x04\x5E"
 
 FROM_CAMERA_TH_SLEEP_SEC = 0.12
 DNN_TH_SLEEP_SEC = 0.01
 VISION_TH_SLEEP_SEC = 0.12
+COMM_TH_SLEEP_SEC = 0.12
 
 start_time = datetime.now()
+
+
+def handle_setup_msg(message):
+    pass
+
+
+def handle_set_power_msg(message):
+    pass
+
+
+def handle_set_warning_msg(message):
+    pass
+
+
+def handle_set_warning_msg(message):
+    pass
+
+
+def handle_get_warning_msg():
+    pass
+
+
+def handle_clear_all_warning_msg(msg):
+    pass
+
+
+def convert_data_to_bytes(data):
+    pass
+
+
+def build_response_message(opcode, data=None):
+    data_bytes = bytearray([0])
+    if data is not None:
+        # convert data to bytes
+        convert_data_to_bytes(data)
+
+    msg_length = bytes(data_bytes.__len__() + 4)
+    res_message_bytes_array = bytearray([PREAMBLE_PREFIX, msg_length, opcode]) + data_bytes
+    checksum = calc_checksum(res_message_bytes_array)
+    res_message_bytes_array = res_message_bytes_array + bytearray([checksum])
+    return res_message
 
 
 class FindHuman:
@@ -46,9 +96,9 @@ class FindHuman:
                         "dog", "horse", "motorbike", "person", "pottedplant", "sheep",
                         "sofa", "train", "tvmonitor"]
         self.COLORS = np.random.uniform(0, 255, size=(len(self.CLASSES), 3))
-        # load our serialized model from disk
-        logging.info("loading model...")
-        self.net = cv2.dnn.readNetFromCaffe('MobileNetSSD_deploy.prototxt.txt', 'MobileNetSSD_deploy.caffemodel')
+        # load our serialized protocol from disk
+        logging.info("loading protocol...")
+        self.net = cv2.dnn.readNetFromCaffe('data/caffemodels/MobileNetSSD_deploy.prototxt.txt', 'data/caffemodels/MobileNetSSD_deploy.caffemodel')
 
         self.rotate_counter = 0
 
@@ -58,8 +108,61 @@ class FindHuman:
             parity=serial.PARITY_NONE,
             stopbits=serial.STOPBITS_ONE,
             bytesize=serial.EIGHTBITS,
-            timeout=0.1
         )
+
+    def communication(self):
+        logging.info("Communication - Start ")
+        process_start = temp_time = datetime.now()
+        # read from socket
+        # read first 3 bytes - msg[0]=preamble; msg[1]=length; msg[2]=opcode
+        while True:
+            logging.info("Communication - read(3) ")
+            msg = self.ser.read(3)
+            msg_in_hex = hex(int.from_bytes(msg, byteorder='little'))
+
+            # TODO - handle set messages
+            logging.info("Communication - handling 3 bytes: {}".format(msg_in_hex))
+
+            # read preamble
+            if msg_in_hex[0] != PREAMBLE_PREFIX:
+                logging.error("Communication error reading Preamble. Expected=0xAA. Received={}".format(msg[0]))
+                return
+
+            # read length
+            length = int.from_bytes(msg[1], byteorder='little')
+
+            # read opcode
+            opcode = msg_in_hex[2]
+
+            # continue reading message - minus 3 preamble + length + opcode
+            msg = self.ser.read(length-3)
+            # handle message
+            try:
+                if opcode == OPCODE_SETUP_MSG:
+                    handle_setup_msg(msg)
+                    response = build_response_message(OPCODE_ACK_RESPONSE)
+                elif opcode == OPCODE_SET_WARNING_MSG:
+                    handle_set_warning_msg(msg)
+                    response = build_response_message(OPCODE_ACK_RESPONSE)
+                elif opcode == OPCODE_CLEAR_ALL_WARNINGS_MSG:
+                    handle_clear_all_warning_msg(msg)
+                    response = build_response_message(OPCODE_ACK_RESPONSE)
+                elif opcode == OPCODE_SET_POWER_MSG:
+                    handle_set_power_msg(msg)
+                    response = build_response_message(OPCODE_ACK_RESPONSE)
+                elif opcode == OPCODE_GET_WARNING_MSG:
+                    get_warning_data = handle_get_warning_msg()
+                    response = build_response_message(OPCODE_GET_WARNING_RESPONSE, get_warning_data)
+            except:
+                response = build_response_message(OPCODE_NACK_RESPONSE)
+
+            # todo - send message
+            msg = self.ser.write(response)
+
+            msg_encoded = msg.encode("hex")
+            logging.info("DNN - Received Ack Message from Robot: " + msg_encoded)
+            logging.info("Communication - End. Duration=" + str(datetime.now() - process_start))
+
 
     # Warning!! do not change order of 'image' argument - it must be last!
     def dnn(self, show, set_confidence, debug, num_of_frames_to_rotate, image):
@@ -74,7 +177,8 @@ class FindHuman:
             temp_time = datetime.now()
             image_rotator = ImageRotator()
             image_rotated = image_rotator.rotate_image(image, 90)
-            image = image_rotator.crop_around_center(image_rotated, *image_rotator.largest_rotated_rect(w, h, math.radians(90)))
+            image = image_rotator.crop_around_center(image_rotated,
+                                                     *image_rotator.largest_rotated_rect(w, h, math.radians(90)))
             self.rotate_counter = 0
             logging.info("DNN - Rotating image Duration=" + str(datetime.now() - temp_time))
 
@@ -159,35 +263,16 @@ class FindHuman:
         return img
 
 
-def is_point_in_polygon(point, polygon):
-    polygonLength = polygon.size, i = 0
-    inside = False
-    pointX = point.X, pointY = point.Y
-    endPoint = polygon[polygonLength - 1]
-    endX = endPoint.X
-    endY = endPoint.Y
-    while i < polygonLength:
-        startX = endX
-        startY = endY
-        endPoint = polygon[i]
-        i += 1
-        endX = endPoint.X
-        endY = endPoint.Y
-        pointY_inside_segment = (endY > pointY ^ startY > pointY)  # ? pointY inside[startY; endY] segment ?
-        under_segment = ((pointX - endX) < (pointY - endY) * (startX - endX) / (startY - endY))  # is under the segment?
-        _inside = pointY_inside_segment and under_segment
-        inside ^= _inside
-    return inside
-
-
 def start_threads(fu, show, debug):
     thread_names = ["Thread_FromCamera", "Thread_DNN", "Thread_Vision"]
+                    # , "Thread_Comm"]
     # max size = 2 - we don't want old images!
     img_queue = queue.Queue(2)
     queue_lock = threading.Lock()
     threads = []
     thread_id = 1
     confidence = 0.2
+    thread = None
     for tName in thread_names:
         if thread_id == 1:
             # "Thread Capture" - PUT IN QUEUE
@@ -197,7 +282,8 @@ def start_threads(fu, show, debug):
             rawCapture = PiRGBArray(camera)
             # set fromCamera args
             args = [camera, rawCapture]
-            thread = HDThread(logging, thread_id, tName, img_queue, queue_lock, FROM_CAMERA_TH_SLEEP_SEC, is_get_from_queue, fu,
+            thread = HDThread(logging, thread_id, tName, img_queue, queue_lock, FROM_CAMERA_TH_SLEEP_SEC,
+                              is_get_from_queue, fu,
                               "fromCamera", args)
 
         elif thread_id == 2:
@@ -216,9 +302,15 @@ def start_threads(fu, show, debug):
             logging.info("Starting Obstruction Detector . Variance Threshold={}.".format(obs_detector.variance))
             # set vision args
             args = [obs_detector]
-            thread = HDThread(logging, thread_id, tName, img_queue, queue_lock, VISION_TH_SLEEP_SEC, is_get_from_queue, fu,
+            thread = HDThread(logging, thread_id, tName, img_queue, queue_lock, VISION_TH_SLEEP_SEC, is_get_from_queue,
+                              fu,
                               "vision", args)
 
+        elif thread_id == 4:
+            args = []
+            thread = HDThread(logging, thread_id, tName, img_queue, queue_lock, COMM_TH_SLEEP_SEC, is_get_from_queue,
+                              fu,
+                              "communication", args)
         thread.start()
         threads.append(thread)
         thread_id += 1
@@ -268,7 +360,9 @@ def main():
     logging.info("******  STARTED Human Detection  ***************")
     logging.info("************************************************")
     logging.info("Application Arguments: {}".format(args))
-    logging.info("Threads sleep [sec]: FromCamera={}, DNN={}, VISION={}".format(FROM_CAMERA_TH_SLEEP_SEC, DNN_TH_SLEEP_SEC, VISION_TH_SLEEP_SEC))
+    logging.info(
+        "Threads sleep [sec]: FromCamera={}, DNN={}, VISION={}".format(FROM_CAMERA_TH_SLEEP_SEC, DNN_TH_SLEEP_SEC,
+                                                                       VISION_TH_SLEEP_SEC))
 
     if args_show:
         cv2.namedWindow("detect")
