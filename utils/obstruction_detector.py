@@ -12,7 +12,7 @@ import glob
 
 import numpy as np
 
-INTENSITY_VARIANCE_THRESHOLD = 1000
+DEFAULT_INTENSITY_VARIANCE_THRESHOLD = 1000
 
 
 class ObstructionDetector(object):
@@ -24,17 +24,38 @@ class ObstructionDetector(object):
     It keeps the result of the last frames - the number of frames is defined by the user in the constructor
     """
 
-    def __init__(self, logging, rows=3, columns=3, num_of_frames_to_validate=5):
+    def __init__(self, logging, rows=3, columns=3, max_hits=5):
         self.logging = logging
         self.rows = rows
         self.columns = columns
-        self.num_of_frames_to_validate = num_of_frames_to_validate
 
         # [Tile1[False, False, False, False, False], Tile2[False...], ...]
-        self.last_tiles_obstructed_matrix = [[False for i in range(num_of_frames_to_validate)] for j in
-                                             range(rows * columns)]
+        self.init_last_tiles_matrix(max_hits, rows, columns)
         self.index = 0
-        self.variance = INTENSITY_VARIANCE_THRESHOLD
+        self.variance_threshold = DEFAULT_INTENSITY_VARIANCE_THRESHOLD
+        self.min_obstruction_hits = 5
+        self.max_obstruction_hits = max_hits
+        self.no_visibility_threshold = 1000
+        self.medium_visibility_threshold = 2500
+        self.full_visibility_threshold = 4000
+
+    def init_last_tiles_matrix(self, max_hits, rows=3, columns=3):
+        self.last_tiles_obstructed_matrix = [[False for i in range(max_hits)] for j in
+                                             range(rows * columns)]
+
+    def set_visibility_thresholds(self, no_visibility_threshold, medium_visibility_threshold,
+                                  full_visibility_threshold):
+        self.no_visibility_threshold = no_visibility_threshold
+        self.medium_visibility_threshold = medium_visibility_threshold
+        self.full_visibility_threshold = full_visibility_threshold
+
+    def set_obstruction_threshold(self, variance_threshold):
+        self.variance_threshold = variance_threshold
+
+    def set_obstruction_min_max_hits(self, min_hits, max_hits):
+        self.min_obstruction_hits = min_hits
+        self.max_obstruction_hits = max_hits
+        self.init_last_tiles_matrix(max_hits)
 
     def is_last_frames_obstructed(self, image, tiles_to_ignore):
         """
@@ -61,14 +82,16 @@ class ObstructionDetector(object):
         _tile_index = 0
         # tile holds the last n results
         for tile in self.last_tiles_obstructed_matrix:
-            if tile.count(True) == self.num_of_frames_to_validate:
+            if tile.count(True) >= self.min_obstruction_hits:
                 debug_all_obstructed_result.append(_tile_index)
                 if _tile_index not in self.tiles_to_ignore:
                     obstructed_tiles_not_ignored.append(_tile_index)
             _tile_index += 1
 
-        self.index = (self.index + 1) % self.num_of_frames_to_validate
-        self.logging.info("Vision - Result: Obstructed Tiles Not to ignore:{}. All Obstructed Tiles including ignored:{}.".format(obstructed_tiles_not_ignored, debug_all_obstructed_result))
+        self.index = (self.index + 1) % self.max_obstruction_hits
+        self.logging.info(
+            "Obstruction - Result: Obstructed Tiles Not to ignore:{}. All Obstructed Tiles including ignored:{}.".format(
+                obstructed_tiles_not_ignored, debug_all_obstructed_result))
         return obstructed_tiles_not_ignored
 
     def __validate_frame_and_add_result_to_list(self, image):
@@ -115,7 +138,7 @@ class ObstructionDetector(object):
         # var = np.var(variance_temp_list, axis=0)  # axis=0 for calculating the arrays vertically [r, g, b]
         var = np.var(variance_temp_list)
         self.logging.debug("variance=" + str(var))
-        return var < INTENSITY_VARIANCE_THRESHOLD
+        return var < self.variance_threshold
 
     def __is_all_points_intensity_below_threshold(self, intensity_below_threshold_temp_list):
         return intensity_below_threshold_temp_list.count(False) == 0
@@ -138,19 +161,22 @@ if __name__ == '__main__':
     logging.basicConfig(level=debug_level, format='%(asctime)s: %(message)s')
 
     filelist = glob.glob(args["image"])
-    obstruction_detector = ObstructionDetector()
+    obstruction_detector = ObstructionDetector(logging)
 
     # Testing for image C:\Projects\vision\data\matrix_0_5.png ==> All Tiles except 0 and 5 are obstructed
     for img_file in filelist:
         logging.info('********** ' + str(img_file) + ' ************')
         img = cv2.imread(img_file)
         res = []
+        obstruction_detector.set_obstruction_min_max_hits(3, 7)
         # Test 1 - do not ignore cells
         for i in range(5):
             res = obstruction_detector.is_last_frames_obstructed(img, None)
+        # expected result --> all except tiles 0 and 7
         assert (res == [1, 2, 3, 4, 5, 6, 8])
 
         # Test 2 - ignore cells 0-5
         for i in range(5):
-            res = obstruction_detector.is_last_frames_obstructed(img, [0,1,2,3,4,5])
+            res = obstruction_detector.is_last_frames_obstructed(img, [0, 1, 2, 3, 4, 5])
+        # expected result --> all except tiles 0 and 7.
         assert (res == [6, 8])

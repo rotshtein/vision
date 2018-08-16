@@ -1,12 +1,13 @@
 from protocol.bytes_converter import IBytesConverter
 from utils.point_in_polygon import Point
-from warning import ObjectClassConverter, ObjectClassHolder
+from warning import ObjectClass, ObjectClassHolder, ObjectClassConverter
 
 
-class HDSetWarningMessage(IBytesConverter):
-    def __init__(self, warning_id, polygon, object_class_holder, object_min_w_h,
-                 object_max_w_h, minimum_confidence, minimum_detection_hits, maximum_detection_hits,
-                 is_default) -> None:
+class HDGetWarningConfigResponse(IBytesConverter):
+
+    def __init__(self, warning_id=None, polygon=None, object_class_holder=None, object_min_w_h=None,
+                 object_max_w_h=None, minimum_confidence=None, minimum_detection_hits=None, maximum_detection_hits=None,
+                 is_default=None) -> None:
         super().__init__()
         self.warning_id = warning_id
         self.polygon = polygon  # type: [Point]
@@ -17,7 +18,7 @@ class HDSetWarningMessage(IBytesConverter):
         self.minimum_detection_hits = minimum_detection_hits
         self.maximum_detection_hits = maximum_detection_hits
         self.is_default = is_default
-        self.opcode = b'xB2'
+        self.opcode = b'xC2'
 
     def to_bytes(self):
         # full_visibility_threshold = bytearray(struct.pack("{}f".format(IBytesConverter.LITTLE_ENDIAN_SIGN), self.full_visibility_threshold))
@@ -113,3 +114,20 @@ class HDSetWarningMessage(IBytesConverter):
         return cls(warning_id, polygon, object_class_holder, object_min_w_h, object_max_w_h, minimum_confidence,
                    minimum_detection_hits, maximum_detection_hits, is_default)
 
+
+if __name__ == '__main__':
+    # object_class = person + furniture
+    objects_holder = ObjectClassHolder()
+    objects_holder.add_objects([ObjectClass.PERSON, ObjectClass.FURNITURE])
+    # object_class_list = [True, False, True, False, False, None, None, None]
+    object_class_list = objects_holder.convert_to_bool_array()
+    object_class_holder_ = ObjectClassHolder(object_class_list)
+
+    polygon_arr = [Point(0, 0), Point(0, 270), Point(270, 270), Point(270, 0)]
+    polygon_bytearray = bytearray()
+    # (warning_id, polygon, object_class, object_min_w_h, object_max_w_h, minimum_confidence, minimum_detection_hits, maximum_detection_hits,is_default)
+    msg = HDGetWarningConfigResponse(5, polygon_arr, object_class_holder_, 20, 300, 20, 5, 10, True)
+    to_bytes = msg.to_bytes()
+    from_bytes = HDGetWarningConfigResponse.from_bytes(to_bytes, to_bytes.__len__())
+    print(from_bytes.polygon)
+    print(from_bytes.object_class_holder)

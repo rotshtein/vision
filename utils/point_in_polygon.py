@@ -4,6 +4,7 @@ def is_object_in_polygon(points, polygon):
             return True
     return False
 
+
 def is_point_in_polygon(point, polygon):
     polygon_length = len(polygon)
     i = 0
@@ -23,7 +24,8 @@ def is_point_in_polygon(point, polygon):
         point_y_inside_segment = ((end_y > point_y) ^ (start_y > point_y))  # ? point_y inside[start_y; end_y] segment ?
         denominator = (start_y - end_y)
         if denominator != 0:
-            under_segment = ((point_x - end_x) < (point_y - end_y) * (start_x - end_x) / denominator)  # is under the segment?
+            under_segment = ((point_x - end_x) < (point_y - end_y) * (
+                        start_x - end_x) / denominator)  # is under the segment?
         else:
             under_segment = False
         _inside = point_y_inside_segment and under_segment
