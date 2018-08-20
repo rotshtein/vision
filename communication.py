@@ -11,6 +11,7 @@ from protocol.bytes_converter import IBytesConverter
 from protocol.responses.hd_get_warning_response import HDGetWarningResponse
 from utils.hd_threading import HDThread
 
+
 PREAMBLE_PREFIX = 0xAA
 OPCODE_SETUP_MSG = 0xB1
 OPCODE_SET_WARNING_MSG = 0xB2
@@ -34,6 +35,7 @@ OPCODE_ACK_RESPONSE = 0xD1
 OPCODE_NACK_RESPONSE = 0xD2
 
 BAUD_RATE = 19200
+PORT = 'COM1'
 
 
 # ROBOT_STOP_MESSAGE_HEX = "\xAA\x09\x1E\x15\x0F\xAA\x00\xFF\x61"
@@ -47,7 +49,7 @@ class Communication(HDThread):
         self.ser = None
         try:
             self.ser = serial.Serial(  # ttyUSB0 for USB port / ttyS0 for IO
-                port='COM1',
+                port=PORT,
                 baudrate=BAUD_RATE,
                 parity=serial.PARITY_NONE,
                 stopbits=serial.STOPBITS_ONE,

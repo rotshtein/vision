@@ -74,7 +74,8 @@ class HumanDetection(HDThread):
         self.logging.debug("{} - Start.".format(self.thread_name))
         process_start = temp_time = datetime.now()
         (h, w) = image.shape[:2]
-        blob = cv2.dnn.blobFromImage(cv2.resize(image, (300, 300)), 0.007843, (300, 300), 127.5)
+        resized_image = cv2.resize(image, (300, 300))
+        blob = cv2.dnn.blobFromImage(resized_image, 0.007843, (300, 300), 127.5)
         self.logging.debug(
             "{} - blobFromImage Resize. Duration={}".format(self.thread_name, datetime.now() - temp_time))
 
@@ -82,8 +83,8 @@ class HumanDetection(HDThread):
             self.logging.debug("{} - Rotating image by 90 deg...".format(self.thread_name))
             temp_time = datetime.now()
             image_rotator = ImageRotator()
-            image_rotated = image_rotator.rotate_image(image, 90)
-            image = image_rotator.crop_around_center(image_rotated,
+            image_rotated = image_rotator.rotate_image(resized_image, 90)
+            resized_image = image_rotator.crop_around_center(image_rotated,
                                                      *image_rotator.largest_rotated_rect(w, h, math.radians(90)))
             self.rotate_counter = 0
             self.logging.debug("{} - Rotating image Duration={}".format(self.thread_name, datetime.now() - temp_time))
@@ -97,7 +98,10 @@ class HumanDetection(HDThread):
             "{} - setInput() + forward(). Duration={}".format(self.thread_name, datetime.now() - temp_time))
 
         for warning in self.warnings.values():  # type: HDWarning
+            result_is_hit = False
             for i in np.arange(0, detections.shape[2]):
+                if result_is_hit:
+                    break
                 # extract the confidence (i.e., probability) associated with the prediction
                 confidence = 100*detections[0, 0, i, 2]
                 # extract the index of the class label from the `detections`,
@@ -116,7 +120,7 @@ class HumanDetection(HDThread):
                 center = Point(startX + object_w/2, startY + object_h/2)
 
                 if self.show:
-                    self.draw_warning_polygon(warning, image)
+                    self.draw_warning_polygon(warning, resized_image)
                 # if and polygon inside
                 minimum_confidence = warning.minimum_confidence
                 if confidence > minimum_confidence and \
@@ -126,23 +130,22 @@ class HumanDetection(HDThread):
                         is_point_in_polygon(center, warning.polygon):
                     # set result counter up
                     if self.show:
-                        self.draw_detection(image, startX, startY, endX, endY, idx, label)
+                        self.draw_detection(resized_image, startX, startY, endX, endY, idx, label)
                     self.set_result_counter(warning.warning_id, True)
                     self.logging.debug("{} - Detection in warning {}".format(self.thread_name, warning.warning_id))
-                    break
-                else:
-                    self.set_result_counter(warning.warning_id, False)
+                    result_is_hit = True
+            if not result_is_hit:
+                self.set_result_counter(warning.warning_id, False)
 
 
         iteration_time = datetime.now() - process_start
         self.iteration_time_sec = iteration_time.microseconds * 1000000
         self.logging.debug("{} - End. Duration={}. ".format(self.thread_name, datetime.now() - process_start))
         self.rotate_counter += 1
-        self.debug_img_queue.put(image)
+        self.debug_img_queue.put(resized_image)
 
     def draw_detection(self, image, startX, startY, endX, endY, idx, label):
-        cv2.rectangle(image, (startX, startY), (endX, endY),
-                      self.COLORS[idx], 2)
+        cv2.rectangle(image, (startX, startY), (endX, endY), self.COLORS[idx], 2)
         y = startY - 15 if startY - 15 > 15 else startY + 15
         cv2.putText(image, label, (startX, y), cv2.FONT_HERSHEY_SIMPLEX, 0.5, self.COLORS[idx], 2)
 
@@ -153,7 +156,8 @@ class HumanDetection(HDThread):
         pts = pts.reshape((-1, 1, 2))
         cv2.polylines(image, [pts], True,  self.COLORS[warning.warning_id])
         font = cv2.FONT_HERSHEY_SIMPLEX
-        cv2.putText(image, "warning {}".format(warning.warning_id), (polygon[1].x, polygon[1].y), font, 0.5, self.COLORS[warning.warning_id], 2)
+        y = polygon[1].y - 15 if polygon[1].y - 15 > 15 else polygon[1].y + 15
+        cv2.putText(image, "warning {}".format(warning.warning_id), (polygon[1].x, y), font, 0.5, self.COLORS[warning.warning_id], 2)
                     # 2, cv2.LINE_AA)
 
     def on_setup_message(self, message: HDSetupMessage):
@@ -202,8 +206,9 @@ class HumanDetection(HDThread):
 
     def on_get_warning_msg(self):
         warning_res = [False]*16
-        for res in self.warnings_results.values():  # type: HDWarningResult
-            warning_res.append(res.result)
+        for warning_id, res in self.warnings_results.items():  # type: HDWarningResult
+            warning_res.insert(warning_id, res.result)
+        warning_res = warning_res[::-1]
         return HDGetWarningResponse(warning_res, None, None)
 
     def on_get_warning_config_msg(self, message: HDGetWarningConfigMessage):
@@ -225,7 +230,7 @@ class HumanDetection(HDThread):
         warning = self.warnings[warning_id]  # type: HDWarning
         warning_result = self.warnings_results[warning_id]  # type: HDWarningResult
         if is_hit:
-            if warning_result.counter <= warning.maximum_detection_hits:
+            if warning_result.counter < warning.maximum_detection_hits:
                 warning_result.counter += 1
         else:  # decrease
             if warning_result.counter > 0:
