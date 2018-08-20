@@ -38,6 +38,9 @@ class IRXMessage(object):
     def on_get_warning_msg(self):
         pass
 
+    def on_get_is_system_status_ok(self):
+        pass
+
     def on_get_warning_config_msg(self, message: HDGetWarningConfigMessage) -> HDGetWarningConfigResponse:
         pass
 

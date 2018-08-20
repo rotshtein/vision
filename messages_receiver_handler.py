@@ -25,7 +25,7 @@ class MessagesReceiverHandler(object):
 
     def __init__(self) -> None:
         super().__init__()
-        self.rx_listeners: [IRXMessage] = []
+        self.rx_listeners = []
 
     def add_rx_listeners(self, rx_listener: IRXMessage):
         self.rx_listeners.append(rx_listener)

@@ -26,7 +26,7 @@ class ObstructionDetector(object):
     It keeps the result of the last frames - the number of frames is defined by the user in the constructor
     """
 
-    def __init__(self, logging, rows=3, columns=3, max_hits=5):
+    def __init__(self, logging, rows=3, columns=3, max_hits=10):
         self.logging = logging
         self.rows = rows
         self.columns = columns

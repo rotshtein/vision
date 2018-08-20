@@ -85,9 +85,11 @@ class HumanDetection(HDThread):
             image_rotator = ImageRotator()
             image_rotated = image_rotator.rotate_image(resized_image, 90)
             resized_image = image_rotator.crop_around_center(image_rotated,
-                                                     *image_rotator.largest_rotated_rect(w, h, math.radians(90)))
+                                                             *image_rotator.largest_rotated_rect(w, h,
+                                                                                                 math.radians(90)))
             self.rotate_counter = 0
             self.logging.debug("{} - Rotating image Duration={}".format(self.thread_name, datetime.now() - temp_time))
+            # todo - rotate polygons
 
         # pass the blob through the network and obtain the detections and predictions
         self.logging.debug("{} - Computing object detections...".format(self.thread_name))
@@ -103,11 +105,11 @@ class HumanDetection(HDThread):
                 if result_is_hit:
                     break
                 # extract the confidence (i.e., probability) associated with the prediction
-                confidence = 100*detections[0, 0, i, 2]
+                confidence = 100 * detections[0, 0, i, 2]
                 # extract the index of the class label from the `detections`,
                 # then compute the (x, y)-coordinates of the bounding box for the object
                 idx = int(detections[0, 0, i, 1])
-                box = detections[0, 0, i, 3:7] * np.array([w, h, w, h])
+                box = detections[0, 0, i, 3:7] * np.array([300, 300, 300, 300])
                 (startX, startY, endX, endY) = box.astype("int")
                 # display the prediction
                 classes_idx_ = self.CLASSES[idx]
@@ -117,8 +119,6 @@ class HumanDetection(HDThread):
                 object_w = abs(startX - endX)
                 object_h = abs(startY - endY)
 
-                center = Point(startX + object_w/2, startY + object_h/2)
-
                 if self.show:
                     self.draw_warning_polygon(warning, resized_image)
                 # if and polygon inside
@@ -127,7 +127,7 @@ class HumanDetection(HDThread):
                         classes_idx_ in warning.object_class_holder.obj_names and \
                         warning.object_min_w_h < object_w and warning.object_min_w_h < object_h and \
                         warning.object_max_w_h > object_w and warning.object_max_w_h > object_h and \
-                        is_point_in_polygon(center, warning.polygon):
+                        (self.is_warning_polygon_in_detection_box(startX, startY, endX, endY, warning.polygon) or self.is_points_in_polygon(startX, startY, endX, endY, warning.polygon)):
                     # set result counter up
                     if self.show:
                         self.draw_detection(resized_image, startX, startY, endX, endY, idx, label)
@@ -137,12 +137,34 @@ class HumanDetection(HDThread):
             if not result_is_hit:
                 self.set_result_counter(warning.warning_id, False)
 
-
         iteration_time = datetime.now() - process_start
         self.iteration_time_sec = iteration_time.microseconds * 1000000
         self.logging.debug("{} - End. Duration={}. ".format(self.thread_name, datetime.now() - process_start))
         self.rotate_counter += 1
         self.debug_img_queue.put(resized_image)
+
+    def is_warning_polygon_in_detection_box(self, startX, startY, endX, endY, polygon):
+        detected_box = [Point(startX, startY), Point(startX, endY), Point(endX, endY), Point(endX, startY)]
+        if is_point_in_polygon(polygon[0], detected_box):
+            return True
+        if is_point_in_polygon(polygon[1], detected_box):
+            return True
+        if is_point_in_polygon(polygon[2], detected_box):
+            return True
+        if is_point_in_polygon(polygon[3], detected_box):
+            return True
+        return False
+
+    def is_points_in_polygon(self, startX, startY, endX, endY, polygon):
+        if is_point_in_polygon(Point(startX, startY), polygon):
+            return True
+        if is_point_in_polygon(Point(startX, endY), polygon):
+            return True
+        if is_point_in_polygon(Point(endX, endY), polygon):
+            return True
+        if is_point_in_polygon(Point(endX, startY), polygon):
+            return True
+        return False
 
     def draw_detection(self, image, startX, startY, endX, endY, idx, label):
         cv2.rectangle(image, (startX, startY), (endX, endY), self.COLORS[idx], 2)
@@ -154,11 +176,12 @@ class HumanDetection(HDThread):
         pts = np.array([[polygon[0].x, polygon[0].y], [polygon[1].x, polygon[1].y],
                         [polygon[2].x, polygon[2].y], [polygon[3].x, polygon[3].y]], np.int32)
         pts = pts.reshape((-1, 1, 2))
-        cv2.polylines(image, [pts], True,  self.COLORS[warning.warning_id])
+        cv2.polylines(image, [pts], True, self.COLORS[warning.warning_id])
         font = cv2.FONT_HERSHEY_SIMPLEX
         y = polygon[1].y - 15 if polygon[1].y - 15 > 15 else polygon[1].y + 15
-        cv2.putText(image, "warning {}".format(warning.warning_id), (polygon[1].x, y), font, 0.5, self.COLORS[warning.warning_id], 2)
-                    # 2, cv2.LINE_AA)
+        cv2.putText(image, "warning {}".format(warning.warning_id), (polygon[1].x, y), font, 0.5,
+                    self.COLORS[warning.warning_id], 2)
+        # 2, cv2.LINE_AA)
 
     def on_setup_message(self, message: HDSetupMessage):
         self.rotate_counter = message.rotate_image_cycle
@@ -205,10 +228,11 @@ class HumanDetection(HDThread):
         pass
 
     def on_get_warning_msg(self):
-        warning_res = [False]*16
-        for warning_id, res in self.warnings_results.items():  # type: HDWarningResult
-            warning_res.insert(warning_id, res.result)
+        warning_res = [False] * 16
+        for warning_id, res in self.warnings_results.items():
+            warning_res.__setitem__(warning_id, res.result)
         warning_res = warning_res[::-1]
+        self.logging.info("{} - on_get_warning_msg={}".format(self.thread_name, warning_res))
         return HDGetWarningResponse(warning_res, None, None)
 
     def on_get_warning_config_msg(self, message: HDGetWarningConfigMessage):
@@ -237,7 +261,8 @@ class HumanDetection(HDThread):
                 warning_result.counter -= 1
         # update_result_to_response
         if warning_result.counter >= warning.minimum_detection_hits:
-            self.logging.info("{} - Detection in warning {} above min. hits.".format(self.thread_name, warning.warning_id))
+            self.logging.info(
+                "{} - Detection in warning {} above min. hits.".format(self.thread_name, warning.warning_id))
             warning_result.result = True
         else:
             warning_result.result = False

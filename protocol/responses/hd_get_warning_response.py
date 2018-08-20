@@ -13,6 +13,9 @@ class HDGetWarningResponse(IBytesConverter):
         self.is_obstructed = is_obstructed  # type: bool
         self.opcode = b'xC1'
 
+    def __str__(self):
+        return "warnings={}. visibility_light_level={}. is_obstructed={}".format(self.warnings, self.visibility_light_level, self.is_obstructed)
+
     def to_bytes(self):
         warning_bits = bitarray(self.warnings, endian=IBytesConverter.LITTLE_ENDIAN)
         is_vision_bit_1 = False
