@@ -11,10 +11,9 @@ class HDGetStatusResponse(IBytesConverter):
         self.opcode = b'xC4'
 
     def to_bytes(self):
-        sw_version = int.to_bytes(self.sw_version, 2, byteorder=IBytesConverter.LITTLE_ENDIAN)
-        fw_version = int.to_bytes(self.fw_version, 2, byteorder=IBytesConverter.LITTLE_ENDIAN)
-        result = sw_version + fw_version
-        return result
+        sw_major, sw_minor = self.sw_version.split(".")
+        fw_major, fw_minor = self.fw_version.split(".")
+        return bytearray([int(sw_major), int(sw_minor), int(fw_major), int(fw_minor)])
 
     @classmethod
     def from_bytes(cls, data_bytes, length=0, offset=0):

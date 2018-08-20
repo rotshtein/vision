@@ -20,6 +20,9 @@ class HDGetSetupConfigResponse(IBytesConverter):
         self.maximum_obstruction_hits = maximum_obstruction_hits
         self.opcode = b'xC3'
 
+    def __str__(self):
+        return str([self.rotate_image_cycle, self.obstruction_threshold, self.no_visibility_threshold, self.medium_visibility_threshold, self.full_visibility_threshold, self.minimum_obstruction_hits, self.maximum_obstruction_hits])
+
     def to_bytes(self):
         rotate_image_cycle = int.to_bytes(self.rotate_image_cycle, 1, byteorder=IBytesConverter.LITTLE_ENDIAN)
         obstruction_threshold = int.to_bytes(self.obstruction_threshold, 2, byteorder=IBytesConverter.LITTLE_ENDIAN)
@@ -34,6 +37,9 @@ class HDGetSetupConfigResponse(IBytesConverter):
                                                 byteorder=IBytesConverter.LITTLE_ENDIAN)
         result = rotate_image_cycle + obstruction_threshold + no_visibility_threshold + medium_visibility_threshold \
                  + full_visibility_threshold + minimum_obstruction_hits + maximum_obstruction_hits
+        # result = bytearray([self.rotate_image_cycle, self.obstruction_threshold, self.no_visibility_threshold,
+        #                     self.medium_visibility_threshold, self.full_visibility_threshold,
+        #                     self.minimum_obstruction_hits, self.maximum_obstruction_hits])
         return result
 
     @classmethod

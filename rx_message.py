@@ -23,10 +23,10 @@ class IRXMessage(object):
     def on_remove_warning_msg(self, message: HDRemoveWarningMessage):
         pass
 
-    def on_remove_all_warnings_msg(self, message: HDRemoveAllWarningsMessage):
+    def on_remove_all_warnings_msg(self):
         pass
 
-    def on_remove_all_warnings_except_defaults_msg(self, message: HDRemoveAllWarningsExceptDefaultMessage):
+    def on_remove_all_warnings_except_defaults_msg(self):
         pass
 
     def on_set_warning_to_default_msg(self, message: HDSetWarningToDefaultMessage):
@@ -41,8 +41,8 @@ class IRXMessage(object):
     def on_get_warning_config_msg(self, message: HDGetWarningConfigMessage) -> HDGetWarningConfigResponse:
         pass
 
-    def on_get_setup_config_msg(self, message: HDGetSetupConfigMessage):
+    def on_get_setup_config_msg(self):
         pass
 
-    def on_get_status_msg(self, message: HDGetStatusMessage) -> HDGetStatusResponse:
+    def on_get_status_msg(self) -> HDGetStatusResponse:
         pass

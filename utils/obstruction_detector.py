@@ -12,6 +12,8 @@ import glob
 
 import numpy as np
 
+from protocol.responses.hd_get_warning_response import VisibilityLightLevel
+
 DEFAULT_INTENSITY_VARIANCE_THRESHOLD = 1000
 
 
@@ -35,19 +37,32 @@ class ObstructionDetector(object):
         self.variance_threshold = DEFAULT_INTENSITY_VARIANCE_THRESHOLD
         self.min_obstruction_hits = 5
         self.max_obstruction_hits = max_hits
-        self.no_visibility_threshold = 1000
-        self.medium_visibility_threshold = 2500
-        self.full_visibility_threshold = 4000
+        self.no_visibility_threshold = 63
+        self.medium_visibility_threshold = 128
+        self.full_visibility_threshold = 190
 
     def init_last_tiles_matrix(self, max_hits, rows=3, columns=3):
         self.last_tiles_obstructed_matrix = [[False for i in range(max_hits)] for j in
                                              range(rows * columns)]
+        self.tiles_intensity_matrix = [0.0] * rows * columns
 
     def set_visibility_thresholds(self, no_visibility_threshold, medium_visibility_threshold,
                                   full_visibility_threshold):
         self.no_visibility_threshold = no_visibility_threshold
         self.medium_visibility_threshold = medium_visibility_threshold
         self.full_visibility_threshold = full_visibility_threshold
+
+    def get_frame_light_level(self, thread_name):
+        image_average_intensity = np.mean(self.tiles_intensity_matrix)
+        logging.debug("{} - image_average_intensity={}. tiles_intensity_matrix={}".format(thread_name, image_average_intensity, self.tiles_intensity_matrix))
+        if image_average_intensity < self.no_visibility_threshold:
+            return VisibilityLightLevel.NO_VISIBILITY
+        elif self.no_visibility_threshold <= image_average_intensity < self.medium_visibility_threshold:
+            return VisibilityLightLevel.NO_VISIBILITY_TO_MEDIUM
+        elif self.medium_visibility_threshold <= image_average_intensity < self.full_visibility_threshold:
+            return VisibilityLightLevel.MEDIUM_TO_FULL
+        elif self.full_visibility_threshold <= image_average_intensity:
+            return VisibilityLightLevel.FULL_VISIBILITY
 
     def set_obstruction_threshold(self, variance_threshold):
         self.variance_threshold = variance_threshold
@@ -57,7 +72,7 @@ class ObstructionDetector(object):
         self.max_obstruction_hits = max_hits
         self.init_last_tiles_matrix(max_hits)
 
-    def is_last_frames_obstructed(self, image, tiles_to_ignore):
+    def is_last_frames_obstructed(self, image, tiles_to_ignore, thread_name=""):
         """
         :param tiles_to_ignore:
         :param image:
@@ -89,17 +104,17 @@ class ObstructionDetector(object):
             _tile_index += 1
 
         self.index = (self.index + 1) % self.max_obstruction_hits
-        self.logging.info(
-            "Obstruction - Result: Obstructed Tiles Not to ignore:{}. All Obstructed Tiles including ignored:{}.".format(
-                obstructed_tiles_not_ignored, debug_all_obstructed_result))
+        self.logging.debug("{} - Tiles to ignore:{}.".format(thread_name, self.tiles_to_ignore))
+        self.logging.debug("{} - All Obstructed Tiles:{}.".format(thread_name, debug_all_obstructed_result))
         return obstructed_tiles_not_ignored
 
     def __validate_frame_and_add_result_to_list(self, image):
         tile_index = 0
         for main_row in range(self.rows):
             for main_col in range(self.columns):
-                result = self.__is_tile_obstructed(image, main_row, main_col, tile_index)
+                result, mean_intensity = self.__is_tile_obstructed(image, main_row, main_col, tile_index)
                 self.last_tiles_obstructed_matrix[tile_index][self.index] = result
+                self.tiles_intensity_matrix.__setitem__(tile_index, mean_intensity)
                 # self.logging.debug(self.last_tiles_obstructed_matrix)
                 tile_index += 1
 
@@ -118,7 +133,8 @@ class ObstructionDetector(object):
             # self.logging.debug("intensity={} of point=[{},{}]".format(intensity, abs_x, abs_y))
             variance_temp_list.append(intensity)
         is_tile_below_variance_threshold = self.__is_all_points_intensity_below_variance_threshold(variance_temp_list)
-        return is_tile_below_variance_threshold
+        mean_tile_intensity = np.mean(variance_temp_list)
+        return is_tile_below_variance_threshold, mean_tile_intensity
 
     def __get_coordinates_of_tile(self):
         coordinates = []
@@ -173,10 +189,15 @@ if __name__ == '__main__':
         for i in range(5):
             res = obstruction_detector.is_last_frames_obstructed(img, None)
         # expected result --> all except tiles 0 and 7
-        assert (res == [1, 2, 3, 4, 5, 6, 8])
+        if str(img_file) == "C:\\Projects\\vision\\data\\matrix_0_5.png":
+            assert (res == [1, 2, 3, 4, 5, 6, 8])
 
         # Test 2 - ignore cells 0-5
         for i in range(5):
             res = obstruction_detector.is_last_frames_obstructed(img, [0, 1, 2, 3, 4, 5])
         # expected result --> all except tiles 0 and 7.
-        assert (res == [6, 8])
+        if str(img_file) == "C:\\Projects\\vision\\data\\matrix_0_5.png":
+            assert (res == [6, 8])
+
+        res = obstruction_detector.get_frame_light_level("")
+        print("light level={}".format(res))

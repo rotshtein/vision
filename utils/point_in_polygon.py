@@ -39,6 +39,9 @@ class Point:
         self.x = x
         self.y = y
 
+    def __str__(self):
+        return str([self.x, self.y])
+
 
 point1 = Point(0.1, 99.9)
 polygon1 = [Point(0, 0), Point(0, 100), Point(100, 100), Point(100, 0)]

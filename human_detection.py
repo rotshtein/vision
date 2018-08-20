@@ -35,11 +35,12 @@ HEIGHT_THR = 150
 
 class HumanDetection(HDThread):
     def __init__(self, thread_name, logging, img_queue, fps, min_confidence, show, num_of_frames_to_rotate, debug,
-                 sw_version, fw_version):
+                 sw_version, fw_version, debug_img_queue):
         super().__init__(thread_name, logging, fps)
         self.logging.info("{} - Init. fps={}".format(thread_name, fps))
         self.rotate_counter = 0
         self.img_queue = img_queue  # type: queue.Queue
+        self.debug_img_queue = debug_img_queue  # type: queue.Queue
         self.min_confidence = min_confidence
         self.show = show
         self.num_of_frames_to_rotate = num_of_frames_to_rotate
@@ -65,12 +66,12 @@ class HumanDetection(HDThread):
         self.warnings_results = {}  # type: {}
 
     def _run(self) -> None:
-        self.logging.info("{} - _run() - queue size={}".format(self.thread_name, self.img_queue.qsize()))
+        self.logging.debug("{} - _run() - queue size={}".format(self.thread_name, self.img_queue.qsize()))
         image = self.img_queue.get()
         self.__dnn(image)
 
     def __dnn(self, image):
-        self.logging.info("{} - Start.".format(self.thread_name))
+        self.logging.debug("{} - Start.".format(self.thread_name))
         process_start = temp_time = datetime.now()
         (h, w) = image.shape[:2]
         blob = cv2.dnn.blobFromImage(cv2.resize(image, (300, 300)), 0.007843, (300, 300), 127.5)
@@ -95,62 +96,72 @@ class HumanDetection(HDThread):
         self.logging.debug(
             "{} - setInput() + forward(). Duration={}".format(self.thread_name, datetime.now() - temp_time))
 
-        # loop over the detections
-        for i in np.arange(0, detections.shape[2]):
-            # extract the confidence (i.e., probability) associated with the prediction
-            confidence = detections[0, 0, i, 2]
-            # extract the index of the class label from the `detections`,
-            # then compute the (x, y)-coordinates of the bounding box for the object
-            idx = int(detections[0, 0, i, 1])
-            box = detections[0, 0, i, 3:7] * np.array([w, h, w, h])
-            (startX, startY, endX, endY) = box.astype("int")
-            # display the prediction
-            label = "{}: {:.2f}% {} {}".format(self.CLASSES[idx], confidence * 100, startX, startY)
-            self.logging.debug("{} - {}".format(self.thread_name, label))
+        for warning in self.warnings.values():  # type: HDWarning
+            for i in np.arange(0, detections.shape[2]):
+                # extract the confidence (i.e., probability) associated with the prediction
+                confidence = 100*detections[0, 0, i, 2]
+                # extract the index of the class label from the `detections`,
+                # then compute the (x, y)-coordinates of the bounding box for the object
+                idx = int(detections[0, 0, i, 1])
+                box = detections[0, 0, i, 3:7] * np.array([w, h, w, h])
+                (startX, startY, endX, endY) = box.astype("int")
+                # display the prediction
+                classes_idx_ = self.CLASSES[idx]
+                label = "{}: {:.2f}% {} {}".format(classes_idx_, confidence, startX, startY)
+                self.logging.debug("{} - {}".format(self.thread_name, label))
 
-            object_w = abs(startX - endX)
-            object_h = abs(startY - endY)
+                object_w = abs(startX - endX)
+                object_h = abs(startY - endY)
 
-            center = Point(object_w/2, object_h/2)
+                center = Point(startX + object_w/2, startY + object_h/2)
 
-            for warning in self.warnings:  # type: HDWarning
+                if self.show:
+                    self.draw_warning_polygon(warning, image)
                 # if and polygon inside
-                if confidence > warning.minimum_confidence and \
-                        self.CLASSES[idx] in warning.object_class_holder.obj_names and \
+                minimum_confidence = warning.minimum_confidence
+                if confidence > minimum_confidence and \
+                        classes_idx_ in warning.object_class_holder.obj_names and \
                         warning.object_min_w_h < object_w and warning.object_min_w_h < object_h and \
-                        warning.object_max_w_h > object_w and warning.object_min_w_h > object_h and \
+                        warning.object_max_w_h > object_w and warning.object_max_w_h > object_h and \
                         is_point_in_polygon(center, warning.polygon):
                     # set result counter up
+                    if self.show:
+                        self.draw_detection(image, startX, startY, endX, endY, idx, label)
                     self.set_result_counter(warning.warning_id, True)
-                    self.logging.info("DNN - Send Stop Message to Robot")
+                    self.logging.debug("{} - Detection in warning {}".format(self.thread_name, warning.warning_id))
+                    break
                 else:
                     self.set_result_counter(warning.warning_id, False)
 
-                # todo - draw polygons (if self.show...)
-
-            if self.show:
-                cv2.rectangle(image, (startX, startY), (endX, endY),
-                              self.COLORS[idx], 2)
-                y = startY - 15 if startY - 15 > 15 else startY + 15
-                cv2.putText(image, label, (startX, y), cv2.FONT_HERSHEY_SIMPLEX, 0.5, self.COLORS[idx], 2)
-
-        if self.show:
-            cv2.imshow('detect', image)
-            k = cv2.waitKey(1)
-            if k % 256 == 27:
-                # ESC pressed
-                self.logging.debug("{} - Escape hit, closing...".format(self.thread_name))
-                return
 
         iteration_time = datetime.now() - process_start
         self.iteration_time_sec = iteration_time.microseconds * 1000000
-        self.logging.info("{} - End. Duration={}. ".format(self.thread_name, datetime.now() - process_start))
+        self.logging.debug("{} - End. Duration={}. ".format(self.thread_name, datetime.now() - process_start))
         self.rotate_counter += 1
+        self.debug_img_queue.put(image)
+
+    def draw_detection(self, image, startX, startY, endX, endY, idx, label):
+        cv2.rectangle(image, (startX, startY), (endX, endY),
+                      self.COLORS[idx], 2)
+        y = startY - 15 if startY - 15 > 15 else startY + 15
+        cv2.putText(image, label, (startX, y), cv2.FONT_HERSHEY_SIMPLEX, 0.5, self.COLORS[idx], 2)
+
+    def draw_warning_polygon(self, warning: HDWarning, image):
+        polygon = warning.polygon
+        pts = np.array([[polygon[0].x, polygon[0].y], [polygon[1].x, polygon[1].y],
+                        [polygon[2].x, polygon[2].y], [polygon[3].x, polygon[3].y]], np.int32)
+        pts = pts.reshape((-1, 1, 2))
+        cv2.polylines(image, [pts], True,  self.COLORS[warning.warning_id])
+        font = cv2.FONT_HERSHEY_SIMPLEX
+        cv2.putText(image, "warning {}".format(warning.warning_id), (polygon[1].x, polygon[1].y), font, 0.5, self.COLORS[warning.warning_id], 2)
+                    # 2, cv2.LINE_AA)
 
     def on_setup_message(self, message: HDSetupMessage):
         self.rotate_counter = message.rotate_image_cycle
 
     def on_set_warning_msg(self, message: HDSetWarningMessage):
+        self.logging.info(
+            "{} - on_set_warning_msg={}".format(self.thread_name, message))
         warning = HDWarning(message.warning_id, message.polygon, message.object_class_holder, message.object_min_w_h,
                             message.object_max_w_h, message.minimum_confidence, message.minimum_detection_hits,
                             message.maximum_detection_hits, message.is_default)
@@ -162,19 +173,23 @@ class HumanDetection(HDThread):
             del self.warnings[message.warning_id]
             del self.warnings_results[message.warning_id]
 
-    def on_remove_all_warnings_msg(self, message: HDRemoveAllWarningsMessage):
+    def on_remove_all_warnings_msg(self):
         self.warnings.clear()
         self.warnings_results.clear()
 
-    def on_remove_all_warnings_except_defaults_msg(self, message: HDRemoveAllWarningsExceptDefaultMessage):
-        for warning in self.warnings:  # type: HDWarning
+    def on_remove_all_warnings_except_defaults_msg(self):
+        warnings_id_to_remove = []
+        for warning_id, warning in self.warnings.items():  # type: HDWarning
             if not warning.is_default:
-                del self.warnings[warning.warning_id]
-                del self.warnings_results[warning.warning_id]
+                warnings_id_to_remove.append(warning_id)
+
+        for id in warnings_id_to_remove:
+            del self.warnings[id]
+            del self.warnings_results[id]
 
     def on_set_warning_to_default_msg(self, message: HDSetWarningToDefaultMessage):
         if message.all_warnings:
-            for warning in self.warnings:  # type: HDWarning
+            for warning in self.warnings.values():  # type: HDWarning
                 warning.is_default = True
         elif message.warning_id in self.warnings:
             warning = self.warnings[message.warning_id]  # type: HDWarning
@@ -187,7 +202,7 @@ class HumanDetection(HDThread):
 
     def on_get_warning_msg(self):
         warning_res = [False]*16
-        for res in self.warnings_results:  # type: HDWarningResult
+        for res in self.warnings_results.values():  # type: HDWarningResult
             warning_res.append(res.result)
         return HDGetWarningResponse(warning_res, None, None)
 
@@ -195,12 +210,15 @@ class HumanDetection(HDThread):
         warning = self.warnings.get(message.warning_id)  # type: HDWarning
         return HDGetWarningConfigResponse(warning.warning_id, warning.polygon, warning.object_class_holder,
                                           warning.object_min_w_h, warning.object_max_w_h, warning.minimum_confidence,
-                                          warning.minimum_detection_hits, warning.maximum_detection_hits)
+                                          warning.minimum_detection_hits, warning.maximum_detection_hits,
+                                          warning.is_default)
 
-    def on_get_setup_config_msg(self, message: HDGetSetupConfigMessage) -> HDGetSetupConfigResponse:
-        return HDGetSetupConfigResponse(self.num_of_frames_to_rotate, None, None, None, None, None, None)
+    def on_get_setup_config_msg(self) -> HDGetSetupConfigResponse:
+        config_response = HDGetSetupConfigResponse(self.num_of_frames_to_rotate, None, None, None, None, None, None)
+        self.logging.info("{} - on_get_setup_config_msg={}".format(self.thread_name, config_response))
+        return config_response
 
-    def on_get_status_msg(self, message: HDGetStatusMessage):
+    def on_get_status_msg(self):
         return HDGetStatusResponse(self.sw_version, self.fw_version)
 
     def set_result_counter(self, warning_id, is_hit):
@@ -210,10 +228,11 @@ class HumanDetection(HDThread):
             if warning_result.counter <= warning.maximum_detection_hits:
                 warning_result.counter += 1
         else:  # decrease
-            if warning_result.counter >= 0:
+            if warning_result.counter > 0:
                 warning_result.counter -= 1
         # update_result_to_response
-        if warning_result.counter >= warning.minimum_confidence:
+        if warning_result.counter >= warning.minimum_detection_hits:
+            self.logging.info("{} - Detection in warning {} above min. hits.".format(self.thread_name, warning.warning_id))
             warning_result.result = True
         else:
             warning_result.result = False

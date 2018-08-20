@@ -13,4 +13,11 @@ class HDGetWarningConfigMessage(IBytesConverter):
 
     @classmethod
     def from_bytes(cls, data_bytes, length=0, offset=0):
-        pass
+        temp_offset = 4
+        start_index = 4
+        num_of_bytes = 1
+        warning_id = int.from_bytes(
+            data_bytes[start_index - temp_offset:start_index - temp_offset + num_of_bytes],
+            byteorder=IBytesConverter.LITTLE_ENDIAN)
+        return cls(warning_id)
+

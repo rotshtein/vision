@@ -11,7 +11,7 @@ class HDWarning():
                  is_default) -> None:
         super().__init__()
         self.warning_id = warning_id
-        self.polygon = polygon
+        self.polygon = polygon  # type: [Point]
         self.object_class_holder = object_class_holder  # type: ObjectClassHolder
         self.object_min_w_h = object_min_w_h
         self.object_max_w_h = object_max_w_h
@@ -35,6 +35,7 @@ class ObjectClassHolder:
         self.objects = set()  # type: set(ObjectClass)
         self.obj_names = []
         if bool_array is not None:
+            bool_array = bool_array[::-1]
             for i in range(len(bool_array)):
                 is_break = False
                 if bool_array[i]:
@@ -47,6 +48,9 @@ class ObjectClassHolder:
                                 is_break = True
                                 break
             self.update_objects_names()
+
+    def __str__(self) -> str:
+        return str(self.obj_names)
 
     def update_objects_names(self):
         self.obj_names = []

@@ -28,8 +28,10 @@ THREAD_CAMERA = "Thread_Camera"
 
 def start_threads(show, debug):
     thread_names = [THREAD_CAMERA, THREAD_DNN, THREAD_VISION, THREAD_COMMUNICATION]
+    # thread_names = [THREAD_COMMUNICATION]
     # max size = 2 - we don't want old images!
     img_queue = queue.Queue(2)
+    debug_queue = queue.Queue(1)
     threads = []
     messages_receiver_handler = MessagesReceiverHandler()
     thread = None
@@ -43,7 +45,7 @@ def start_threads(show, debug):
             confidence = 0.2
             fps = 0
             thread = HumanDetection(tName, logging, img_queue, fps, confidence, show, num_of_frames_to_rotate, debug,
-                                    SW_VERSION, FW_VERSION)
+                                    SW_VERSION, FW_VERSION, debug_queue)
             messages_receiver_handler.add_rx_listeners(thread)
 
         elif tName == THREAD_VISION:
@@ -58,10 +60,23 @@ def start_threads(show, debug):
         thread.start()
         threads.append(thread)
 
+    is_exit = False
+    while not is_exit:
+        if show:
+            cv2.imshow('detect', debug_queue.get())
+            k = cv2.waitKey(1)
+            if k % 256 == 27:
+                # ESC pressed
+                logging.debug("Escape hit, closing...")
+                is_exit = True
+                cv2.destroyAllWindows()
+
+    print("Exiting Main Thread")
     # Wait for all threads to complete
     for t in threads:
+        t.exit_thread()
         t.join()
-    print("Exiting Main Thread")
+
 
 
 def main():

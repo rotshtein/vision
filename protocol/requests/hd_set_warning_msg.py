@@ -19,6 +19,17 @@ class HDSetWarningMessage(IBytesConverter):
         self.is_default = is_default
         self.opcode = b'xB2'
 
+    def __str__(self):
+        return str(["warning_id={}".format(self.warning_id),
+                    "polygon={}".format(', '.join([str(x) for x in self.polygon])),
+                    "object_class={}".format(self.object_class_holder.obj_names),
+                    "object_min_w_h={}".format(self.object_min_w_h),
+                    "object_max_w_h={}".format(self.object_max_w_h),
+                    "minimum_confidence={}".format(self.minimum_confidence),
+                    "minimum_detection_hits={}".format(self.minimum_detection_hits),
+                    "maximum_detection_hits={}".format(self.maximum_detection_hits),
+                    "is_default={}".format(self.is_default)])
+
     def to_bytes(self):
         # full_visibility_threshold = bytearray(struct.pack("{}f".format(IBytesConverter.LITTLE_ENDIAN_SIGN), self.full_visibility_threshold))
         warning_id = int.to_bytes(self.warning_id, 1, byteorder=IBytesConverter.LITTLE_ENDIAN)

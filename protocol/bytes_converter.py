@@ -18,7 +18,8 @@ class IBytesConverter(object):
 
 def calc_checksum(data):
     crc = 0
-    for i in range(data.len):
+    for i in range(len(data)):
         crc += data[i]
         i += 1
-    return ~crc
+    crc = ~crc % 256
+    return int.to_bytes(crc, 1, byteorder=IBytesConverter.LITTLE_ENDIAN, signed=False)
