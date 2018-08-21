@@ -26,7 +26,7 @@ THREAD_DNN = "Thread_DNN"
 THREAD_CAMERA = "Thread_Camera"
 
 
-def start_threads(show, debug):
+def start_threads(show, debug, port, baudrate):
     thread_names = [THREAD_CAMERA, THREAD_DNN, THREAD_VISION, THREAD_COMMUNICATION]
     # thread_names = [THREAD_COMMUNICATION]
     # max size = 2 - we don't want old images!
@@ -39,6 +39,7 @@ def start_threads(show, debug):
         if tName == THREAD_CAMERA:
             fps = 4
             thread = Camera(tName, logging, img_queue, fps)
+            messages_receiver_handler.add_rx_listeners(thread)
 
         elif tName == THREAD_DNN:
             num_of_frames_to_rotate = 9
@@ -55,14 +56,14 @@ def start_threads(show, debug):
 
         elif tName == THREAD_COMMUNICATION:
             # no fps since it's blocking
-            thread = Communication(tName, logging, messages_receiver_handler)
+            thread = Communication(tName, logging, messages_receiver_handler, port, baudrate)
 
         thread.start()
         threads.append(thread)
 
     is_exit = False
-    while not is_exit:
-        if show:
+    if show:
+        while not is_exit:
             cv2.imshow('detect', debug_queue.get())
             k = cv2.waitKey(1)
             if k % 256 == 27:
@@ -78,7 +79,6 @@ def start_threads(show, debug):
         t.join()
 
 
-
 def main():
     # construct the argument parse and parse the arguments
     ap = argparse.ArgumentParser()
@@ -89,6 +89,8 @@ def main():
     ap.add_argument("-d", "--debug", required=False, default=False, action='store_true',
                     help="change log level to DEBUG")
     ap.add_argument("-l", "--loggingFileName", required=False, default="", help="change log level to DEBUG")
+    ap.add_argument("-p", "--port", required=False, help="serial port")
+    ap.add_argument("-b", "--baudrate", required=False, help="serial baudrate")
     args = vars(ap.parse_args())
 
     debug_level = logging.INFO
@@ -96,6 +98,8 @@ def main():
     args_show = args["show"]
     args_image = args["image"]
     args_confidence = args["confidence"]
+    args_port = args["port"]
+    args_baudrate = args["baudrate"]
 
     if args_debug:
         debug_level = logging.DEBUG
@@ -116,7 +120,7 @@ def main():
         cv2.namedWindow("detect")
 
     if args_image == 'c':
-        start_threads(args_show, args_debug)
+        start_threads(args_show, args_debug, args_port, args_baudrate)
     else:
         filelist = glob.glob(args_image)
         for file in filelist:
@@ -128,7 +132,8 @@ def main():
             fps = 0
             _img_queue = queue.Queue(2)
             _img_queue.put(img)
-            thread = HumanDetection(THREAD_DNN, logging, _img_queue, fps, confidence, True, num_of_frames_to_rotate, False,
+            thread = HumanDetection(THREAD_DNN, logging, _img_queue, fps, confidence, True, num_of_frames_to_rotate,
+                                    False,
                                     SW_VERSION, FW_VERSION)
             thread.run()
             if args_show:

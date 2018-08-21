@@ -31,6 +31,9 @@ class Vision(HDThread):
         image = self.img_queue.get()
         self._vision(image)
 
+    def is_module_in_error(self):
+        return self.in_error
+
     def _vision(self, img):
         start_time = datetime.now()
         self.logging.debug("{} - Start.".format(self.thread_name))

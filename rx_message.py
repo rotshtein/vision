@@ -14,6 +14,9 @@ from protocol.responses.hd_get_warning_config_response import HDGetWarningConfig
 
 
 class IRXMessage(object):
+    def is_module_in_error(self):
+        pass
+
     def on_setup_message(self, message: HDSetupMessage):
         pass
 

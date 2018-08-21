@@ -76,6 +76,12 @@ class MessagesReceiverHandler(object):
                 response.is_obstructed = data.is_obstructed
             if data.warnings is not None:
                 response.warnings = data.warnings
+
+            # check if there are any errors in all other models - if so throw exception
+            if rx_listener.is_module_in_error():
+                raise Exception("{} in Error. Send Nack".format(rx_listener.thread_name))
+
+
         return response
 
     def handle_get_warning_config_msg(self, message):

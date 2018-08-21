@@ -70,8 +70,16 @@ class HumanDetection(HDThread):
         image = self.img_queue.get()
         self.__dnn(image)
 
+    def is_module_in_error(self):
+        return self.in_error
+
     def __dnn(self, image):
         self.logging.debug("{} - Start.".format(self.thread_name))
+
+        is_rotate = False
+        if self.rotate_counter >= self.num_of_frames_to_rotate:
+            is_rotate = True
+
         process_start = temp_time = datetime.now()
         (h, w) = image.shape[:2]
         resized_image = cv2.resize(image, (300, 300))
@@ -79,7 +87,7 @@ class HumanDetection(HDThread):
         self.logging.debug(
             "{} - blobFromImage Resize. Duration={}".format(self.thread_name, datetime.now() - temp_time))
 
-        if self.rotate_counter >= self.num_of_frames_to_rotate:
+        if is_rotate:
             self.logging.debug("{} - Rotating image by 90 deg...".format(self.thread_name))
             temp_time = datetime.now()
             image_rotator = ImageRotator()
@@ -119,15 +127,19 @@ class HumanDetection(HDThread):
                 object_w = abs(startX - endX)
                 object_h = abs(startY - endY)
 
+                polygon = warning.polygon
+                if is_rotate:
+                    polygon = self.rotate_polygon(polygon)
+
                 if self.show:
-                    self.draw_warning_polygon(warning, resized_image)
+                    self.draw_warning_polygon(polygon, warning.warning_id, resized_image)
                 # if and polygon inside
                 minimum_confidence = warning.minimum_confidence
                 if confidence > minimum_confidence and \
                         classes_idx_ in warning.object_class_holder.obj_names and \
                         warning.object_min_w_h < object_w and warning.object_min_w_h < object_h and \
                         warning.object_max_w_h > object_w and warning.object_max_w_h > object_h and \
-                        (self.is_warning_polygon_in_detection_box(startX, startY, endX, endY, warning.polygon) or self.is_points_in_polygon(startX, startY, endX, endY, warning.polygon)):
+                        (self.is_warning_polygon_in_detection_box(startX, startY, endX, endY, polygon) or self.is_points_in_polygon(startX, startY, endX, endY, polygon)):
                     # set result counter up
                     if self.show:
                         self.draw_detection(resized_image, startX, startY, endX, endY, idx, label)
@@ -142,6 +154,9 @@ class HumanDetection(HDThread):
         self.logging.debug("{} - End. Duration={}. ".format(self.thread_name, datetime.now() - process_start))
         self.rotate_counter += 1
         self.debug_img_queue.put(resized_image)
+
+    def rotate_polygon(self, polygon):
+        return ImageRotator.rotate()
 
     def is_warning_polygon_in_detection_box(self, startX, startY, endX, endY, polygon):
         detected_box = [Point(startX, startY), Point(startX, endY), Point(endX, endY), Point(endX, startY)]
@@ -171,17 +186,19 @@ class HumanDetection(HDThread):
         y = startY - 15 if startY - 15 > 15 else startY + 15
         cv2.putText(image, label, (startX, y), cv2.FONT_HERSHEY_SIMPLEX, 0.5, self.COLORS[idx], 2)
 
-    def draw_warning_polygon(self, warning: HDWarning, image):
-        polygon = warning.polygon
+    def draw_warning_polygon(self, polygon, warning_id, image):
         pts = np.array([[polygon[0].x, polygon[0].y], [polygon[1].x, polygon[1].y],
                         [polygon[2].x, polygon[2].y], [polygon[3].x, polygon[3].y]], np.int32)
         pts = pts.reshape((-1, 1, 2))
-        cv2.polylines(image, [pts], True, self.COLORS[warning.warning_id])
+        cv2.polylines(image, [pts], True, self.COLORS[warning_id])
         font = cv2.FONT_HERSHEY_SIMPLEX
         y = polygon[1].y - 15 if polygon[1].y - 15 > 15 else polygon[1].y + 15
-        cv2.putText(image, "warning {}".format(warning.warning_id), (polygon[1].x, y), font, 0.5,
-                    self.COLORS[warning.warning_id], 2)
+        cv2.putText(image, "warning {}".format(warning_id), (polygon[1].x, y), font, 0.5,
+                    self.COLORS[warning_id], 2)
         # 2, cv2.LINE_AA)
+
+    def is_module_in_error(self):
+        return self.in_error
 
     def on_setup_message(self, message: HDSetupMessage):
         self.rotate_counter = message.rotate_image_cycle

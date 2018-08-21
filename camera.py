@@ -31,6 +31,9 @@ class Camera(HDThread):
         # wait until queue is empty
         self.img_queue.put(image)
 
+    def is_module_in_error(self):
+        return self.in_error
+
     def _from_camera(self):
         temp_time = start_time = datetime.now()
         self.logging.debug("{} - Start.".format(self.thread_name))

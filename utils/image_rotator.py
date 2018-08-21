@@ -77,7 +77,6 @@ class ImageRotator:
 
         return result
 
-
     def largest_rotated_rect(self, w, h, angle):
         """
         Given a rectangle of size wxh that has been rotated by 'angle' (in
@@ -113,7 +112,6 @@ class ImageRotator:
             bb_h - 2 * y
         )
 
-
     def crop_around_center(self, image, width, height):
         """
         Given a NumPy / OpenCV 2 image, crops it to the given width and height,
@@ -135,3 +133,35 @@ class ImageRotator:
         y2 = int(image_center[1] + height * 0.5)
 
         return image[y1:y2, x1:x2]
+
+    def rotate(self, xy, theta):
+        # https://en.wikipedia.org/wiki/Rotation_matrix#In_two_dimensions
+        cos_theta, sin_theta = math.cos(theta), math.sin(theta)
+
+        return (
+            xy[0] * cos_theta - xy[1] * sin_theta,
+            xy[0] * sin_theta + xy[1] * cos_theta
+        )
+
+    def translate(self, xy, offset):
+        return xy[0] + offset[0], xy[1] + offset[1]
+
+
+if __name__ == '__main__':
+    rotator = ImageRotator()
+    # Create the square relative to (0, 0)
+    w, h = 100, 100
+
+    points = [
+        (0, 0),
+        (0, h),
+        (w, h),
+        (w, 0)
+    ]
+
+    offset = (40000, 50000)
+    degrees = 90
+    theta = math.radians(degrees)
+
+    # Apply rotation, then translation to each point
+    print([rotator.translate(rotator.rotate(xy, theta), offset) for xy in points])

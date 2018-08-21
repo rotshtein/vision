@@ -19,11 +19,16 @@ class HDThread(threading.Thread, IRXMessage):
         self.fps = fps
         self.iteration_time_sec = 0.0
         self.last_measured_time = datetime.now()
+        self.in_error = False
 
     def run(self) -> None:
         while not self.is_exit:
             self._calc_fps()
-            self._run()
+            try:
+                self._run()
+            except Exception as e:
+                self.logging.info("{} - Exception: {}".format(self.thread_name, e.__str__()))
+                self.in_error = True
             if self.fps != 0 and self.iteration_time_sec != 0:
                 sleep_time = 1 / self.fps - self.iteration_time_sec
                 sleep_time = sleep_time if sleep_time > 0 else 0

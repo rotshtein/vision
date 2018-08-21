@@ -34,23 +34,25 @@ OPCODE_GET_STATUS_RESPONSE = 0xC4
 OPCODE_ACK_RESPONSE = 0xD1
 OPCODE_NACK_RESPONSE = 0xD2
 
-BAUD_RATE = 19200
-PORT = 'COM1'
+BAUD_RATE = 115200
+PORT = '/dev/ttyAMA0'  # COM1 / ttyUSB0 for USB port / ttyS0 for IO
 
 
 # ROBOT_STOP_MESSAGE_HEX = "\xAA\x09\x1E\x15\x0F\xAA\x00\xFF\x61"
 # ROBOT_STATUS_MESSAGE_HEX = "\xAA\x09\x1E\x16\x0F\xA7\x00\x04\x5E"
 
 class Communication(HDThread):
-    def __init__(self, thread_name, logging, messages_receiver_handler):
+    def __init__(self, thread_name, logging, messages_receiver_handler, port=PORT, baudrate=BAUD_RATE):
         super().__init__(thread_name, logging, 0)
         self.logging.info("{} - Init. fps={}".format(thread_name, 0))
         self.messages_receiver_handler = messages_receiver_handler  # type: MessagesReceiverHandler
+        self.port = port if port is not None else PORT
+        self.baudrate = baudrate if baudrate is not None else BAUD_RATE
         self.ser = None
         try:
             self.ser = serial.Serial(  # ttyUSB0 for USB port / ttyS0 for IO
-                port=PORT,
-                baudrate=BAUD_RATE,
+                port=self.port,
+                baudrate=self.baudrate,
                 parity=serial.PARITY_NONE,
                 stopbits=serial.STOPBITS_ONE,
                 bytesize=serial.EIGHTBITS,
@@ -129,7 +131,7 @@ class Communication(HDThread):
                 response = self.messages_receiver_handler.build_response_message(OPCODE_ACK_RESPONSE)
 
             # RESPONSE DIFFERENT FROM ACK
-            elif opcode == OPCODE_GET_WARNING_MSG:
+            elif opcode == OPCODE_GET_WARNING_MSG:  # check if there is error in modules - if so throw exception
                 warning_response = self.messages_receiver_handler.handle_get_warning_msg()
                 response = self.messages_receiver_handler.build_response_message(OPCODE_GET_WARNING_RESPONSE,
                                                                                  warning_response.to_bytes())
