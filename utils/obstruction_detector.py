@@ -153,7 +153,7 @@ class ObstructionDetector(object):
         # next line is commented out - was relevant to rgb image - now it's gray
         # var = np.var(variance_temp_list, axis=0)  # axis=0 for calculating the arrays vertically [r, g, b]
         var = np.var(variance_temp_list)
-        self.logging.debug("variance=" + str(var))
+        # self.logging.debug("variance=" + str(var))
         return var < self.variance_threshold
 
     def __is_all_points_intensity_below_threshold(self, intensity_below_threshold_temp_list):

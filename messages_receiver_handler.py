@@ -70,6 +70,8 @@ class MessagesReceiverHandler(object):
         response = HDGetWarningResponse()
         for rx_listener in self.rx_listeners:
             data = rx_listener.on_get_warning_msg()  # type: HDGetWarningResponse
+            if data is None:
+                continue
             if data.visibility_light_level is not None:
                 response.visibility_light_level = data.visibility_light_level
             if data.is_obstructed is not None:
@@ -100,6 +102,8 @@ class MessagesReceiverHandler(object):
         response = HDGetSetupConfigResponse()
         for rx_listener in self.rx_listeners:
             data = rx_listener.on_get_setup_config_msg()
+            if data is None:
+                continue
             if data.rotate_image_cycle is not None:
                 response.rotate_image_cycle = data.rotate_image_cycle
             if data.obstruction_threshold is not None:

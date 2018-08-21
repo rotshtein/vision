@@ -3,4 +3,4 @@
 echo "Run Human Detection!"
 source ~/.profile
 workon cv
-python dnnr.py -i c -p "/dev/ttyAMA0" -b "115200"
+python dnnr.py -i c -p "/dev/ttyUSB0" -b "38400"

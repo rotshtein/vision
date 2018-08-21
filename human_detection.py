@@ -34,14 +34,13 @@ HEIGHT_THR = 150
 
 
 class HumanDetection(HDThread):
-    def __init__(self, thread_name, logging, img_queue, fps, min_confidence, show, num_of_frames_to_rotate, debug,
-                 sw_version, fw_version, debug_img_queue):
+    def __init__(self, thread_name, logging, img_queue, fps, show, num_of_frames_to_rotate, debug, sw_version,
+                 fw_version, debug_img_queue):
         super().__init__(thread_name, logging, fps)
         self.logging.info("{} - Init. fps={}".format(thread_name, fps))
         self.rotate_counter = 0
         self.img_queue = img_queue  # type: queue.Queue
         self.debug_img_queue = debug_img_queue  # type: queue.Queue
-        self.min_confidence = min_confidence
         self.show = show
         self.num_of_frames_to_rotate = num_of_frames_to_rotate
         self.debug = debug
@@ -75,6 +74,10 @@ class HumanDetection(HDThread):
 
     def __dnn(self, image):
         self.logging.debug("{} - Start.".format(self.thread_name))
+
+        if image is None:
+            self.logging.debug("{} - Image is none".format(self.thread_name))
+            return
 
         is_rotate = False
         if self.rotate_counter >= self.num_of_frames_to_rotate:
@@ -129,7 +132,8 @@ class HumanDetection(HDThread):
 
                 polygon = warning.polygon
                 if is_rotate:
-                    polygon = self.rotate_polygon(polygon)
+                    pass
+                    # polygon = self.rotate_polygon(polygon)
 
                 if self.show:
                     self.draw_warning_polygon(polygon, warning.warning_id, resized_image)
@@ -153,7 +157,8 @@ class HumanDetection(HDThread):
         self.iteration_time_sec = iteration_time.microseconds * 1000000
         self.logging.debug("{} - End. Duration={}. ".format(self.thread_name, datetime.now() - process_start))
         self.rotate_counter += 1
-        self.debug_img_queue.put(resized_image)
+        if self.show:
+            self.debug_img_queue.put(resized_image)
 
     def rotate_polygon(self, polygon):
         return ImageRotator.rotate()

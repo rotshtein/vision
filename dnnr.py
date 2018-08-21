@@ -43,14 +43,13 @@ def start_threads(show, debug, port, baudrate):
 
         elif tName == THREAD_DNN:
             num_of_frames_to_rotate = 9
-            confidence = 0.2
             fps = 0
-            thread = HumanDetection(tName, logging, img_queue, fps, confidence, show, num_of_frames_to_rotate, debug,
-                                    SW_VERSION, FW_VERSION, debug_queue)
+            thread = HumanDetection(tName, logging, img_queue, fps, show, num_of_frames_to_rotate, debug, SW_VERSION,
+                                    FW_VERSION, debug_queue)
             messages_receiver_handler.add_rx_listeners(thread)
 
         elif tName == THREAD_VISION:
-            fps = 3
+            fps = 2
             thread = Vision(tName, logging, img_queue, fps)
             messages_receiver_handler.add_rx_listeners(thread)
 
@@ -72,11 +71,12 @@ def start_threads(show, debug, port, baudrate):
                 is_exit = True
                 cv2.destroyAllWindows()
 
-    print("Exiting Main Thread")
     # Wait for all threads to complete
     for t in threads:
-        t.exit_thread()
+        # t.exit_thread()
         t.join()
+
+    print("Exiting Main Thread")
 
 
 def main():
@@ -88,7 +88,7 @@ def main():
     ap.add_argument("-c", "--confidence", type=float, default=0.2, help="minimum probability to filter weak detections")
     ap.add_argument("-d", "--debug", required=False, default=False, action='store_true',
                     help="change log level to DEBUG")
-    ap.add_argument("-l", "--loggingFileName", required=False, default="", help="change log level to DEBUG")
+    ap.add_argument("-l", "--loggingFileName", required=False, default="", help="log to a file")
     ap.add_argument("-p", "--port", required=False, help="serial port")
     ap.add_argument("-b", "--baudrate", required=False, help="serial baudrate")
     args = vars(ap.parse_args())
@@ -132,8 +132,8 @@ def main():
             fps = 0
             _img_queue = queue.Queue(2)
             _img_queue.put(img)
-            thread = HumanDetection(THREAD_DNN, logging, _img_queue, fps, confidence, True, num_of_frames_to_rotate,
-                                    False, SW_VERSION, FW_VERSION)
+            thread = HumanDetection(THREAD_DNN, logging, _img_queue, fps, True, num_of_frames_to_rotate, False,
+                                    SW_VERSION, FW_VERSION, )
             thread.run()
             if args_show:
                 cv2.imshow('detect', img)
