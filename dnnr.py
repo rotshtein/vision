@@ -133,8 +133,7 @@ def main():
             _img_queue = queue.Queue(2)
             _img_queue.put(img)
             thread = HumanDetection(THREAD_DNN, logging, _img_queue, fps, confidence, True, num_of_frames_to_rotate,
-                                    False,
-                                    SW_VERSION, FW_VERSION)
+                                    False, SW_VERSION, FW_VERSION)
             thread.run()
             if args_show:
                 cv2.imshow('detect', img)

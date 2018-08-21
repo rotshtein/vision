@@ -47,7 +47,7 @@ class Communication(HDThread):
         self.logging.info("{} - Init. fps={}".format(thread_name, 0))
         self.messages_receiver_handler = messages_receiver_handler  # type: MessagesReceiverHandler
         self.port = port if port is not None else PORT
-        self.baudrate = baudrate if baudrate is not None else BAUD_RATE
+        self.baudrate = int(baudrate) if baudrate is not None else BAUD_RATE
         self.ser = None
         try:
             self.ser = serial.Serial(  # ttyUSB0 for USB port / ttyS0 for IO
@@ -57,6 +57,7 @@ class Communication(HDThread):
                 stopbits=serial.STOPBITS_ONE,
                 bytesize=serial.EIGHTBITS,
             )
+            self.logging.info("{} - Initialized Serial port: port={} baudrate={}".format(thread_name, self.port, self.baudrate))
         except Exception as e:
             self.logging.info("{} - Initializing Serial port failed. {}".format(thread_name, e.__str__()))
             self.exit_thread()
@@ -65,8 +66,8 @@ class Communication(HDThread):
         self._communication()
 
     def _communication(self):
-        self.logging.debug("Communication - Start ")
-        process_start = datetime.now()
+        self.logging.debug("{} - Start.".format(self.thread_name))
+        start_time = datetime.now()
 
         # read message
         if self.ser is not None:
@@ -78,14 +79,15 @@ class Communication(HDThread):
                 msg = self.ser.write(response)
                 # msg_encoded = msg.encode("hex")
                 # self.logging.info("DNN - Received Ack Message from Robot: " + msg_encoded)
-                self.logging.debug("Communication - End. Duration=" + str(datetime.now() - process_start))
+                iteration_time = datetime.now() - start_time
+                self.logging.debug("{} - End. Total Duration={}".format(self.thread_name, iteration_time))
             except:
                 self.ser.flushInput()
 
     def read_header(self):
         msg = self.ser.read(3)
         # msg_in_hex = hex(int.from_bytes(msg, byteorder=IBytesConverter.BIG_ENDIAN))
-        self.logging.info("Communication - read message header 3 bytes: {}".format(msg))
+        self.logging.info("{} - read message header 3 bytes: {}".format(self.thread_name, msg))
         return msg
 
     def handle_message_header(self):
@@ -93,7 +95,7 @@ class Communication(HDThread):
         msg = self.read_header()
         # read preamble
         if msg[0] != PREAMBLE_PREFIX:
-            self.logging.error("Communication error reading Preamble. Expected=0xAA. Received={}".format(msg[0]))
+            self.logging.error("{} - error reading Preamble. Expected=0xAA. Received={}".format(self.thread_name, msg[0]))
             return
         # read length
         length = msg[1]
@@ -104,7 +106,7 @@ class Communication(HDThread):
     def handle_message_body(self, length, opcode):
         # continue reading message - minus 3 bytes: preamble + length + opcode
         msg = self.ser.read(length - 3)
-        self.logging.info("Communication - read message body length={}. message: {}".format(length - 3, msg))
+        self.logging.info("{} - read message body length={}. message: {}".format(self.thread_name, length - 3, msg))
         response = None
         # handle message
         try:
@@ -149,8 +151,8 @@ class Communication(HDThread):
                                                                                  warning_response.to_bytes())
 
         except Exception as e:
-            print("Error in communication - handle_message_body - " + e.__str__())
+            print("{} - Error in handle_message_body - {}".format(self.thread_name, e.__str__()))
             response = self.messages_receiver_handler.build_response_message(OPCODE_NACK_RESPONSE)
 
-        self.logging.info("Communication - Send Response message. length={}. message: {}".format(length - 3, response))
+        self.logging.info("{} - Send Response message. length={}. message: {}".format(self.thread_name, length - 3, response))
         return response
