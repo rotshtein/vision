@@ -26,7 +26,7 @@ from protocol.responses.hd_get_warning_config_response import HDGetWarningConfig
 from protocol.responses.hd_get_warning_response import HDGetWarningResponse
 from utils.hd_threading import HDThread
 from utils.image_rotator import ImageRotator
-from utils.point_in_polygon import is_point_in_polygon, Point
+from utils.point_in_polygon import is_point_in_polygon, Point, rotate_and_translate_polygon
 from warning import HDWarning, HDWarningResult
 
 DNN_TH_SLEEP_SEC = 0
@@ -86,9 +86,6 @@ class HumanDetection(HDThread):
         process_start = temp_time = datetime.now()
         (h, w) = image.shape[:2]
         resized_image = cv2.resize(image, (300, 300))
-        blob = cv2.dnn.blobFromImage(resized_image, 0.007843, (300, 300), 127.5)
-        self.logging.debug(
-            "{} - blobFromImage Resize. Duration={}".format(self.thread_name, datetime.now() - temp_time))
 
         if is_rotate:
             self.logging.debug("{} - Rotating image by 90 deg...".format(self.thread_name))
@@ -100,7 +97,10 @@ class HumanDetection(HDThread):
                                                                                                  math.radians(90)))
             self.rotate_counter = 0
             self.logging.debug("{} - Rotating image Duration={}".format(self.thread_name, datetime.now() - temp_time))
-            # todo - rotate polygons
+
+        blob = cv2.dnn.blobFromImage(resized_image, 0.007843, (300, 300), 127.5)
+        self.logging.debug(
+            "{} - blobFromImage Resize. Duration={}".format(self.thread_name, datetime.now() - temp_time))
 
         # pass the blob through the network and obtain the detections and predictions
         self.logging.debug("{} - Computing object detections...".format(self.thread_name))
@@ -132,8 +132,7 @@ class HumanDetection(HDThread):
 
                 polygon = warning.polygon
                 if is_rotate:
-                    pass
-                    # polygon = self.rotate_polygon(polygon)
+                    polygon = self.rotate_polygon(polygon)
 
                 if self.show:
                     self.draw_warning_polygon(polygon, warning.warning_id, resized_image)
@@ -143,7 +142,10 @@ class HumanDetection(HDThread):
                         classes_idx_ in warning.object_class_holder.obj_names and \
                         warning.object_min_w_h < object_w and warning.object_min_w_h < object_h and \
                         warning.object_max_w_h > object_w and warning.object_max_w_h > object_h and \
-                        (self.is_warning_polygon_in_detection_box(startX, startY, endX, endY, polygon) or self.is_points_in_polygon(startX, startY, endX, endY, polygon)):
+                        (self.is_warning_polygon_in_detection_box(startX, startY, endX, endY,
+                                                                  polygon) or self.is_points_in_polygon(startX, startY,
+                                                                                                        endX, endY,
+                                                                                                        polygon)):
                     # set result counter up
                     if self.show:
                         self.draw_detection(resized_image, startX, startY, endX, endY, idx, label)
@@ -161,7 +163,7 @@ class HumanDetection(HDThread):
             self.debug_img_queue.put(resized_image)
 
     def rotate_polygon(self, polygon):
-        return ImageRotator.rotate()
+        return rotate_and_translate_polygon(polygon, 90)
 
     def is_warning_polygon_in_detection_box(self, startX, startY, endX, endY, polygon):
         detected_box = [Point(startX, startY), Point(startX, endY), Point(endX, endY), Point(endX, startY)]
@@ -197,8 +199,10 @@ class HumanDetection(HDThread):
         pts = pts.reshape((-1, 1, 2))
         cv2.polylines(image, [pts], True, self.COLORS[warning_id])
         font = cv2.FONT_HERSHEY_SIMPLEX
-        y = polygon[1].y - 15 if polygon[1].y - 15 > 15 else polygon[1].y + 15
-        cv2.putText(image, "warning {}".format(warning_id), (polygon[1].x, y), font, 0.5,
+        x = int((polygon[0].x + polygon[1].x + polygon[2].x + polygon[3].x)/4) - 20
+        y = int((polygon[0].y + polygon[1].y + polygon[2].y + polygon[3].y)/4)
+
+        cv2.putText(image, "w{}".format(warning_id), (x, y), font, 0.5,
                     self.COLORS[warning_id], 2)
         # 2, cv2.LINE_AA)
 
