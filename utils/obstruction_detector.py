@@ -45,6 +45,7 @@ class ObstructionDetector(object):
         self.last_tiles_obstructed_matrix = [[False for i in range(max_hits)] for j in
                                              range(rows * columns)]
         self.tiles_intensity_matrix = [0.0] * rows * columns
+        self.index = 0
 
     def set_visibility_thresholds(self, no_visibility_threshold, medium_visibility_threshold,
                                   full_visibility_threshold):

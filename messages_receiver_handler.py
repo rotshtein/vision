@@ -15,7 +15,7 @@ from rx_message import IRXMessage
 
 PREAMBLE_PREFIX = 0xAA
 
-MSG_FIXED_LENGTH_WITHOUT_DATA = 3
+MSG_FIXED_LENGTH_WITHOUT_DATA = 4
 
 
 class MessagesReceiverHandler(object):
@@ -78,6 +78,8 @@ class MessagesReceiverHandler(object):
                 response.is_obstructed = data.is_obstructed
             if data.warnings is not None:
                 response.warnings = data.warnings
+                # response.warnings[5] = True
+                # response.warnings[15] = True
 
             # check if there are any errors in all other models - if so throw exception
             if rx_listener.is_module_in_error():
@@ -129,10 +131,11 @@ class MessagesReceiverHandler(object):
         return response
 
     def build_response_message(self, opcode, data=None):
-        data_length = 1 if data is None else data.__len__()
+        data_length = 0 if data is None else data.__len__()
         total_msg_length = data_length + MSG_FIXED_LENGTH_WITHOUT_DATA
         res_message_bytes_array = bytearray([PREAMBLE_PREFIX, total_msg_length, opcode])
-        res_message_bytes_array += (data if data is not None else b'\x00')
+        if data is not None:
+            res_message_bytes_array += data
         checksum = calc_checksum(res_message_bytes_array)
         res_message_bytes_array = res_message_bytes_array + checksum
         return res_message_bytes_array

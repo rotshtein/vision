@@ -3,6 +3,7 @@ Created on Aug 14, 2018
 
 @author: ziv
 """
+import binascii
 from datetime import datetime
 import serial
 
@@ -87,7 +88,7 @@ class Communication(HDThread):
     def read_header(self):
         msg = self.ser.read(3)
         # msg_in_hex = hex(int.from_bytes(msg, byteorder=IBytesConverter.BIG_ENDIAN))
-        self.logging.info("{} - read message header 3 bytes: {}".format(self.thread_name, msg))
+        self.logging.info("{} - read message header 3 bytes: {}".format(self.thread_name, binascii.hexlify(msg)))
         return msg
 
     def handle_message_header(self):
@@ -95,7 +96,7 @@ class Communication(HDThread):
         msg = self.read_header()
         # read preamble
         if msg[0] != PREAMBLE_PREFIX:
-            self.logging.error("{} - error reading Preamble. Expected=0xAA. Received={}".format(self.thread_name, msg[0]))
+            self.logging.error("{} - error reading Preamble. Expected=0xAA. Received={}".format(self.thread_name, binascii.hexlify(msg[0])))
             return
         # read length
         length = msg[1]
@@ -106,7 +107,7 @@ class Communication(HDThread):
     def handle_message_body(self, length, opcode):
         # continue reading message - minus 3 bytes: preamble + length + opcode
         msg = self.ser.read(length - 3)
-        self.logging.info("{} - read message body length={}. message: {}".format(self.thread_name, length - 3, msg))
+        self.logging.info("{} - read message body length={}. message: {}".format(self.thread_name, length - 3, binascii.hexlify(msg)))
         response = None
         # handle message
         try:
@@ -154,5 +155,5 @@ class Communication(HDThread):
             print("{} - Error in handle_message_body - {}".format(self.thread_name, e.__str__()))
             response = self.messages_receiver_handler.build_response_message(OPCODE_NACK_RESPONSE)
 
-        self.logging.info("{} - Send Response message. length={}. message: {}".format(self.thread_name, length - 3, response))
+        self.logging.info("{} - Send Response message. message: {}".format(self.thread_name, binascii.hexlify(response)))
         return response

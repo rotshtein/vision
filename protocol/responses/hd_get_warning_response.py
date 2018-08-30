@@ -17,7 +17,8 @@ class HDGetWarningResponse(IBytesConverter):
         return "warnings={}. visibility_light_level={}. is_obstructed={}".format(self.warnings, self.visibility_light_level, self.is_obstructed)
 
     def to_bytes(self):
-        warning_bits = bitarray(self.warnings, endian=IBytesConverter.LITTLE_ENDIAN)
+        warning_bits1 = bitarray(self.warnings[0:8], endian=IBytesConverter.LITTLE_ENDIAN)
+        warning_bits2 = bitarray(self.warnings[8:16], endian=IBytesConverter.LITTLE_ENDIAN)
         is_vision_bit_1 = False
         is_vision_bit_2 = False
         if self.visibility_light_level == VisibilityLightLevel.NO_VISIBILITY_TO_MEDIUM:
@@ -29,7 +30,7 @@ class HDGetWarningResponse(IBytesConverter):
             is_vision_bit_1 = True
             is_vision_bit_2 = True
         vision_bits = bitarray([is_vision_bit_1, is_vision_bit_2, self.is_obstructed, None, None, None, None, None], endian=IBytesConverter.LITTLE_ENDIAN)
-        result = warning_bits + vision_bits
+        result = warning_bits1 + warning_bits2 + vision_bits
         return result.tobytes()
 
     @classmethod

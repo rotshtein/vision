@@ -24,10 +24,10 @@ class HDSetupMessage(IBytesConverter):
         # full_visibility_threshold = bytearray(struct.pack("{}f".format(IBytesConverter.LITTLE_ENDIAN_SIGN), self.full_visibility_threshold))
         rotate_image_cycle = int.to_bytes(self.rotate_image_cycle, 1, byteorder=IBytesConverter.LITTLE_ENDIAN)
         obstruction_threshold = int.to_bytes(self.obstruction_threshold, 2, byteorder=IBytesConverter.LITTLE_ENDIAN)
-        no_visibility_threshold = int.to_bytes(self.no_visibility_threshold, 2, byteorder=IBytesConverter.LITTLE_ENDIAN)
-        medium_visibility_threshold = int.to_bytes(self.medium_visibility_threshold, 2,
+        no_visibility_threshold = int.to_bytes(self.no_visibility_threshold, 1, byteorder=IBytesConverter.LITTLE_ENDIAN)
+        medium_visibility_threshold = int.to_bytes(self.medium_visibility_threshold, 1,
                                                    byteorder=IBytesConverter.LITTLE_ENDIAN)
-        full_visibility_threshold = int.to_bytes(self.full_visibility_threshold, 2,
+        full_visibility_threshold = int.to_bytes(self.full_visibility_threshold, 1,
                                                  byteorder=IBytesConverter.LITTLE_ENDIAN)
         minimum_obstruction_hits = int.to_bytes(self.minimum_obstruction_hits, 1,
                                                 byteorder=IBytesConverter.LITTLE_ENDIAN)
@@ -51,31 +51,31 @@ class HDSetupMessage(IBytesConverter):
             data_bytes[start_index - temp_offset:start_index - temp_offset + num_of_bytes],
             byteorder=IBytesConverter.LITTLE_ENDIAN)
         start_index = 7
-        num_of_bytes = 2
+        num_of_bytes = 1
         no_visibility_threshold = int.from_bytes(
             data_bytes[start_index - temp_offset:start_index - temp_offset + num_of_bytes],
             byteorder=IBytesConverter.LITTLE_ENDIAN)
-        start_index = 9
-        num_of_bytes = 2
+        start_index = 8
+        num_of_bytes = 1
         medium_visibility_threshold = int.from_bytes(
             data_bytes[start_index - temp_offset:start_index - temp_offset + num_of_bytes],
             byteorder=IBytesConverter.LITTLE_ENDIAN)
-        start_index = 11
-        num_of_bytes = 2
+        start_index = 9
+        num_of_bytes = 1
         full_visibility_threshold = int.from_bytes(
             data_bytes[start_index - temp_offset:start_index - temp_offset + num_of_bytes],
             byteorder=IBytesConverter.LITTLE_ENDIAN)
-        start_index = 13
+        start_index = 10
         num_of_bytes = 1
         minimum_obstruction_hits = int.from_bytes(
             data_bytes[start_index - temp_offset:start_index - temp_offset + num_of_bytes],
             byteorder=IBytesConverter.LITTLE_ENDIAN)
-        start_index = 14
+        start_index = 11
         num_of_bytes = 1
         maximum_obstruction_hits = int.from_bytes(
             data_bytes[start_index - temp_offset:start_index - temp_offset + num_of_bytes],
             byteorder=IBytesConverter.LITTLE_ENDIAN)
-        start_index = 15
+        start_index = 12
         num_of_bytes = 1
         checksum = int.from_bytes(data_bytes[start_index - temp_offset:start_index - temp_offset + num_of_bytes],
                                   byteorder=IBytesConverter.LITTLE_ENDIAN)

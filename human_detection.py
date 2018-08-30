@@ -210,7 +210,8 @@ class HumanDetection(HDThread):
         return self.in_error
 
     def on_setup_message(self, message: HDSetupMessage):
-        self.rotate_counter = message.rotate_image_cycle
+        self.logging.info("{} - on_setup_message={}".format(self.thread_name, message))
+        self.num_of_frames_to_rotate = message.rotate_image_cycle
 
     def on_set_warning_msg(self, message: HDSetWarningMessage):
         self.logging.info(
@@ -257,7 +258,7 @@ class HumanDetection(HDThread):
         warning_res = [False] * 16
         for warning_id, res in self.warnings_results.items():
             warning_res.__setitem__(warning_id, res.result)
-        warning_res = warning_res[::-1]
+        # warning_res = warning_res[::-1]
         self.logging.info("{} - on_get_warning_msg={}".format(self.thread_name, warning_res))
         return HDGetWarningResponse(warning_res, None, None)
 

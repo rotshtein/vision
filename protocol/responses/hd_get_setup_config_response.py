@@ -56,31 +56,31 @@ class HDGetSetupConfigResponse(IBytesConverter):
             data_bytes[start_index - temp_offset:start_index - temp_offset + num_of_bytes],
             byteorder=IBytesConverter.LITTLE_ENDIAN)
         start_index = 7
-        num_of_bytes = 2
+        num_of_bytes = 1
         no_visibility_threshold = int.from_bytes(
             data_bytes[start_index - temp_offset:start_index - temp_offset + num_of_bytes],
             byteorder=IBytesConverter.LITTLE_ENDIAN)
-        start_index = 9
-        num_of_bytes = 2
+        start_index = 8
+        num_of_bytes = 1
         medium_visibility_threshold = int.from_bytes(
             data_bytes[start_index - temp_offset:start_index - temp_offset + num_of_bytes],
             byteorder=IBytesConverter.LITTLE_ENDIAN)
-        start_index = 11
-        num_of_bytes = 2
+        start_index = 9
+        num_of_bytes = 1
         full_visibility_threshold = int.from_bytes(
             data_bytes[start_index - temp_offset:start_index - temp_offset + num_of_bytes],
             byteorder=IBytesConverter.LITTLE_ENDIAN)
-        start_index = 13
+        start_index = 10
         num_of_bytes = 1
         minimum_obstruction_hits = int.from_bytes(
             data_bytes[start_index - temp_offset:start_index - temp_offset + num_of_bytes],
             byteorder=IBytesConverter.LITTLE_ENDIAN)
-        start_index = 14
+        start_index = 11
         num_of_bytes = 1
         maximum_obstruction_hits = int.from_bytes(
             data_bytes[start_index - temp_offset:start_index - temp_offset + num_of_bytes],
             byteorder=IBytesConverter.LITTLE_ENDIAN)
-        start_index = 15
+        start_index = 12
         num_of_bytes = 1
         checksum = int.from_bytes(data_bytes[start_index - temp_offset:start_index - temp_offset + num_of_bytes],
                                   byteorder=IBytesConverter.LITTLE_ENDIAN)

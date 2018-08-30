@@ -3,6 +3,7 @@ Created on Aug 14, 2018
 
 @author: ziv
 """
+import os
 import queue
 import cv2
 import argparse
@@ -122,7 +123,8 @@ def main():
     if args_image == 'c':
         start_threads(args_show, args_debug, args_port, args_baudrate)
     else:
-        filelist = glob.glob(args_image)
+        filelist = glob.glob(os.path.join(args_image, '*.jpg'))
+        # filelist = glob.glob(args_image)
         for file in filelist:
             logging.info('********** ' + str(file) + ' ************')
             start_time = datetime.now()
