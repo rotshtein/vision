@@ -16,7 +16,10 @@ from communication import Communication
 from messages_receiver_handler import MessagesReceiverHandler
 from human_detection import HumanDetection
 from protocol.bytes_converter import calc_checksum
+from protocol.requests.hd_set_warning_msg import HDSetWarningMessage
+from utils.point_in_polygon import Point
 from vision import Vision
+from warning import ObjectClassHolder
 
 SW_VERSION = "0.1"
 FW_VERSION = "0.1"
@@ -133,9 +136,18 @@ def main():
         debug_queue = queue.Queue()
         target_fps = 0
         num_of_frames_to_rotate = 9
-        thread = HumanDetection(THREAD_DNN, logging, _img_queue, target_fps, True, num_of_frames_to_rotate, SW_VERSION,
+        hd_thread = HumanDetection(THREAD_DNN, logging, _img_queue, target_fps, True, num_of_frames_to_rotate, SW_VERSION,
                                 FW_VERSION, debug_queue)
-        thread.start()
+
+        # set a single warning - start...
+        hd_thread.num_of_frames_to_rotate = 9
+        polygon_arr = [Point(0, 0), Point(0, 270), Point(270, 270), Point(270, 0)]
+        object_class_holder = ObjectClassHolder([False, False, False, False, False, False, False, True])
+        warning_message = HDSetWarningMessage(5, polygon_arr, object_class_holder, 0, 300, 20, 1, 2, True)
+        hd_thread.on_set_warning_msg(warning_message)
+        # set a single warning - end ...
+
+        hd_thread.start()
         index = 0
         if args_show:
             while initial_queue_size > 0:
@@ -148,7 +160,7 @@ def main():
                 # ESC pressed
                 logging.debug("Escape hit, closing...")
                 cv2.destroyAllWindows()
-        thread.join(1)
+        hd_thread.join(1)
         print("Exiting Main Thread...")
 
 
