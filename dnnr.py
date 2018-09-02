@@ -30,8 +30,7 @@ THREAD_DNN = "Thread_DNN"
 THREAD_CAMERA = "Thread_Camera"
 
 
-def start_threads(show, port, baudrate):
-    thread_names = [THREAD_CAMERA, THREAD_DNN, THREAD_VISION, THREAD_COMMUNICATION]
+def start_threads(show, port, baudrate, thread_names):
     # thread_names = [THREAD_COMMUNICATION]
     # max size = 2 - we don't want old images!
     img_queue = queue.Queue(2)
@@ -82,6 +81,15 @@ def start_threads(show, port, baudrate):
 
     print("Exiting Main Thread")
 
+def create_dummy_warning(hd_thread):
+    # set a single warning - start...
+    hd_thread.num_of_frames_to_rotate = 9
+    polygon_arr = [Point(0, 0), Point(0, 270), Point(270, 270), Point(270, 0)]
+    object_class_holder = ObjectClassHolder([False, False, False, False, False, False, False, True])
+    warning_message = HDSetWarningMessage(5, polygon_arr, object_class_holder, 0, 300, 20, 1, 2, True)
+    hd_thread.on_set_warning_msg(warning_message)
+    # set a single warning - end ...
+
 
 def main():
     # construct the argument parse and parse the arguments
@@ -124,42 +132,35 @@ def main():
         cv2.namedWindow("detect")
 
     if args_image == 'c':
-        start_threads(args_show, args_port, args_baudrate)
+        thread_names = [THREAD_CAMERA, THREAD_DNN, THREAD_VISION, THREAD_COMMUNICATION]
+        start_threads(args_show, args_port, args_baudrate, thread_names)
     else:
         filelist = glob.glob(os.path.join(args_image, '*.png'))
-        _img_queue = queue.Queue()
+        list_of_images = []
         for file in filelist:
             logging.info('********** ' + str(file) + ' ************')
             img = cv2.imread(file)
-            _img_queue.put(img)
-        initial_queue_size = _img_queue.qsize()
+            list_of_images.append(img)
+        _img_queue = queue.Queue()
         debug_queue = queue.Queue()
         target_fps = 0
         num_of_frames_to_rotate = 9
-        hd_thread = HumanDetection(THREAD_DNN, logging, _img_queue, target_fps, True, num_of_frames_to_rotate, SW_VERSION,
-                                FW_VERSION, debug_queue)
-
-        # set a single warning - start...
-        hd_thread.num_of_frames_to_rotate = 9
-        polygon_arr = [Point(0, 0), Point(0, 270), Point(270, 270), Point(270, 0)]
-        object_class_holder = ObjectClassHolder([False, False, False, False, False, False, False, True])
-        warning_message = HDSetWarningMessage(5, polygon_arr, object_class_holder, 0, 300, 20, 1, 2, True)
-        hd_thread.on_set_warning_msg(warning_message)
-        # set a single warning - end ...
-
+        hd_thread = HumanDetection(THREAD_DNN, logging, _img_queue, target_fps, True, num_of_frames_to_rotate,
+                                   SW_VERSION,
+                                   FW_VERSION, debug_queue)
+        create_dummy_warning(hd_thread)
         hd_thread.start()
-        index = 0
-        if args_show:
-            while initial_queue_size > 0:
-                cv2.imshow('detect{}'.format(index), debug_queue.get())
-                index += 1
-                print("index={}".format(index))
-                initial_queue_size -= 1
-            k = cv2.waitKey()
-            if k % 256 == 27:
-                # ESC pressed
-                logging.debug("Escape hit, closing...")
-                cv2.destroyAllWindows()
+        while True:
+            for i in range(len(list_of_images)):
+                _img_queue.put(list_of_images.__getitem__(i))
+                image = debug_queue.get()
+                if args_show:
+                    cv2.imshow('detect', image)
+                    k = cv2.waitKey(1)
+                    if k % 256 == 27:
+                        # ESC pressed
+                        logging.debug("Escape hit, closing...")
+                        cv2.destroyAllWindows()
         hd_thread.join(1)
         print("Exiting Main Thread...")
 
