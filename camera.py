@@ -11,8 +11,8 @@ FROM_CAMERA_TH_SLEEP_SEC = 0.12
 
 
 class Camera(HDThread):
-    def __init__(self, thread_name, logging, img_queue, fps):
-        super().__init__(thread_name, logging, fps)
+    def __init__(self, thread_name, logging, img_queue, target_fps):
+        super().__init__(thread_name, logging, target_fps)
         self.img_queue = img_queue
         self.logging.info("{} - Start Init PiCamera...".format(thread_name))
         try:

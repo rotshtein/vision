@@ -9,6 +9,7 @@ import queue
 import numpy as np
 import cv2
 from datetime import datetime
+import threading
 
 from protocol.requests.hd_get_setup_config_msg import HDGetSetupConfigMessage
 from protocol.requests.hd_get_status_msg import HDGetStatusMessage
@@ -34,16 +35,15 @@ HEIGHT_THR = 150
 
 
 class HumanDetection(HDThread):
-    def __init__(self, thread_name, logging, img_queue, fps, show, num_of_frames_to_rotate, debug, sw_version,
+    def __init__(self, thread_name, logging, img_queue, target_fps, show, num_of_frames_to_rotate, sw_version,
                  fw_version, debug_img_queue):
-        super().__init__(thread_name, logging, fps)
-        self.logging.info("{} - Init. fps={}".format(thread_name, fps))
+        super().__init__(thread_name, logging, target_fps)
+        self.logging.info("{} - Init.".format(thread_name))
         self.rotate_counter = 0
         self.img_queue = img_queue  # type: queue.Queue
         self.debug_img_queue = debug_img_queue  # type: queue.Queue
         self.show = show
         self.num_of_frames_to_rotate = num_of_frames_to_rotate
-        self.debug = debug
         self.sw_version = sw_version
         self.fw_version = fw_version
 
@@ -63,6 +63,7 @@ class HumanDetection(HDThread):
         # warnings_results does not keep all 16 warnings but only warnings that were set.
         # the response message is always initialized with 16 False bits and iterates over warnings_results
         self.warnings_results = {}  # type: {}
+        self.lock = threading.Lock()
 
     def _run(self) -> None:
         self.logging.debug("{} - _run() - queue size={}".format(self.thread_name, self.img_queue.qsize()))
@@ -124,7 +125,7 @@ class HumanDetection(HDThread):
                 (startX, startY, endX, endY) = box.astype("int")
                 # display the prediction
                 classes_idx_ = self.CLASSES[idx]
-                label = "{}: {:.2f}% {} {}".format(classes_idx_, confidence, startX, startY)
+                label = "{}: {:.2f}%".format(classes_idx_, confidence)
                 self.logging.debug("{} - {}".format(self.thread_name, label))
 
                 object_w = abs(startX - endX)
@@ -191,7 +192,7 @@ class HumanDetection(HDThread):
     def draw_detection(self, image, startX, startY, endX, endY, idx, label):
         cv2.rectangle(image, (startX, startY), (endX, endY), self.COLORS[idx], 2)
         y = startY - 15 if startY - 15 > 15 else startY + 15
-        cv2.putText(image, label, (startX, y), cv2.FONT_HERSHEY_SIMPLEX, 0.5, self.COLORS[idx], 2)
+        # cv2.putText(image, label, (startX, y), cv2.FONT_HERSHEY_SIMPLEX, 0.5, self.COLORS[idx], 2)
 
     def draw_warning_polygon(self, polygon, warning_id, image):
         pts = np.array([[polygon[0].x, polygon[0].y], [polygon[1].x, polygon[1].y],
@@ -199,8 +200,8 @@ class HumanDetection(HDThread):
         pts = pts.reshape((-1, 1, 2))
         cv2.polylines(image, [pts], True, self.COLORS[warning_id])
         font = cv2.FONT_HERSHEY_SIMPLEX
-        x = int((polygon[0].x + polygon[1].x + polygon[2].x + polygon[3].x)/4) - 20
-        y = int((polygon[0].y + polygon[1].y + polygon[2].y + polygon[3].y)/4)
+        x = int((polygon[0].x + polygon[1].x + polygon[2].x + polygon[3].x) / 4) - 20
+        y = int((polygon[0].y + polygon[1].y + polygon[2].y + polygon[3].y) / 4)
 
         cv2.putText(image, "w{}".format(warning_id), (x, y), font, 0.5,
                     self.COLORS[warning_id], 2)
@@ -219,35 +220,55 @@ class HumanDetection(HDThread):
         warning = HDWarning(message.warning_id, message.polygon, message.object_class_holder, message.object_min_w_h,
                             message.object_max_w_h, message.minimum_confidence, message.minimum_detection_hits,
                             message.maximum_detection_hits, message.is_default)
-        self.warnings[message.warning_id] = warning
-        self.warnings_results[message.warning_id] = HDWarningResult()
+        self.lock.acquire()
+        try:
+            self.warnings[message.warning_id] = warning
+            self.warnings_results[message.warning_id] = HDWarningResult()
+        finally:
+            self.lock.release()
 
     def on_remove_warning_msg(self, message: HDRemoveWarningMessage):
-        if message.warning_id in self.warnings:
-            del self.warnings[message.warning_id]
-            del self.warnings_results[message.warning_id]
+        self.lock.acquire()
+        try:
+            if message.warning_id in self.warnings:
+                del self.warnings[message.warning_id]
+                del self.warnings_results[message.warning_id]
+        finally:
+            self.lock.release()
 
     def on_remove_all_warnings_msg(self):
-        self.warnings.clear()
-        self.warnings_results.clear()
+        self.lock.acquire()
+        try:
+            self.warnings.clear()
+            self.warnings_results.clear()
+        finally:
+            self.lock.release()
 
     def on_remove_all_warnings_except_defaults_msg(self):
         warnings_id_to_remove = []
-        for warning_id, warning in self.warnings.items():  # type: HDWarning
-            if not warning.is_default:
-                warnings_id_to_remove.append(warning_id)
+        self.lock.acquire()
+        try:
+            for warning_id, warning in self.warnings.items():  # type: HDWarning
+                if not warning.is_default:
+                    warnings_id_to_remove.append(warning_id)
 
-        for id in warnings_id_to_remove:
-            del self.warnings[id]
-            del self.warnings_results[id]
+            for id in warnings_id_to_remove:
+                del self.warnings[id]
+                del self.warnings_results[id]
+        finally:
+            self.lock.release()
 
     def on_set_warning_to_default_msg(self, message: HDSetWarningToDefaultMessage):
-        if message.all_warnings:
-            for warning in self.warnings.values():  # type: HDWarning
+        self.lock.acquire()
+        try:
+            if message.all_warnings:
+                for warning in self.warnings.values():  # type: HDWarning
+                    warning.is_default = True
+            elif message.warning_id in self.warnings:
+                warning = self.warnings[message.warning_id]  # type: HDWarning
                 warning.is_default = True
-        elif message.warning_id in self.warnings:
-            warning = self.warnings[message.warning_id]  # type: HDWarning
-            warning.is_default = True
+        finally:
+            self.lock.release()
 
     def on_set_power_msg(self, message: HDSetPowerMessage):
         # todo - need to implement ????
@@ -256,14 +277,22 @@ class HumanDetection(HDThread):
 
     def on_get_warning_msg(self):
         warning_res = [False] * 16
-        for warning_id, res in self.warnings_results.items():
-            warning_res.__setitem__(warning_id, res.result)
-        # warning_res = warning_res[::-1]
+        self.lock.acquire()
+        try:
+            for warning_id, res in self.warnings_results.items():
+                warning_res.__setitem__(warning_id, res.result)
+            # warning_res = warning_res[::-1]
+        finally:
+            self.lock.release()
         self.logging.info("{} - on_get_warning_msg={}".format(self.thread_name, warning_res))
         return HDGetWarningResponse(warning_res, None, None)
 
     def on_get_warning_config_msg(self, message: HDGetWarningConfigMessage):
-        warning = self.warnings.get(message.warning_id)  # type: HDWarning
+        self.lock.acquire()
+        try:
+            warning = self.warnings.get(message.warning_id)  # type: HDWarning
+        finally:
+            self.lock.release()
         return HDGetWarningConfigResponse(warning.warning_id, warning.polygon, warning.object_class_holder,
                                           warning.object_min_w_h, warning.object_max_w_h, warning.minimum_confidence,
                                           warning.minimum_detection_hits, warning.maximum_detection_hits,
@@ -278,18 +307,22 @@ class HumanDetection(HDThread):
         return HDGetStatusResponse(self.sw_version, self.fw_version)
 
     def set_result_counter(self, warning_id, is_hit):
-        warning = self.warnings[warning_id]  # type: HDWarning
-        warning_result = self.warnings_results[warning_id]  # type: HDWarningResult
-        if is_hit:
-            if warning_result.counter < warning.maximum_detection_hits:
-                warning_result.counter += 1
-        else:  # decrease
-            if warning_result.counter > 0:
-                warning_result.counter -= 1
-        # update_result_to_response
-        if warning_result.counter >= warning.minimum_detection_hits:
-            self.logging.info(
-                "{} - Detection in warning {} above min. hits.".format(self.thread_name, warning.warning_id))
-            warning_result.result = True
-        else:
-            warning_result.result = False
+        self.lock.acquire()
+        try:
+            warning = self.warnings[warning_id]  # type: HDWarning
+            warning_result = self.warnings_results[warning_id]  # type: HDWarningResult
+            if is_hit:
+                if warning_result.counter < warning.maximum_detection_hits:
+                    warning_result.counter += 1
+            else:  # decrease
+                if warning_result.counter > 0:
+                    warning_result.counter -= 1
+            # update_result_to_response
+            if warning_result.counter >= warning.minimum_detection_hits:
+                self.logging.info(
+                    "{} - Detection in warning {} above min. hits.".format(self.thread_name, warning.warning_id))
+                warning_result.result = True
+            else:
+                warning_result.result = False
+        finally:
+            self.lock.release()

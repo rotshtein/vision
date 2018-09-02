@@ -26,10 +26,10 @@ class HDGetSetupConfigResponse(IBytesConverter):
     def to_bytes(self):
         rotate_image_cycle = int.to_bytes(self.rotate_image_cycle, 1, byteorder=IBytesConverter.LITTLE_ENDIAN)
         obstruction_threshold = int.to_bytes(self.obstruction_threshold, 2, byteorder=IBytesConverter.LITTLE_ENDIAN)
-        no_visibility_threshold = int.to_bytes(self.no_visibility_threshold, 2, byteorder=IBytesConverter.LITTLE_ENDIAN)
-        medium_visibility_threshold = int.to_bytes(self.medium_visibility_threshold, 2,
+        no_visibility_threshold = int.to_bytes(self.no_visibility_threshold, 1, byteorder=IBytesConverter.LITTLE_ENDIAN)
+        medium_visibility_threshold = int.to_bytes(self.medium_visibility_threshold, 1,
                                                    byteorder=IBytesConverter.LITTLE_ENDIAN)
-        full_visibility_threshold = int.to_bytes(self.full_visibility_threshold, 2,
+        full_visibility_threshold = int.to_bytes(self.full_visibility_threshold, 1,
                                                  byteorder=IBytesConverter.LITTLE_ENDIAN)
         minimum_obstruction_hits = int.to_bytes(self.minimum_obstruction_hits, 1,
                                                 byteorder=IBytesConverter.LITTLE_ENDIAN)

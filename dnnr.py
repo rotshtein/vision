@@ -27,7 +27,7 @@ THREAD_DNN = "Thread_DNN"
 THREAD_CAMERA = "Thread_Camera"
 
 
-def start_threads(show, debug, port, baudrate):
+def start_threads(show, port, baudrate):
     thread_names = [THREAD_CAMERA, THREAD_DNN, THREAD_VISION, THREAD_COMMUNICATION]
     # thread_names = [THREAD_COMMUNICATION]
     # max size = 2 - we don't want old images!
@@ -38,20 +38,20 @@ def start_threads(show, debug, port, baudrate):
     thread = None
     for tName in thread_names:
         if tName == THREAD_CAMERA:
-            fps = 4
-            thread = Camera(tName, logging, img_queue, fps)
+            target_fps = 4
+            thread = Camera(tName, logging, img_queue, target_fps)
             messages_receiver_handler.add_rx_listeners(thread)
 
         elif tName == THREAD_DNN:
             num_of_frames_to_rotate = 9
-            fps = 0
-            thread = HumanDetection(tName, logging, img_queue, fps, show, num_of_frames_to_rotate, debug, SW_VERSION,
+            target_fps = 0
+            thread = HumanDetection(tName, logging, img_queue, target_fps, show, num_of_frames_to_rotate, SW_VERSION,
                                     FW_VERSION, debug_queue)
             messages_receiver_handler.add_rx_listeners(thread)
 
         elif tName == THREAD_VISION:
-            fps = 2
-            thread = Vision(tName, logging, img_queue, fps)
+            target_fps = 2
+            thread = Vision(tName, logging, img_queue, target_fps)
             messages_receiver_handler.add_rx_listeners(thread)
 
         elif tName == THREAD_COMMUNICATION:
@@ -121,33 +121,35 @@ def main():
         cv2.namedWindow("detect")
 
     if args_image == 'c':
-        start_threads(args_show, args_debug, args_port, args_baudrate)
+        start_threads(args_show, args_port, args_baudrate)
     else:
-        filelist = glob.glob(os.path.join(args_image, '*.jpg'))
-        # filelist = glob.glob(args_image)
+        filelist = glob.glob(os.path.join(args_image, '*.png'))
+        _img_queue = queue.Queue()
         for file in filelist:
             logging.info('********** ' + str(file) + ' ************')
-            start_time = datetime.now()
             img = cv2.imread(file)
-            num_of_frames_to_rotate = 9
-            confidence = 0.2
-            fps = 0
-            _img_queue = queue.Queue(2)
             _img_queue.put(img)
-            thread = HumanDetection(THREAD_DNN, logging, _img_queue, fps, True, num_of_frames_to_rotate, False,
-                                    SW_VERSION, FW_VERSION, )
-            thread.run()
-            if args_show:
-                cv2.imshow('detect', img)
-                try:
-                    while cv2.getWindowProperty('detect', 0) >= 0:
-                        k = cv2.waitKey(50)
-                        if k > 0:
-                            break
-                except:
-                    pass
-            logging.info(datetime.now() - start_time)
-    cv2.destroyAllWindows()
+        initial_queue_size = _img_queue.qsize()
+        debug_queue = queue.Queue()
+        target_fps = 0
+        num_of_frames_to_rotate = 9
+        thread = HumanDetection(THREAD_DNN, logging, _img_queue, target_fps, True, num_of_frames_to_rotate, SW_VERSION,
+                                FW_VERSION, debug_queue)
+        thread.start()
+        index = 0
+        if args_show:
+            while initial_queue_size > 0:
+                cv2.imshow('detect{}'.format(index), debug_queue.get())
+                index += 1
+                print("index={}".format(index))
+                initial_queue_size -= 1
+            k = cv2.waitKey()
+            if k % 256 == 27:
+                # ESC pressed
+                logging.debug("Escape hit, closing...")
+                cv2.destroyAllWindows()
+        thread.join(1)
+        print("Exiting Main Thread...")
 
 
 main()

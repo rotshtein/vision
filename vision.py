@@ -18,11 +18,11 @@ from utils.obstruction_detector import ObstructionDetector
 
 
 class Vision(HDThread):
-    def __init__(self, thread_name, logging, img_queue, fps):
-        super().__init__(thread_name, logging, fps)
+    def __init__(self, thread_name, logging, img_queue, target_fps):
+        super().__init__(thread_name, logging, target_fps)
         self.obs_detector = ObstructionDetector(logging)
         self.logging.info(
-            "{} - Init. fps={}, Variance Threshold={}".format(thread_name, fps, self.obs_detector.variance_threshold))
+            "{} - Init. ".format(thread_name))
         self.img_queue = img_queue  # type: Queue
         self.is_obstructed = True
         self.visibility_light_level = VisibilityLightLevel.FULL_VISIBILITY

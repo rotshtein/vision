@@ -11,12 +11,12 @@ from rx_message import IRXMessage
 
 
 class HDThread(threading.Thread, IRXMessage):
-    def __init__(self, thread_name, logging, fps):
+    def __init__(self, thread_name, logging, target_fps):
         super().__init__()
         self.thread_name = thread_name
         self.is_exit = False
         self.logging = logging  # type: logging
-        self.fps = fps
+        self.target_fps = target_fps
         self.iteration_time_sec = 0.0
         self.last_measured_time = datetime.now()
         self.in_error = False
@@ -29,8 +29,8 @@ class HDThread(threading.Thread, IRXMessage):
             except Exception as e:
                 self.logging.info("{} - Exception: {}".format(self.thread_name, e.__str__()))
                 self.in_error = True
-            if self.fps != 0 and self.iteration_time_sec != 0:
-                sleep_time = 1 / self.fps - self.iteration_time_sec
+            if self.target_fps != 0 and self.iteration_time_sec != 0:
+                sleep_time = 1 / self.target_fps - self.iteration_time_sec
                 sleep_time = sleep_time if sleep_time > 0 else 0
                 # self.logging.debug("sleep_time={}".format(sleep_time))
                 self.logging.debug("{} - Going to sleep {} sec".format(self.thread_name, sleep_time))
