@@ -3,19 +3,18 @@ Created on Aug 14, 2018
 
 @author: ziv
 """
-import os
-import queue
-import cv2
 import argparse
 import glob
-from datetime import datetime
 import logging
+import os
+import queue
+
+import cv2
 
 from camera import Camera
 from communication import Communication
-from messages_receiver_handler import MessagesReceiverHandler
 from human_detection import HumanDetection
-from protocol.bytes_converter import calc_checksum
+from messages_receiver_handler import MessagesReceiverHandler
 from protocol.requests.hd_set_warning_msg import HDSetWarningMessage
 from utils.point_in_polygon import Point
 from vision import Vision

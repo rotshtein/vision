@@ -14,12 +14,3 @@ class IBytesConverter(object):
     @classmethod
     def from_bytes(cls, data_bytes, length=0, offset=0):
         pass
-
-
-def calc_checksum(data):
-    crc = 0
-    for i in range(len(data)):
-        crc += data[i]
-        i += 1
-    crc = ~crc % 256
-    return int.to_bytes(crc, 1, byteorder=IBytesConverter.LITTLE_ENDIAN, signed=False)

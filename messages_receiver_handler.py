@@ -1,7 +1,5 @@
-from protocol.bytes_converter import calc_checksum, IBytesConverter
+from protocol.bytes_converter import IBytesConverter
 from protocol.requests.hd_get_warning_config_msg import HDGetWarningConfigMessage
-from protocol.requests.hd_remove_all_warnings_except_default_msg import HDRemoveAllWarningsExceptDefaultMessage
-from protocol.requests.hd_remove_all_warnings_msg import HDRemoveAllWarningsMessage
 from protocol.requests.hd_remove_warning_msg import HDRemoveWarningMessage
 from protocol.requests.hd_set_power_msg import HDSetPowerMessage
 from protocol.requests.hd_set_warning_msg import HDSetWarningMessage
@@ -133,6 +131,14 @@ class MessagesReceiverHandler(object):
         res_message_bytes_array = bytearray([PREAMBLE_PREFIX, total_msg_length, opcode])
         if data is not None:
             res_message_bytes_array += data
-        checksum = calc_checksum(res_message_bytes_array)
+        checksum = self.calc_checksum(res_message_bytes_array)
         res_message_bytes_array = res_message_bytes_array + checksum
         return res_message_bytes_array
+
+    def calc_checksum(self, data):
+        crc = 0
+        for i in range(len(data)):
+            crc += data[i]
+            i += 1
+        _crc = ~crc % 256
+        return int.to_bytes(_crc, 1, byteorder=IBytesConverter.LITTLE_ENDIAN)
