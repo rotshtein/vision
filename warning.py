@@ -77,7 +77,7 @@ class ObjectClassHolder:
             for key, value in _obj.value.items():
                 bool_result[key] = True
                 break
-        return bool_result
+        return bool_result[::-1]
 
 
 class ObjectClassConverter(object):

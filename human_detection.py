@@ -233,6 +233,8 @@ class HumanDetection(HDThread):
             if message.warning_id in self.warnings:
                 del self.warnings[message.warning_id]
                 del self.warnings_results[message.warning_id]
+            else:
+                raise Exception("{} - on_remove_warning_msg - No warning id to remove {}".format(self.thread_name, message.warning_id))
         finally:
             self.lock.release()
 
