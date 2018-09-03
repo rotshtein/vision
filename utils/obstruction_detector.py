@@ -55,7 +55,9 @@ class ObstructionDetector(object):
 
     def get_frame_light_level(self, thread_name):
         image_average_intensity = np.mean(self.tiles_intensity_matrix)
-        logging.debug("{} - image_average_intensity={}. tiles_intensity_matrix={}".format(thread_name, image_average_intensity, self.tiles_intensity_matrix))
+        logging.debug(
+            "{} - image_average_intensity={}. tiles_intensity_matrix={}".format(thread_name, image_average_intensity,
+                                                                                self.tiles_intensity_matrix))
         if image_average_intensity < self.no_visibility_threshold:
             return VisibilityLightLevel.NO_VISIBILITY
         elif self.no_visibility_threshold <= image_average_intensity < self.medium_visibility_threshold:
@@ -66,9 +68,16 @@ class ObstructionDetector(object):
             return VisibilityLightLevel.FULL_VISIBILITY
 
     def set_obstruction_threshold(self, variance_threshold):
+        if variance_threshold == 0:
+            self.logging.info("Thread_Vision - Warning! Variance is set to 0. Obstruction will be ignored...")
         self.variance_threshold = variance_threshold
 
     def set_obstruction_min_max_hits(self, min_hits, max_hits):
+        if min_hits > max_hits:
+            self.logging.info("Thread_Vision - Illegal values in set_obstruction_min_max_hits: Min={} is bigger than "
+                              "Max={}. Aborting...:.".format(min_hits, max_hits))
+        if max_hits == 0:
+            self.logging.info("Thread_Vision - Warning! obstruction max hits=0. Obstruction will be ignored...")
         self.min_obstruction_hits = min_hits
         self.max_obstruction_hits = max_hits
         self.init_last_tiles_matrix(max_hits)
@@ -90,6 +99,10 @@ class ObstructionDetector(object):
 
         # handle current frame - do validation
         # self.logging.info("Vision - Started Obstruction detection. Tiles to ignore:{}".format(tiles_to_ignore))
+
+        if self.max_obstruction_hits == 0:
+            self.logging.debug("{} - Warning - Max obstruction hits = 0. Aborting...:.".format(thread_name))
+            return []
         self.__validate_frame_and_add_result_to_list(image)
 
         # check if any tile is consecutively obstructed in the last n frames
