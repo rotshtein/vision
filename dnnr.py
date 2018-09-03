@@ -136,6 +136,8 @@ def main():
         start_threads(args_show, args_port, args_baudrate, thread_names)
     else:
         filelist = glob.glob(os.path.join(args_image, '*.png'))
+        filelist.extend(glob.glob(os.path.join(args_image, '*.jpg')))
+        filelist.extend(glob.glob(os.path.join(args_image, '*.bmp')))
         list_of_images = []
         for file in filelist:
             logging.info('********** ' + str(file) + ' ************')
