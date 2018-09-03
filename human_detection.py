@@ -46,6 +46,8 @@ class HumanDetection(HDThread):
         self.num_of_frames_to_rotate = num_of_frames_to_rotate
         self.sw_version = sw_version
         self.fw_version = fw_version
+        self.is_logging_debug = False
+        self.save_images_to_disk = False
 
         self.CLASSES = ["background", "aeroplane", "bicycle", "bird", "boat",
                         "bottle", "bus", "car", "cat", "chair", "cow", "diningtable",
@@ -213,6 +215,9 @@ class HumanDetection(HDThread):
     def on_setup_message(self, message: HDSetupMessage):
         self.logging.info("{} - on_setup_message={}".format(self.thread_name, message))
         self.num_of_frames_to_rotate = message.rotate_image_cycle
+        self.is_logging_debug = message.logging_debug
+        self.show = message.show_images
+        self.save_images_to_disk = message.save_images_to_disk
 
     def on_set_warning_msg(self, message: HDSetWarningMessage):
         self.logging.info(
@@ -301,7 +306,8 @@ class HumanDetection(HDThread):
                                           warning.is_default)
 
     def on_get_setup_config_msg(self) -> HDGetSetupConfigResponse:
-        config_response = HDGetSetupConfigResponse(self.num_of_frames_to_rotate, None, None, None, None, None, None)
+        config_response = HDGetSetupConfigResponse(self.num_of_frames_to_rotate, None, None, None, None, None, None,
+                                                   self.is_logging_debug, self.show, self.save_images_to_disk)
         self.logging.info("{} - on_get_setup_config_msg={}".format(self.thread_name, config_response))
         return config_response
 

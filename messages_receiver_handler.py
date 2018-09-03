@@ -115,6 +115,12 @@ class MessagesReceiverHandler(object):
                 response.minimum_obstruction_hits = data.minimum_obstruction_hits
             if data.maximum_obstruction_hits is not None:
                 response.maximum_obstruction_hits = data.maximum_obstruction_hits
+            if data.logging_debug is not None:
+                response.logging_debug = data.logging_debug
+            if data.show_images is not None:
+                response.show_images= data.show_images
+            if data.save_images_to_disk is not None:
+                response.save_images_to_disk = data.save_images_to_disk
         return response
 
     def handle_get_status_msg(self):

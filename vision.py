@@ -71,6 +71,9 @@ class Vision(HDThread):
                                             self.obs_detector.medium_visibility_threshold,
                                             self.obs_detector.full_visibility_threshold,
                                             self.obs_detector.min_obstruction_hits,
-                                            self.obs_detector.max_obstruction_hits)
+                                            self.obs_detector.max_obstruction_hits,
+                                            None,
+                                            None,
+                                            None)
         self.logging.info("{} - on_get_setup_config_msg={}".format(self.thread_name, response))
         return response

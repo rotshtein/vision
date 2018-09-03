@@ -6,7 +6,8 @@ from protocol.bytes_converter import IBytesConverter
 class HDSetupMessage(IBytesConverter):
 
     def __init__(self, rotate_image_cycle, obstruction_threshold, no_visibility_threshold, medium_visibility_threshold,
-                 full_visibility_threshold, minimum_obstruction_hits, maximum_obstruction_hits) -> None:
+                 full_visibility_threshold, minimum_obstruction_hits, maximum_obstruction_hits, logging_debug,
+                 show_images, save_images_to_disk) -> None:
         super().__init__()
         self.rotate_image_cycle = rotate_image_cycle
         self.obstruction_threshold = obstruction_threshold
@@ -15,10 +16,16 @@ class HDSetupMessage(IBytesConverter):
         self.full_visibility_threshold = full_visibility_threshold
         self.minimum_obstruction_hits = minimum_obstruction_hits
         self.maximum_obstruction_hits = maximum_obstruction_hits
+        self.logging_debug = logging_debug
+        self.show_images = show_images
+        self.save_images_to_disk = save_images_to_disk
         self.opcode = b'xB1'
 
     def __str__(self):
-        return str([self.rotate_image_cycle, self.obstruction_threshold, self.no_visibility_threshold, self.medium_visibility_threshold, self.full_visibility_threshold, self.minimum_obstruction_hits, self.maximum_obstruction_hits])
+        return str([self.rotate_image_cycle, self.obstruction_threshold, self.no_visibility_threshold,
+                    self.medium_visibility_threshold, self.full_visibility_threshold,
+                    self.minimum_obstruction_hits, self.maximum_obstruction_hits,
+                    self.logging_debug, self.show_images, self.save_images_to_disk])
 
     def to_bytes(self):
         # full_visibility_threshold = bytearray(struct.pack("{}f".format(IBytesConverter.LITTLE_ENDIAN_SIGN), self.full_visibility_threshold))
@@ -33,8 +40,15 @@ class HDSetupMessage(IBytesConverter):
                                                 byteorder=IBytesConverter.LITTLE_ENDIAN)
         maximum_obstruction_hits = int.to_bytes(self.maximum_obstruction_hits, 1,
                                                 byteorder=IBytesConverter.LITTLE_ENDIAN)
+        logging_debug = bool.to_bytes(self.logging_debug, 1,
+                                      byteorder=IBytesConverter.LITTLE_ENDIAN)
+        show_images = bool.to_bytes(self.show_images, 1,
+                                    byteorder=IBytesConverter.LITTLE_ENDIAN)
+        save_images_to_disk = bool.to_bytes(self.save_images_to_disk, 1,
+                                            byteorder=IBytesConverter.LITTLE_ENDIAN)
         result = rotate_image_cycle + obstruction_threshold + no_visibility_threshold + medium_visibility_threshold \
-                 + full_visibility_threshold + minimum_obstruction_hits + maximum_obstruction_hits
+                 + full_visibility_threshold + minimum_obstruction_hits + maximum_obstruction_hits + logging_debug \
+                 + show_images + save_images_to_disk
         return result
 
     @classmethod
@@ -77,10 +91,24 @@ class HDSetupMessage(IBytesConverter):
             byteorder=IBytesConverter.LITTLE_ENDIAN)
         start_index = 12
         num_of_bytes = 1
+        logging_debug = bool.from_bytes(data_bytes[start_index - temp_offset:start_index - temp_offset + num_of_bytes],
+                                        byteorder=IBytesConverter.LITTLE_ENDIAN)
+        start_index = 13
+        num_of_bytes = 1
+        show_images = bool.from_bytes(data_bytes[start_index - temp_offset:start_index - temp_offset + num_of_bytes],
+                                      byteorder=IBytesConverter.LITTLE_ENDIAN)
+        start_index = 14
+        num_of_bytes = 1
+        save_images_to_disk = bool.from_bytes(
+            data_bytes[start_index - temp_offset:start_index - temp_offset + num_of_bytes],
+            byteorder=IBytesConverter.LITTLE_ENDIAN)
+        start_index = 15
+        num_of_bytes = 1
         checksum = int.from_bytes(data_bytes[start_index - temp_offset:start_index - temp_offset + num_of_bytes],
                                   byteorder=IBytesConverter.LITTLE_ENDIAN)
         return cls(rotate_image_cycle, obstruction_threshold, no_visibility_threshold, medium_visibility_threshold,
-                   full_visibility_threshold, minimum_obstruction_hits, maximum_obstruction_hits)
+                   full_visibility_threshold, minimum_obstruction_hits, maximum_obstruction_hits, logging_debug,
+                   show_images, save_images_to_disk)
 
 
 if __name__ == '__main__':
