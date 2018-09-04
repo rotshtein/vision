@@ -36,12 +36,13 @@ HEIGHT_THR = 150
 
 class HumanDetection(HDThread):
     def __init__(self, thread_name, logging, img_queue, target_fps, show, num_of_frames_to_rotate, sw_version,
-                 fw_version, debug_img_queue):
+                 fw_version, debug_img_queue, debug_save_img_queue=None):
         super().__init__(thread_name, logging, target_fps)
         self.logging.info("{} - Init.".format(thread_name))
         self.rotate_counter = 0
         self.img_queue = img_queue  # type: queue.Queue
         self.debug_img_queue = debug_img_queue  # type: queue.Queue
+        self.debug_save_img_queue = debug_save_img_queue  # type: queue.Queue
         self.show = show
         self.num_of_frames_to_rotate = num_of_frames_to_rotate
         self.sw_version = sw_version
@@ -162,6 +163,8 @@ class HumanDetection(HDThread):
         self.iteration_time_sec = iteration_time.microseconds * 1000000
         self.logging.debug("{} - End. Duration={}. ".format(self.thread_name, datetime.now() - process_start))
         self.rotate_counter += 1
+        if self.save_images_to_disk:
+            self.debug_save_img_queue.put(resized_image)
         if self.show:
             self.debug_img_queue.put(resized_image)
 
@@ -212,10 +215,22 @@ class HumanDetection(HDThread):
     def is_module_in_error(self):
         return self.in_error
 
+    def handle_log_level_change(self):
+        level = self.logging.INFO
+        if self.is_logging_debug:
+            level = self.logging.DEBUG
+        logger = self.logging.getLogger()
+        logger.setLevel(level)
+        for handler in logger.handlers:
+            handler.setLevel(level)
+
     def on_setup_message(self, message: HDSetupMessage):
         self.logging.info("{} - on_setup_message={}".format(self.thread_name, message))
         self.num_of_frames_to_rotate = message.rotate_image_cycle
+
         self.is_logging_debug = message.logging_debug
+        self.handle_log_level_change()
+
         self.show = message.show_images
         self.save_images_to_disk = message.save_images_to_disk
 

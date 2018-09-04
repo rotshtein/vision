@@ -2,7 +2,11 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="15741994-b401-49d7-b680-7125fc6fcaa4" name="Default" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/communication.py" beforeDir="false" afterPath="$PROJECT_DIR$/communication.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dnnr.py" beforeDir="false" afterPath="$PROJECT_DIR$/dnnr.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/human_detection.py" beforeDir="false" afterPath="$PROJECT_DIR$/human_detection.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/utils/hd_thread.py" beforeDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -13,25 +17,50 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="dnnr.py" pinned="false" current-in-tab="false">
+      <file leaf-file-name="dnnr.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/dnnr.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="191">
-              <caret line="121" column="9" lean-forward="true" selection-start-line="121" selection-start-column="9" selection-end-line="121" selection-end-column="9" />
+            <state relative-caret-position="73">
+              <caret line="133" column="35" selection-start-line="133" selection-start-column="35" selection-end-line="133" selection-end-column="35" />
               <folding>
-                <element signature="e#46#55#0" expanded="true" />
+                <element signature="e#46#61#0" expanded="true" />
+                <element signature="e#2460#2905#0" />
               </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="communication.py" pinned="false" current-in-tab="true">
+      <file leaf-file-name="file_saver.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/file_saver.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="270">
+              <caret line="47" column="35" selection-start-line="47" selection-start-column="35" selection-end-line="47" selection-end-column="35" />
+              <folding>
+                <element signature="e#46#58#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="communication.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/communication.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="182">
-              <caret line="60" column="56" selection-start-line="60" selection-start-column="56" selection-end-line="60" selection-end-column="56" />
+            <state relative-caret-position="221">
+              <caret line="51" selection-start-line="51" selection-end-line="51" />
               <folding>
                 <element signature="e#46#61#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="hd_get_warning_response.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/protocol/responses/hd_get_warning_response.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="612">
+              <caret line="36" column="8" selection-start-line="36" selection-start-column="8" selection-end-line="36" selection-end-column="8" />
+              <folding>
+                <element signature="e#0#21#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -40,32 +69,21 @@
       <file leaf-file-name="human_detection.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/human_detection.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="119">
-              <caret line="214" column="44" selection-start-line="214" selection-start-column="44" selection-end-line="214" selection-end-column="44" />
+            <state relative-caret-position="28">
+              <caret line="40" column="25" selection-start-line="40" selection-start-column="25" selection-end-line="40" selection-end-column="25" />
               <folding>
                 <element signature="e#46#57#0" expanded="true" />
+                <element signature="e#14800#15679#0" />
               </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="hd_get_warning_config_msg.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/protocol/requests/hd_get_warning_config_msg.py">
+      <file leaf-file-name="hd_get_setup_config_response.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/protocol/responses/hd_get_setup_config_response.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="51">
-              <caret line="3" column="6" selection-start-line="3" selection-start-column="6" selection-end-line="3" selection-end-column="6" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="hd_get_warning_config_response.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/protocol/responses/hd_get_warning_config_response.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="204">
-              <caret line="12" column="39" lean-forward="true" selection-start-line="12" selection-start-column="39" selection-end-line="12" selection-end-column="39" />
-              <folding>
-                <element signature="e#0#52#0" expanded="true" />
-              </folding>
+            <state relative-caret-position="90">
+              <caret line="30" column="8" selection-start-line="30" selection-start-column="8" selection-end-line="30" selection-end-column="8" />
             </state>
           </provider>
         </entry>
@@ -73,8 +91,8 @@
       <file leaf-file-name="messages_receiver_handler.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/messages_receiver_handler.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="131">
-              <caret line="45" column="41" selection-start-line="45" selection-start-column="41" selection-end-line="45" selection-end-column="41" />
+            <state relative-caret-position="192">
+              <caret line="33" column="38" selection-start-line="33" selection-start-column="38" selection-end-line="33" selection-end-column="38" />
               <folding>
                 <element signature="e#0#67#0" expanded="true" />
               </folding>
@@ -82,13 +100,13 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="vision.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/vision.py">
+      <file leaf-file-name="hd_threading.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/utils/hd_threading.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="117">
-              <caret line="56" column="54" selection-start-line="56" selection-start-column="54" selection-end-line="56" selection-end-column="54" />
+            <state relative-caret-position="147">
+              <caret line="16" column="8" selection-start-line="16" selection-start-column="8" selection-end-line="16" selection-end-column="8" />
               <folding>
-                <element signature="e#46#75#0" expanded="true" />
+                <element signature="e#46#62#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -105,20 +123,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>on_setup_message</find>
-      <find>Exception</find>
-      <find>excep</find>
-      <find>update</find>
-      <find>index</find>
-      <find>warnings_results</find>
-      <find>self.warnings_results</find>
-      <find>lock</find>
-      <find>warnings</find>
-      <find>checkedListBoxObjectClass</find>
-      <find>self.warnings</find>
-      <find>label</find>
-      <find>handle_message</find>
-      <find>handle_message_body</find>
       <find>is_modul</find>
       <find>in_error</find>
       <find>min_obstruction_hits</find>
@@ -135,6 +139,20 @@
       <find>thread_name</find>
       <find>max_obstruction_hits</find>
       <find>setup</find>
+      <find>MessagesReceiverHandler</find>
+      <find>Error in serial</find>
+      <find>calc_checksum</find>
+      <find>from_byte</find>
+      <find>on_setup_message</find>
+      <find>save_images_to_disk</find>
+      <find>Error in handle_message_body</find>
+      <find>show</find>
+      <find>Tiles to ignore</find>
+      <find>THREAD_CAMERA</find>
+      <find>log</find>
+      <find>DEBUG_FOLDER_NAME</find>
+      <find>debug_save_img_queue</find>
+      <find>debug_queue</find>
     </findStrings>
     <replaceStrings>
       <replace>logging.info</replace>
@@ -148,7 +166,6 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/hd_thread.py" />
         <option value="$PROJECT_DIR$/data/warning.py" />
         <option value="$PROJECT_DIR$/data/warningmsg.py" />
         <option value="$PROJECT_DIR$/data/hdwarning.py" />
@@ -176,7 +193,6 @@
         <option value="$PROJECT_DIR$/protocol/responses/hd_get_warning_config_response.py" />
         <option value="$PROJECT_DIR$/dnnx.py" />
         <option value="$PROJECT_DIR$/protocol/responses/hd_get_status_response.py" />
-        <option value="$PROJECT_DIR$/protocol/bytes_converter.py" />
         <option value="$PROJECT_DIR$/protocol/requests/hd_get_warning_config_msg.py" />
         <option value="$PROJECT_DIR$/protocol/requests/hd_remove_all_warnings_except_default_msg.py" />
         <option value="$PROJECT_DIR$/protocol/requests/hd_remove_warning_msg.py" />
@@ -187,26 +203,28 @@
         <option value="$PROJECT_DIR$/scripts/run_dnnr_w_camera.sh" />
         <option value="$PROJECT_DIR$/utils/point_in_polygon.py" />
         <option value="$PROJECT_DIR$/protocol/responses/hd_get_warning_response.py" />
-        <option value="$PROJECT_DIR$/protocol/responses/hd_get_setup_config_response.py" />
-        <option value="$PROJECT_DIR$/protocol/requests/hd_setup_msg.py" />
         <option value="$PROJECT_DIR$/utils/hd_threading.py" />
         <option value="$PROJECT_DIR$/camera.py" />
-        <option value="$PROJECT_DIR$/vision.py" />
         <option value="$PROJECT_DIR$/protocol/requests/hd_set_warning_msg.py" />
-        <option value="$PROJECT_DIR$/dnnr.py" />
-        <option value="$PROJECT_DIR$/messages_receiver_handler.py" />
         <option value="$PROJECT_DIR$/utils/obstruction_detector.py" />
         <option value="$PROJECT_DIR$/warning.py" />
+        <option value="$PROJECT_DIR$/protocol/bytes_converter.py" />
+        <option value="$PROJECT_DIR$/protocol/responses/hd_get_setup_config_response.py" />
+        <option value="$PROJECT_DIR$/vision.py" />
+        <option value="$PROJECT_DIR$/messages_receiver_handler.py" />
+        <option value="$PROJECT_DIR$/protocol/requests/hd_setup_msg.py" />
         <option value="$PROJECT_DIR$/human_detection.py" />
         <option value="$PROJECT_DIR$/communication.py" />
+        <option value="$PROJECT_DIR$/file_saver.py" />
+        <option value="$PROJECT_DIR$/dnnr.py" />
       </list>
     </option>
   </component>
   <component name="ProjectFrameBounds" extendedState="6">
-    <option name="x" value="126" />
-    <option name="y" value="123" />
-    <option name="width" value="1345" />
-    <option name="height" value="429" />
+    <option name="x" value="247" />
+    <option name="y" value="87" />
+    <option name="width" value="1060" />
+    <option name="height" value="603" />
   </component>
   <component name="ProjectLevelVcsManager">
     <ConfirmationsSetting value="1" id="Add" />
@@ -226,23 +244,6 @@
             </path>
             <path>
               <item name="vision" type="b2602c69:ProjectViewProjectNode" />
-              <item name="vision" type="462c0819:PsiDirectoryNode" />
-              <item name="protocol" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="vision" type="b2602c69:ProjectViewProjectNode" />
-              <item name="vision" type="462c0819:PsiDirectoryNode" />
-              <item name="protocol" type="462c0819:PsiDirectoryNode" />
-              <item name="requests" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="vision" type="b2602c69:ProjectViewProjectNode" />
-              <item name="vision" type="462c0819:PsiDirectoryNode" />
-              <item name="protocol" type="462c0819:PsiDirectoryNode" />
-              <item name="responses" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="vision" type="b2602c69:ProjectViewProjectNode" />
               <item name="External Libraries" type="cb654da1:ExternalLibrariesNode" />
             </path>
           </expand>
@@ -258,10 +259,10 @@
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="C:\Projects\vision" />
+      <recent name="C:\Projects\vision\documents" />
       <recent name="C:\Projects\vision\protocol\responses" />
       <recent name="C:\Projects\vision\protocol\requests" />
       <recent name="C:\Projects\vision\protocol" />
-      <recent name="C:\Projects\vision\data" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
       <recent name="C:\Projects\vision\protocol\requests" />
@@ -283,7 +284,7 @@
       </list>
     </option>
   </component>
-  <component name="RunManager" selected="Python.dnnr">
+  <component name="RunManager" selected="Python.dnnr image">
     <configuration name="dnnr image" type="PythonConfigurationType" factoryName="Python">
       <module name="vision" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -315,7 +316,7 @@
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <option name="SCRIPT_NAME" value="$PROJECT_DIR$/dnnr.py" />
-      <option name="PARAMETERS" value="-i c -s -p &quot;COM1&quot;" />
+      <option name="PARAMETERS" value="-i c -d -p &quot;COM1&quot;" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
       <option name="MODULE_MODE" value="false" />
@@ -455,16 +456,16 @@
     <layout>
       <window_info anchor="bottom" id="TODO" order="6" sideWeight="0.49932885" weight="0.3298969" />
       <window_info anchor="bottom" id="Event Log" order="10" sideWeight="0.50939596" side_tool="true" weight="0.34462446" />
-      <window_info anchor="bottom" id="Run" order="2" sideWeight="0.490604" weight="0.359352" />
+      <window_info anchor="bottom" id="Run" order="2" sideWeight="0.490604" weight="0.544919" />
       <window_info anchor="bottom" id="Version Control" order="7" sideWeight="0.49932885" weight="0.3298969" />
-      <window_info anchor="bottom" id="Python Console" order="8" sideWeight="0.47449663" weight="0.30191457" />
+      <window_info anchor="bottom" id="Python Console" order="8" sideWeight="0.47449663" weight="0.31958762" />
       <window_info anchor="bottom" id="Terminal" order="9" sideWeight="0.49395972" weight="0.3622975" />
-      <window_info content_ui="combo" id="Project" order="0" sideWeight="0.75" visible="true" weight="0.23355705" />
+      <window_info content_ui="combo" id="Project" order="0" sideWeight="0.75" visible="true" weight="0.20268457" />
       <window_info anchor="right" id="R Packages" order="4" />
       <window_info anchor="right" id="R Graphics" order="3" />
       <window_info anchor="bottom" id="Find" order="1" sideWeight="0.47583893" weight="0.44919" />
       <window_info id="Structure" order="1" sideWeight="0.25090253" side_tool="true" weight="0.23355705" />
-      <window_info active="true" anchor="bottom" id="Debug" order="3" sideWeight="0.6912752" visible="true" weight="0.49779087" />
+      <window_info active="true" anchor="bottom" id="Debug" order="3" sideWeight="0.6912752" visible="true" weight="0.5964654" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" visible="true" weight="0.24966443" />
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
@@ -506,7 +507,7 @@
           </properties>
         </breakpoint>
       </default-breakpoints>
-      <option name="time" value="455" />
+      <option name="time" value="480" />
     </breakpoint-manager>
   </component>
   <component name="debuggerHistoryManager">
@@ -591,81 +592,53 @@ binascii.hexlify(response)</expression-string>
     </expressions>
     <expressions id="evaluateExpression">
       <expression>
-        <expression-string>self.object_class_holder.convert_to_bool_array()</expression-string>
+        <expression-string>os.path.join('debug', 'waka.jpg')</expression-string>
         <language-id>Python</language-id>
         <evaluation-mode>EXPRESSION</evaluation-mode>
       </expression>
       <expression>
-        <expression-string>self.img_queue.qsize()</expression-string>
+        <expression-string>int.from_bytes(calc_checksum, byteorder='little')</expression-string>
         <language-id>Python</language-id>
         <evaluation-mode>EXPRESSION</evaluation-mode>
       </expression>
       <expression>
-        <expression-string>_img_queue.qsize</expression-string>
+        <expression-string>msg_concat[length - 1]</expression-string>
         <language-id>Python</language-id>
         <evaluation-mode>EXPRESSION</evaluation-mode>
       </expression>
       <expression>
-        <expression-string>_img_queue.qsize()</expression-string>
+        <expression-string>int.from_bytes(calc_checksum)</expression-string>
         <language-id>Python</language-id>
         <evaluation-mode>EXPRESSION</evaluation-mode>
       </expression>
       <expression>
-        <expression-string>glob.glob(os.path.join('protocol', '*.py'))</expression-string>
+        <expression-string>calc_checksum</expression-string>
         <language-id>Python</language-id>
         <evaluation-mode>EXPRESSION</evaluation-mode>
       </expression>
       <expression>
-        <expression-string>os.path.join('protocol', '*.py')</expression-string>
+        <expression-string>msg_concat</expression-string>
         <language-id>Python</language-id>
         <evaluation-mode>EXPRESSION</evaluation-mode>
       </expression>
       <expression>
-        <expression-string>glob.glob('/protocol/*.py')</expression-string>
+        <expression-string>msg_concat[0]</expression-string>
         <language-id>Python</language-id>
         <evaluation-mode>EXPRESSION</evaluation-mode>
       </expression>
       <expression>
-        <expression-string>glob.glob('//protocol//*.py')</expression-string>
+        <expression-string>~crc % 256</expression-string>
         <language-id>Python</language-id>
         <evaluation-mode>EXPRESSION</evaluation-mode>
       </expression>
       <expression>
-        <expression-string>glob.glob('\\protocol\\*.py')</expression-string>
+        <expression-string>~crc</expression-string>
         <language-id>Python</language-id>
         <evaluation-mode>EXPRESSION</evaluation-mode>
       </expression>
     </expressions>
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$APPLICATION_HOME_DIR$/helpers/python-skeletons/io.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="133">
-          <caret line="83" column="8" selection-start-line="83" selection-start-column="8" selection-end-line="83" selection-end-column="8" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$USER_HOME$/Miniconda3/envs/hd_env/Lib/site-packages/serial/serialwin32.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="17">
-          <caret line="265" selection-start-line="265" selection-end-line="265" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/protocol/requests/hd_get_status_msg.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="51">
-          <caret line="3" column="6" selection-start-line="3" selection-start-column="6" selection-end-line="3" selection-end-column="6" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/protocol/requests/hd_get_warning_msg.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="51">
-          <caret line="3" column="6" selection-start-line="3" selection-start-column="6" selection-end-line="3" selection-end-column="6" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/protocol/requests/hd_set_power_msg.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="255">
@@ -677,13 +650,6 @@ binascii.hexlify(response)</expression-string>
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="34">
           <caret line="3" column="34" lean-forward="true" selection-start-line="3" selection-start-column="34" selection-end-line="3" selection-end-column="34" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/protocol/bytes_converter.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="218">
-          <caret line="24" selection-start-line="24" selection-end-line="24" />
         </state>
       </provider>
     </entry>
@@ -736,20 +702,6 @@ binascii.hexlify(response)</expression-string>
         </state>
       </provider>
     </entry>
-    <entry file="file://$USER_HOME$/Miniconda3/envs/hd_env/Lib/site-packages/serial/serialjava.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="302">
-          <caret line="52" column="6" selection-start-line="52" selection-start-column="6" selection-end-line="52" selection-end-column="6" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$USER_HOME$/Miniconda3/envs/hd_env/Lib/site-packages/serial/serialutil.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="106">
-          <caret line="177" column="17" selection-start-line="177" selection-start-column="17" selection-end-line="177" selection-end-column="17" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/data/caffemodels/MobileNetSSD_deploy.prototxt.txt">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="21233">
@@ -798,34 +750,10 @@ binascii.hexlify(response)</expression-string>
     <entry file="file://$PROJECT_DIR$/protocol/__init__.py">
       <provider selected="true" editor-type-id="text-editor" />
     </entry>
-    <entry file="file://$PROJECT_DIR$/rx_message.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="132">
-          <caret line="19" column="8" selection-start-line="19" selection-start-column="8" selection-end-line="19" selection-end-column="8" />
-          <folding>
-            <element signature="e#0#77#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$USER_HOME$/Miniconda3/envs/hd_env/Lib/threading.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="132">
           <caret line="915" selection-start-line="915" selection-end-line="915" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$USER_HOME$/.PyCharmCE2018.1/system/python_stubs/-804653637/builtins.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="151">
-          <caret line="2854" column="8" selection-start-line="2854" selection-start-column="8" selection-end-line="2854" selection-end-column="8" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$USER_HOME$/.PyCharmCE2018.1/system/python_stubs/-804653637/cv2/__init__.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="108">
-          <caret line="8744" column="4" selection-start-line="8744" selection-start-column="4" selection-end-line="8744" selection-end-column="4" />
         </state>
       </provider>
     </entry>
@@ -843,37 +771,10 @@ binascii.hexlify(response)</expression-string>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/protocol/responses/hd_get_warning_response.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="132">
-          <caret line="10" column="33" selection-start-line="10" selection-start-column="33" selection-end-line="10" selection-end-column="33" />
-          <folding>
-            <element signature="e#0#21#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/protocol/requests/hd_get_setup_config_msg.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="51">
           <caret line="3" column="6" selection-start-line="3" selection-start-column="6" selection-end-line="3" selection-end-column="6" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/protocol/responses/hd_get_setup_config_response.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="107">
-          <caret line="31" column="82" selection-start-line="31" selection-start-column="82" selection-end-line="31" selection-end-column="82" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/protocol/requests/hd_setup_msg.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="124">
-          <caret line="10" column="13" selection-start-line="10" selection-start-column="13" selection-end-line="10" selection-end-column="13" />
-          <folding>
-            <element signature="e#0#13#0" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -894,16 +795,6 @@ binascii.hexlify(response)</expression-string>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/utils/hd_threading.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="241">
-          <caret line="49" column="8" selection-start-line="49" selection-start-column="8" selection-end-line="49" selection-end-column="8" />
-          <folding>
-            <element signature="e#46#62#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/data/plain_matrix.png">
       <provider selected="true" editor-type-id="images" />
     </entry>
@@ -920,43 +811,6 @@ binascii.hexlify(response)</expression-string>
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="102">
           <caret line="6" column="33" selection-start-line="6" selection-start-column="33" selection-end-line="6" selection-end-column="33" />
-          <folding>
-            <element signature="e#0#52#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/vision.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="117">
-          <caret line="56" column="54" selection-start-line="56" selection-start-column="54" selection-end-line="56" selection-end-column="54" />
-          <folding>
-            <element signature="e#46#75#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/messages_receiver_handler.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="131">
-          <caret line="45" column="41" selection-start-line="45" selection-start-column="41" selection-end-line="45" selection-end-column="41" />
-          <folding>
-            <element signature="e#0#67#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/protocol/requests/hd_remove_warning_msg.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="51">
-          <caret line="3" column="6" selection-start-line="3" selection-start-column="6" selection-end-line="3" selection-end-column="6" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/protocol/responses/hd_get_warning_config_response.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="204">
-          <caret line="12" column="39" lean-forward="true" selection-start-line="12" selection-start-column="39" selection-end-line="12" selection-end-column="39" />
           <folding>
             <element signature="e#0#52#0" expanded="true" />
           </folding>
@@ -990,32 +844,183 @@ binascii.hexlify(response)</expression-string>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/human_detection.py">
+    <entry file="file://$USER_HOME$/Miniconda3/envs/hd_env/Lib/site-packages/serial/serialutil.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="119">
-          <caret line="214" column="44" selection-start-line="214" selection-start-column="44" selection-end-line="214" selection-end-column="44" />
+        <state relative-caret-position="106">
+          <caret line="582" column="8" selection-start-line="582" selection-start-column="8" selection-end-line="582" selection-end-column="8" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$USER_HOME$/Miniconda3/envs/hd_env/Lib/site-packages/serial/serialjava.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="225">
+          <caret line="187" column="13" selection-start-line="187" selection-start-column="13" selection-end-line="187" selection-end-column="13" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/protocol/bytes_converter.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="227">
+          <caret line="14" column="8" selection-start-line="14" selection-start-column="8" selection-end-line="14" selection-end-column="8" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/protocol/requests/hd_remove_warning_msg.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="80">
+          <caret line="10" column="30" lean-forward="true" selection-start-line="10" selection-start-column="30" selection-end-line="10" selection-end-column="30" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$USER_HOME$/.PyCharmCE2018.1/system/python_stubs/-804653637/builtins.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="121">
+          <caret line="1038" column="8" selection-start-line="1038" selection-start-column="8" selection-end-line="1038" selection-end-column="8" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/vision.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="322">
+          <caret line="76" column="48" selection-start-line="76" selection-start-column="48" selection-end-line="76" selection-end-column="48" />
           <folding>
-            <element signature="e#46#57#0" expanded="true" />
+            <element signature="e#46#75#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/dnnr.py">
+    <entry file="file://$PROJECT_DIR$/rx_message.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="191">
-          <caret line="121" column="9" lean-forward="true" selection-start-line="121" selection-start-column="9" selection-end-line="121" selection-end-column="9" />
+        <state relative-caret-position="141">
+          <caret line="20" selection-start-line="20" selection-end-line="20" />
           <folding>
-            <element signature="e#46#55#0" expanded="true" />
+            <element signature="e#0#77#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/protocol/requests/hd_setup_msg.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="254">
+          <caret line="101" column="46" lean-forward="true" selection-start-line="101" selection-start-column="46" selection-end-line="101" selection-end-column="46" />
+          <folding>
+            <element signature="e#0#13#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/protocol/responses/hd_get_warning_config_response.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="255">
+          <caret line="22" column="8" selection-start-line="22" selection-start-column="8" selection-end-line="22" selection-end-column="8" />
+          <folding>
+            <element signature="e#0#52#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/protocol/responses/hd_get_setup_config_response.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="90">
+          <caret line="30" column="8" selection-start-line="30" selection-start-column="8" selection-end-line="30" selection-end-column="8" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/protocol/responses/hd_get_warning_response.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="612">
+          <caret line="36" column="8" selection-start-line="36" selection-start-column="8" selection-end-line="36" selection-end-column="8" />
+          <folding>
+            <element signature="e#0#21#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/messages_receiver_handler.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="192">
+          <caret line="33" column="38" selection-start-line="33" selection-start-column="38" selection-end-line="33" selection-end-column="38" />
+          <folding>
+            <element signature="e#0#67#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/utils/hd_thread.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="402">
+          <caret line="141" column="21" selection-start-line="141" selection-start-column="21" selection-end-line="141" selection-end-column="21" />
+          <folding>
+            <element signature="e#0#29#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/utils/hd_threading.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="147">
+          <caret line="16" column="8" selection-start-line="16" selection-start-column="8" selection-end-line="16" selection-end-column="8" />
+          <folding>
+            <element signature="e#46#62#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/debug/waka.jpg">
+      <provider selected="true" editor-type-id="images" />
+    </entry>
+    <entry file="file://$USER_HOME$/.PyCharmCE2018.1/system/python_stubs/-804653637/cv2/__init__.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-147">
+          <caret line="10692" column="4" selection-start-line="10692" selection-start-column="4" selection-end-line="10692" selection-end-column="4" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$USER_HOME$/Miniconda3/envs/hd_env/Lib/queue.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="17">
+          <caret line="53" column="8" selection-start-line="53" selection-start-column="8" selection-end-line="53" selection-end-column="8" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/human_detection.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="28">
+          <caret line="40" column="25" selection-start-line="40" selection-start-column="25" selection-end-line="40" selection-end-column="25" />
+          <folding>
+            <element signature="e#46#57#0" expanded="true" />
+            <element signature="e#14800#15679#0" />
           </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/communication.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="182">
-          <caret line="60" column="56" selection-start-line="60" selection-start-column="56" selection-end-line="60" selection-end-column="56" />
+        <state relative-caret-position="221">
+          <caret line="51" selection-start-line="51" selection-end-line="51" />
           <folding>
             <element signature="e#46#61#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/file_saver.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="270">
+          <caret line="47" column="35" selection-start-line="47" selection-start-column="35" selection-end-line="47" selection-end-column="35" />
+          <folding>
+            <element signature="e#46#58#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/dnnr.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="73">
+          <caret line="133" column="35" selection-start-line="133" selection-start-column="35" selection-end-line="133" selection-end-column="35" />
+          <folding>
+            <element signature="e#46#61#0" expanded="true" />
+            <element signature="e#2460#2905#0" />
           </folding>
         </state>
       </provider>

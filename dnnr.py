@@ -13,6 +13,7 @@ import cv2
 
 from camera import Camera
 from communication import Communication
+from file_saver import FilesSaver
 from human_detection import HumanDetection
 from messages_receiver_handler import MessagesReceiverHandler
 from protocol.requests.hd_set_warning_msg import HDSetWarningMessage
@@ -27,6 +28,7 @@ THREAD_COMMUNICATION = "Thread_Communication"
 THREAD_VISION = "Thread_Vision"
 THREAD_DNN = "Thread_DNN"
 THREAD_CAMERA = "Thread_Camera"
+THREAD_FILES_SAVER = "Thread_Files_Saver"
 
 
 def start_threads(show, port, baudrate, thread_names):
@@ -34,12 +36,13 @@ def start_threads(show, port, baudrate, thread_names):
     # max size = 2 - we don't want old images!
     img_queue = queue.Queue(2)
     debug_queue = queue.Queue(1)
+    debug_save_img_queue = queue.Queue()
     threads = []
     messages_receiver_handler = MessagesReceiverHandler()
     thread = None
     for tName in thread_names:
         if tName == THREAD_CAMERA:
-            target_fps = 4
+            target_fps = 10
             thread = Camera(tName, logging, img_queue, target_fps)
             messages_receiver_handler.add_rx_listeners(thread)
 
@@ -47,7 +50,7 @@ def start_threads(show, port, baudrate, thread_names):
             num_of_frames_to_rotate = 9
             target_fps = 0
             thread = HumanDetection(tName, logging, img_queue, target_fps, show, num_of_frames_to_rotate, SW_VERSION,
-                                    FW_VERSION, debug_queue)
+                                    FW_VERSION, debug_queue, debug_save_img_queue)
             messages_receiver_handler.add_rx_listeners(thread)
 
         elif tName == THREAD_VISION:
@@ -59,19 +62,23 @@ def start_threads(show, port, baudrate, thread_names):
             # no fps since it's blocking
             thread = Communication(tName, logging, messages_receiver_handler, port, baudrate)
 
+        elif tName == THREAD_FILES_SAVER:
+            # no fps since it's blocking
+            thread = FilesSaver(tName, logging, debug_save_img_queue)
+
         thread.start()
         threads.append(thread)
 
     is_exit = False
-    if show:
-        while not is_exit:
-            cv2.imshow('detect', debug_queue.get())
-            k = cv2.waitKey(1)
-            if k % 256 == 27:
-                # ESC pressed
-                logging.debug("Escape hit, closing...")
-                is_exit = True
-                cv2.destroyAllWindows()
+    # if show:
+    while not is_exit:
+        cv2.imshow('detect', debug_queue.get())
+        k = cv2.waitKey(1)
+        if k % 256 == 27:
+            # ESC pressed
+            logging.debug("Escape hit, closing...")
+            is_exit = True
+            cv2.destroyAllWindows()
 
     # Wait for all threads to complete
     for t in threads:
@@ -131,7 +138,7 @@ def main():
         cv2.namedWindow("detect")
 
     if args_image == 'c':
-        thread_names = [THREAD_CAMERA, THREAD_DNN, THREAD_VISION, THREAD_COMMUNICATION]
+        thread_names = [THREAD_CAMERA, THREAD_DNN, THREAD_VISION, THREAD_COMMUNICATION, THREAD_FILES_SAVER]
         start_threads(args_show, args_port, args_baudrate, thread_names)
     else:
         filelist = glob.glob(os.path.join(args_image, '*.png'))

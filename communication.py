@@ -44,7 +44,7 @@ PORT = '/dev/ttyAMA0'  # COM1 / ttyUSB0 for USB port / ttyS0 for IO
 class Communication(HDThread):
     def __init__(self, thread_name, logging, messages_receiver_handler, port=PORT, baudrate=BAUD_RATE):
         super().__init__(thread_name, logging, 0)
-        self.logging.info("{} - Init.".format(thread_name, 0))
+        self.logging.info("{} - Init.".format(thread_name))
         self.messages_receiver_handler = messages_receiver_handler  # type: MessagesReceiverHandler
         self.port = port if port is not None else PORT
         self.baudrate = int(baudrate) if baudrate is not None else BAUD_RATE
@@ -84,7 +84,8 @@ class Communication(HDThread):
                 iteration_time = datetime.now() - start_time
                 self.logging.debug("{} - End. Total Duration={}".format(self.thread_name, iteration_time))
             except Exception as e:
-                self.logging.error("{} - Error in serial - flushing input buffer. {}".format(self.thread_name, e.__str__()))
+                self.logging.error(
+                    "{} - Error in serial - flushing input buffer. {}".format(self.thread_name, e.__str__()))
                 self.ser.reset_input_buffer()
 
     def validate_crc(self, msg_concat, length):
@@ -121,7 +122,8 @@ class Communication(HDThread):
         # continue reading message - minus 3 bytes: preamble + length + opcode
         msg_body = self.ser.read(length - 3)
         self.logging.info(
-            "{} - read message body length={}. message: {}".format(self.thread_name, length - 3, binascii.hexlify(msg_body)))
+            "{} - read message body length={}. message: {}".format(self.thread_name, length - 3,
+                                                                   binascii.hexlify(msg_body)))
 
         response = None
         # handle message
