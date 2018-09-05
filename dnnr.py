@@ -31,7 +31,7 @@ THREAD_CAMERA = "Thread_Camera"
 THREAD_FILES_SAVER = "Thread_Files_Saver"
 
 
-def start_threads(show, port, baudrate, thread_names):
+def start_threads(show, port, baudrate, thread_names, save_images_to_disk):
     # thread_names = [THREAD_COMMUNICATION]
     # max size = 2 - we don't want old images!
     img_queue = queue.Queue(2)
@@ -50,7 +50,7 @@ def start_threads(show, port, baudrate, thread_names):
             num_of_frames_to_rotate = 9
             target_fps = 0
             thread = HumanDetection(tName, logging, img_queue, target_fps, show, num_of_frames_to_rotate, SW_VERSION,
-                                    FW_VERSION, debug_queue, debug_save_img_queue)
+                                    FW_VERSION, debug_queue, save_images_to_disk, debug_save_img_queue)
             messages_receiver_handler.add_rx_listeners(thread)
 
         elif tName == THREAD_VISION:
@@ -109,6 +109,7 @@ def main():
     ap.add_argument("-l", "--loggingFileName", required=False, default="", help="log to a file")
     ap.add_argument("-p", "--port", required=False, help="serial port")
     ap.add_argument("-b", "--baudrate", required=False, help="serial baudrate")
+    ap.add_argument("-v", "--saveimages", required=False, default=False, action='store_true', help="save images to disk")
     args = vars(ap.parse_args())
 
     debug_level = logging.INFO
@@ -118,6 +119,7 @@ def main():
     args_confidence = args["confidence"]
     args_port = args["port"]
     args_baudrate = args["baudrate"]
+    save_images_to_disk = args["saveimages"]
 
     if args_debug:
         debug_level = logging.DEBUG
@@ -139,7 +141,7 @@ def main():
 
     if args_image == 'c':
         thread_names = [THREAD_CAMERA, THREAD_DNN, THREAD_VISION, THREAD_COMMUNICATION, THREAD_FILES_SAVER]
-        start_threads(args_show, args_port, args_baudrate, thread_names)
+        start_threads(args_show, args_port, args_baudrate, thread_names, save_images_to_disk)
     else:
         filelist = glob.glob(os.path.join(args_image, '*.png'))
         filelist.extend(glob.glob(os.path.join(args_image, '*.jpg')))

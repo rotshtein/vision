@@ -36,7 +36,7 @@ HEIGHT_THR = 150
 
 class HumanDetection(HDThread):
     def __init__(self, thread_name, logging, img_queue, target_fps, show, num_of_frames_to_rotate, sw_version,
-                 fw_version, debug_img_queue, debug_save_img_queue=None):
+                 fw_version, debug_img_queue, save_images_to_disk=False, debug_save_img_queue=None):
         super().__init__(thread_name, logging, target_fps)
         self.logging.info("{} - Init.".format(thread_name))
         self.rotate_counter = 0
@@ -48,7 +48,7 @@ class HumanDetection(HDThread):
         self.sw_version = sw_version
         self.fw_version = fw_version
         self.is_logging_debug = False
-        self.save_images_to_disk = False
+        self.save_images_to_disk = save_images_to_disk
 
         self.CLASSES = ["background", "aeroplane", "bicycle", "bird", "boat",
                         "bottle", "bus", "car", "cat", "chair", "cow", "diningtable",
