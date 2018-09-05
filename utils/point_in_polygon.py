@@ -74,12 +74,12 @@ def translate(point, translate_x=0, translate_y=300):
     return p
 
 
-point1 = Point(0.1, 99.9)
-polygon1 = [Point(0, 0), Point(0, 100), Point(100, 100), Point(100, 0)]
-assert is_point_in_polygon(point1, polygon1) is True
-
-print(translate(rotate(Point(150, 150), 90), 0, 300))
-print(translate(rotate(Point(300, 0), 90), 0, 300))
-
-rotate_and_translate_polygon(polygon1, 90)
-print(polygon1)
+# point1 = Point(0.1, 99.9)
+# polygon1 = [Point(0, 0), Point(0, 100), Point(100, 100), Point(100, 0)]
+# assert is_point_in_polygon(point1, polygon1) is True
+#
+# print(translate(rotate(Point(150, 150), 90), 0, 300))
+# print(translate(rotate(Point(300, 0), 90), 0, 300))
+#
+# rotate_and_translate_polygon(polygon1, 90)
+# print(polygon1)
