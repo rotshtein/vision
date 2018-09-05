@@ -3,6 +3,8 @@
   <component name="ChangeListManager">
     <list default="true" id="15741994-b401-49d7-b680-7125fc6fcaa4" name="Default" comment="">
       <change beforePath="$PROJECT_DIR$/dnnr.py" beforeDir="false" afterPath="$PROJECT_DIR$/dnnr.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/human_detection.py" beforeDir="false" afterPath="$PROJECT_DIR$/human_detection.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vision.py" beforeDir="false" afterPath="$PROJECT_DIR$/vision.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -38,64 +40,10 @@
         <entry file="file://$PROJECT_DIR$/dnnr.py">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="172">
-              <caret line="53" column="92" selection-start-line="53" selection-start-column="92" selection-end-line="53" selection-end-column="92" />
+              <caret line="50" column="28" lean-forward="true" selection-start-line="50" selection-start-column="28" selection-end-line="50" selection-end-column="28" />
               <folding>
                 <element signature="e#46#61#0" expanded="true" />
               </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="file_saver.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/file_saver.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="136">
-              <caret line="11" selection-start-line="11" selection-end-line="11" />
-              <folding>
-                <element signature="e#46#55#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="obstruction_detector.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/utils/obstruction_detector.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="297">
-              <caret line="188" selection-start-line="188" selection-end-line="188" />
-              <folding>
-                <element signature="e#63#78#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="communication.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/communication.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="187">
-              <caret line="55" column="31" selection-start-line="55" selection-start-column="31" selection-end-line="55" selection-end-column="31" />
-              <folding>
-                <element signature="e#46#61#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="api.py" pinned="false" current-in-tab="false">
-        <entry file="file://$USER_HOME$/Miniconda3/envs/hd_env/Lib/site-packages/watchdog/observers/api.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="156">
-              <caret line="252" column="8" selection-start-line="252" selection-start-column="8" selection-end-line="252" selection-end-column="8" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="__init__.py" pinned="false" current-in-tab="false">
-        <entry file="file://$USER_HOME$/Miniconda3/envs/hd_env/Lib/logging/__init__.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="125">
-              <caret line="1898" selection-start-line="1898" selection-end-line="1898" />
             </state>
           </provider>
         </entry>
@@ -103,8 +51,8 @@
       <file leaf-file-name="human_detection.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/human_detection.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="183">
-              <caret line="37" column="8" selection-start-line="37" selection-start-column="8" selection-end-line="37" selection-end-column="8" />
+            <state relative-caret-position="-1188">
+              <caret line="5" selection-start-line="5" selection-end-line="5" />
               <folding>
                 <element signature="e#46#57#0" expanded="true" />
                 <element signature="e#14800#15679#0" />
@@ -136,7 +84,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>debug</find>
       <find>resized_image</find>
       <find>set</find>
       <find>thread_name</find>
@@ -166,6 +113,7 @@
       <find>150</find>
       <find>Point</find>
       <find>is_logging_debug</find>
+      <find>confid</find>
     </findStrings>
     <replaceStrings>
       <replace>logging.info</replace>
@@ -221,15 +169,15 @@
         <option value="$PROJECT_DIR$/warning.py" />
         <option value="$PROJECT_DIR$/protocol/bytes_converter.py" />
         <option value="$PROJECT_DIR$/protocol/responses/hd_get_setup_config_response.py" />
-        <option value="$PROJECT_DIR$/vision.py" />
         <option value="$PROJECT_DIR$/messages_receiver_handler.py" />
         <option value="$PROJECT_DIR$/protocol/requests/hd_setup_msg.py" />
         <option value="$PROJECT_DIR$/communication.py" />
         <option value="$PROJECT_DIR$/file_saver.py" />
         <option value="$PROJECT_DIR$/camera.py" />
         <option value="$PROJECT_DIR$/utils/point_in_polygon.py" />
-        <option value="$PROJECT_DIR$/human_detection.py" />
+        <option value="$PROJECT_DIR$/vision.py" />
         <option value="$PROJECT_DIR$/dnnr.py" />
+        <option value="$PROJECT_DIR$/human_detection.py" />
       </list>
     </option>
   </component>
@@ -474,12 +422,12 @@
       <window_info anchor="bottom" id="Version Control" order="7" sideWeight="0.49932885" weight="0.3298969" />
       <window_info anchor="bottom" id="Python Console" order="8" sideWeight="0.47449663" weight="0.31958762" />
       <window_info anchor="bottom" id="Terminal" order="9" sideWeight="0.49395972" weight="0.101620026" />
-      <window_info content_ui="combo" id="Project" order="0" sideWeight="0.75" visible="true" weight="0.20268457" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" sideWeight="0.75" visible="true" weight="0.20268457" />
       <window_info anchor="right" id="R Packages" order="4" />
       <window_info anchor="right" id="R Graphics" order="3" />
       <window_info anchor="bottom" id="Find" order="1" sideWeight="0.47583893" weight="0.44919" />
       <window_info id="Structure" order="1" sideWeight="0.25090253" side_tool="true" weight="0.23355705" />
-      <window_info active="true" anchor="bottom" id="Debug" order="3" sideWeight="0.6912752" visible="true" weight="0.33431518" />
+      <window_info anchor="bottom" id="Debug" order="3" sideWeight="0.6912752" weight="0.33431518" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" visible="true" weight="0.24966443" />
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
@@ -495,11 +443,6 @@
   <component name="XDebuggerManager">
     <breakpoint-manager>
       <breakpoints>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/utils/obstruction_detector.py</url>
-          <line>206</line>
-          <option name="timeStamp" value="140" />
-        </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$USER_HOME$/Miniconda3/envs/hd_env/Lib/queue.py</url>
           <line>169</line>
@@ -824,16 +767,6 @@ binascii.hexlify(response)</expression-string>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/vision.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="322">
-          <caret line="76" column="48" selection-start-line="76" selection-start-column="48" selection-end-line="76" selection-end-column="48" />
-          <folding>
-            <element signature="e#46#75#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/rx_message.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="141">
@@ -956,43 +889,6 @@ binascii.hexlify(response)</expression-string>
         </state>
       </provider>
     </entry>
-    <entry file="file://$USER_HOME$/Miniconda3/envs/hd_env/Lib/logging/__init__.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="125">
-          <caret line="1898" selection-start-line="1898" selection-end-line="1898" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/file_saver.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="136">
-          <caret line="11" selection-start-line="11" selection-end-line="11" />
-          <folding>
-            <element signature="e#46#55#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/utils/obstruction_detector.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="297">
-          <caret line="188" selection-start-line="188" selection-end-line="188" />
-          <folding>
-            <element signature="e#63#78#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/communication.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="187">
-          <caret line="55" column="31" selection-start-line="55" selection-start-column="31" selection-end-line="55" selection-end-column="31" />
-          <folding>
-            <element signature="e#46#61#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/data/caffemodels/MobileNetSSD_deploy.prototxt.txt">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="132">
@@ -1017,10 +913,57 @@ binascii.hexlify(response)</expression-string>
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/utils/obstruction_detector.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-2344">
+          <caret line="27" lean-forward="true" selection-start-line="27" selection-end-line="27" />
+          <folding>
+            <element signature="e#63#78#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/file_saver.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-49">
+          <caret line="11" selection-start-line="11" selection-end-line="11" />
+          <folding>
+            <element signature="e#46#55#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/vision.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-119">
+          <caret line="5" selection-start-line="5" selection-end-line="5" />
+          <folding>
+            <element signature="e#46#75#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/communication.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="136">
+          <caret line="55" column="31" selection-start-line="55" selection-start-column="31" selection-end-line="55" selection-end-column="31" />
+          <folding>
+            <element signature="e#46#61#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$USER_HOME$/Miniconda3/envs/hd_env/Lib/logging/__init__.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="125">
+          <caret line="1898" selection-start-line="1898" selection-end-line="1898" />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/human_detection.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="183">
-          <caret line="37" column="8" selection-start-line="37" selection-start-column="8" selection-end-line="37" selection-end-column="8" />
+        <state relative-caret-position="-1188">
+          <caret line="5" selection-start-line="5" selection-end-line="5" />
           <folding>
             <element signature="e#46#57#0" expanded="true" />
             <element signature="e#14800#15679#0" />
@@ -1031,7 +974,7 @@ binascii.hexlify(response)</expression-string>
     <entry file="file://$PROJECT_DIR$/dnnr.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="172">
-          <caret line="53" column="92" selection-start-line="53" selection-start-column="92" selection-end-line="53" selection-end-column="92" />
+          <caret line="50" column="28" lean-forward="true" selection-start-line="50" selection-start-column="28" selection-end-line="50" selection-end-column="28" />
           <folding>
             <element signature="e#46#61#0" expanded="true" />
           </folding>

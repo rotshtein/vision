@@ -5,17 +5,13 @@ Created on Aug 12, 2018
 """
 import math
 import queue
-
-import numpy as np
-import cv2
-from datetime import datetime
 import threading
+from datetime import datetime
 
-from protocol.requests.hd_get_setup_config_msg import HDGetSetupConfigMessage
-from protocol.requests.hd_get_status_msg import HDGetStatusMessage
+import cv2
+import numpy as np
+
 from protocol.requests.hd_get_warning_config_msg import HDGetWarningConfigMessage
-from protocol.requests.hd_remove_all_warnings_except_default_msg import HDRemoveAllWarningsExceptDefaultMessage
-from protocol.requests.hd_remove_all_warnings_msg import HDRemoveAllWarningsMessage
 from protocol.requests.hd_remove_warning_msg import HDRemoveWarningMessage
 from protocol.requests.hd_set_power_msg import HDSetPowerMessage
 from protocol.requests.hd_set_warning_msg import HDSetWarningMessage

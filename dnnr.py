@@ -32,7 +32,6 @@ THREAD_FILES_SAVER = "Thread_Files_Saver"
 
 
 def start_threads(show, port, baudrate, thread_names, save_images_to_disk):
-    # thread_names = [THREAD_COMMUNICATION]
     # max size = 2 - we don't want old images!
     img_queue = queue.Queue(2)
     debug_queue = queue.Queue(1)
@@ -42,7 +41,7 @@ def start_threads(show, port, baudrate, thread_names, save_images_to_disk):
     thread = None
     for tName in thread_names:
         if tName == THREAD_CAMERA:
-            target_fps = 10
+            target_fps = 4
             thread = Camera(tName, logging, img_queue, target_fps)
             messages_receiver_handler.add_rx_listeners(thread)
 
@@ -105,7 +104,7 @@ def main():
     ap.add_argument("-i", "--image", required=True, help="path to input image")
     ap.add_argument("-s", "--show", required=False, default=False, action='store_true',
                     help="Whether to show the processed image")
-    ap.add_argument("-c", "--confidence", type=float, default=0.2, help="minimum probability to filter weak detections")
+    # ap.add_argument("-c", "--confidence", type=float, default=0.2, help="minimum probability to filter weak detections")
     ap.add_argument("-d", "--debug", required=False, default=False, action='store_true',
                     help="change log level to DEBUG")
     ap.add_argument("-l", "--loggingFileName", required=False, default="", help="log to a file")

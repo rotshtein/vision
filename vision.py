@@ -8,8 +8,6 @@ from queue import Queue
 
 import cv2
 
-from protocol.requests.hd_get_setup_config_msg import HDGetSetupConfigMessage
-from protocol.requests.hd_get_warning_msg import HDGetWarningMessage
 from protocol.requests.hd_setup_msg import HDSetupMessage
 from protocol.responses.hd_get_setup_config_response import HDGetSetupConfigResponse
 from protocol.responses.hd_get_warning_response import HDGetWarningResponse, VisibilityLightLevel
