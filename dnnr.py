@@ -51,6 +51,8 @@ def start_threads(show, port, baudrate, thread_names, save_images_to_disk):
             target_fps = 0
             thread = HumanDetection(tName, logging, img_queue, target_fps, show, num_of_frames_to_rotate, SW_VERSION,
                                     FW_VERSION, debug_queue, save_images_to_disk, debug_save_img_queue)
+            if save_images_to_disk:  # only for debugging purpose - init app with a warning
+                create_dummy_warning(thread)
             messages_receiver_handler.add_rx_listeners(thread)
 
         elif tName == THREAD_VISION:
