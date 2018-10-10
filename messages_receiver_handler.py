@@ -10,6 +10,7 @@ from protocol.responses.hd_get_status_response import HDGetStatusResponse
 from protocol.responses.hd_get_warning_config_response import HDGetWarningConfigResponse
 from protocol.responses.hd_get_warning_response import HDGetWarningResponse
 from rx_message import IRXMessage
+# from utils import buzzer
 
 PREAMBLE_PREFIX = 0xAA
 
@@ -76,6 +77,9 @@ class MessagesReceiverHandler(object):
                 response.is_obstructed = data.is_obstructed
             if data.warnings is not None:
                 response.warnings = data.warnings
+                if response.warnings.count(True) != 0:
+                    pass
+                    # buzzer.buzz()
 
             # check if there are any errors in all other models - if so throw exception
             if rx_listener.is_module_in_error():

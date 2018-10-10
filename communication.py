@@ -59,6 +59,8 @@ class Communication(HDThread):
             )
             self.logging.info(
                 "{} - Initialized Serial port: port={} baudrate={}".format(thread_name, self.port, self.baudrate))
+            // send bringup to ST slave
+			self.ser.write(bytearray([PREAMBLE_PREFIX, PREAMBLE_PREFIX, PREAMBLE_PREFIX, PREAMBLE_PREFIX]))
         except Exception as e:
             self.logging.info("{} - Initializing Serial port failed. {}".format(thread_name, e.__str__()))
             self.exit_thread()

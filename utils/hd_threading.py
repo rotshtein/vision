@@ -44,7 +44,7 @@ class HDThread(threading.Thread, IRXMessage):
         time = datetime.now() - self.last_measured_time
         cycle_sec = time.microseconds / 1000000 + time.seconds
         last_measured_fps = 1.0 if cycle_sec == 0 else 1 / cycle_sec
-        self.logging.debug("{0:s} - last measured fps={1:.2f}".format(self.thread_name, last_measured_fps))
+        self.logging.info("{0:s} - last measured fps={1:.2f}".format(self.thread_name, last_measured_fps))
         self.last_measured_time = datetime.now()
 
     def _run(self):

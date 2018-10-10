@@ -150,7 +150,7 @@ class HumanDetection(HDThread):
                     if self.show:
                         self.draw_detection(resized_image, startX, startY, endX, endY, idx, label)
                     self.set_result_counter(warning.warning_id, True)
-                    self.logging.debug("{} - Detection in warning {}".format(self.thread_name, warning.warning_id))
+                    self.logging.info("{} - Detection in warning {}".format(self.thread_name, warning.warning_id))
                     result_is_hit = True
             if not result_is_hit:
                 self.set_result_counter(warning.warning_id, False)

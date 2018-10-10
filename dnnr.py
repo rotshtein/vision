@@ -160,6 +160,7 @@ def main():
         debug_queue = queue.Queue()
         target_fps = 0
         num_of_frames_to_rotate = 9
+        logging.info("Creating HD Thread")
         hd_thread = HumanDetection(THREAD_DNN, logging, _img_queue, target_fps, True, num_of_frames_to_rotate,
                                    SW_VERSION,
                                    FW_VERSION, debug_queue)
@@ -167,8 +168,10 @@ def main():
         hd_thread.start()
         while True:
             for i in range(len(list_of_images)):
+                logging.info("Prepare to fetch an image")
                 _img_queue.put(list_of_images.__getitem__(i))
                 image = debug_queue.get()
+                logging.info("Got an image")
                 if args_show:
                     cv2.imshow('detect', image)
                     k = cv2.waitKey(1)
@@ -176,6 +179,7 @@ def main():
                         # ESC pressed
                         logging.debug("Escape hit, closing...")
                         cv2.destroyAllWindows()
+                #time.sleep(1.0)
         hd_thread.join(1)
         print("Exiting Main Thread...")
 
