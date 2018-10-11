@@ -1,10 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="15741994-b401-49d7-b680-7125fc6fcaa4" name="Default" comment="">
-      <change beforePath="$PROJECT_DIR$/communication.py" beforeDir="false" afterPath="$PROJECT_DIR$/communication.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dnnr.py" beforeDir="false" afterPath="$PROJECT_DIR$/dnnr.py" afterDir="false" />
-    </list>
+    <list default="true" id="15741994-b401-49d7-b680-7125fc6fcaa4" name="Default" comment="" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -68,38 +65,11 @@
       <file leaf-file-name="communication.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/communication.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-2006">
+            <state relative-caret-position="-1979">
               <caret line="38" lean-forward="true" selection-start-line="38" selection-end-line="38" />
               <folding>
                 <element signature="e#46#61#0" expanded="true" />
               </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="sample.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/utils/temp/sample.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state>
-              <caret column="15" lean-forward="true" selection-start-column="15" selection-end-column="15" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="serialjava.py" pinned="false" current-in-tab="false">
-        <entry file="file://$USER_HOME$/Miniconda3/envs/hd_env/Lib/site-packages/serial/serialjava.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="225">
-              <caret line="155" column="8" selection-start-line="155" selection-start-column="8" selection-end-line="155" selection-end-column="8" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="messages_receiver_handler.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/messages_receiver_handler.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="108">
-              <caret line="137" column="8" selection-start-line="137" selection-start-column="8" selection-end-line="137" selection-end-column="8" />
             </state>
           </provider>
         </entry>
@@ -923,13 +893,6 @@ binascii.hexlify(response)</expression-string>
         </state>
       </provider>
     </entry>
-    <entry file="file://$USER_HOME$/Miniconda3/envs/hd_env/Lib/site-packages/serial/serialjava.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="225">
-          <caret line="155" column="8" selection-start-line="155" selection-start-column="8" selection-end-line="155" selection-end-column="8" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/human_detection.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="110">
@@ -940,22 +903,8 @@ binascii.hexlify(response)</expression-string>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/messages_receiver_handler.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="108">
-          <caret line="137" column="8" selection-start-line="137" selection-start-column="8" selection-end-line="137" selection-end-column="8" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/utils/temp/temp.sh">
       <provider selected="true" editor-type-id="text-editor" />
-    </entry>
-    <entry file="file://$PROJECT_DIR$/utils/temp/sample.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state>
-          <caret column="15" lean-forward="true" selection-start-column="15" selection-end-column="15" />
-        </state>
-      </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/dnnr.py">
       <provider selected="true" editor-type-id="text-editor">
@@ -967,9 +916,30 @@ binascii.hexlify(response)</expression-string>
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/utils/temp/sample.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state>
+          <caret column="15" lean-forward="true" selection-start-column="15" selection-end-column="15" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$USER_HOME$/Miniconda3/envs/hd_env/Lib/site-packages/serial/serialjava.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="225">
+          <caret line="155" column="8" selection-start-line="155" selection-start-column="8" selection-end-line="155" selection-end-column="8" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/messages_receiver_handler.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="108">
+          <caret line="137" column="8" selection-start-line="137" selection-start-column="8" selection-end-line="137" selection-end-column="8" />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/communication.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-2006">
+        <state relative-caret-position="-1979">
           <caret line="38" lean-forward="true" selection-start-line="38" selection-end-line="38" />
           <folding>
             <element signature="e#46#61#0" expanded="true" />
