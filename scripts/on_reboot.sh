@@ -9,4 +9,4 @@ fi
 source /home/pi/.profile
 workon cv
 cd /home/pi/vision
-python dnnr.py -i c -p "/dev/ttyAMA0" -b "38400" -m -l hd_log.log
+python dnnr.py -i c -p "/dev/ttyAMA0" -b "115200" -m -l hd_log.log
