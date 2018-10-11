@@ -33,7 +33,8 @@ THREAD_FILES_SAVER = "Thread_Files_Saver"
 
 def start_threads(show, port, baudrate, thread_names, save_images_to_disk, simulate_warnings):
     # max size = 2 - we don't want old images!
-    img_queue = queue.Queue(2)
+    detection_queue = queue.Queue(1)
+    vision_queue = queue.Queue(1)
     debug_queue = queue.Queue(1)
     debug_save_img_queue = queue.Queue()
     threads = []
@@ -42,13 +43,13 @@ def start_threads(show, port, baudrate, thread_names, save_images_to_disk, simul
     for tName in thread_names:
         if tName == THREAD_CAMERA:
             target_fps = 4
-            thread = Camera(tName, logging, img_queue, target_fps)
+            thread = Camera(tName, logging, detection_queue, vision_queue, target_fps)
             messages_receiver_handler.add_rx_listeners(thread)
 
         elif tName == THREAD_DNN:
             num_of_frames_to_rotate = 9
             target_fps = 0
-            thread = HumanDetection(tName, logging, img_queue, target_fps, show, num_of_frames_to_rotate, SW_VERSION,
+            thread = HumanDetection(tName, logging, detection_queue, target_fps, show, num_of_frames_to_rotate, SW_VERSION,
                                     FW_VERSION, debug_queue, save_images_to_disk, debug_save_img_queue)
             if simulate_warnings:  # only for debugging purpose - init app with a warning
                 create_dummy_warning(thread)
@@ -56,7 +57,7 @@ def start_threads(show, port, baudrate, thread_names, save_images_to_disk, simul
 
         elif tName == THREAD_VISION:
             target_fps = 2
-            thread = Vision(tName, logging, img_queue, target_fps)
+            thread = Vision(tName, logging, vision_queue, target_fps)
             messages_receiver_handler.add_rx_listeners(thread)
 
         elif tName == THREAD_COMMUNICATION:

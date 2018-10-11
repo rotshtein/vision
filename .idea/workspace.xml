@@ -1,7 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="15741994-b401-49d7-b680-7125fc6fcaa4" name="Default" comment="" />
+    <list default="true" id="15741994-b401-49d7-b680-7125fc6fcaa4" name="Default" comment="">
+      <change beforePath="$PROJECT_DIR$/camera.py" beforeDir="false" afterPath="$PROJECT_DIR$/camera.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dnnr.py" beforeDir="false" afterPath="$PROJECT_DIR$/dnnr.py" afterDir="false" />
+    </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -11,11 +14,23 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="dnnr.py" pinned="false" current-in-tab="false">
+      <file leaf-file-name="camera.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/camera.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="255">
+              <caret line="39" column="28" lean-forward="true" selection-start-line="39" selection-start-column="28" selection-end-line="39" selection-end-column="28" />
+              <folding>
+                <element signature="e#46#56#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="dnnr.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/dnnr.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1666">
-              <caret line="113" column="96" lean-forward="true" selection-start-line="113" selection-start-column="96" selection-end-line="113" selection-end-column="96" />
+            <state relative-caret-position="307">
+              <caret line="44" column="26" lean-forward="true" selection-start-line="44" selection-start-column="26" selection-end-line="44" selection-end-column="26" />
               <folding>
                 <element signature="e#46#61#0" expanded="true" />
               </folding>
@@ -23,23 +38,32 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="hd_threading.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/utils/hd_threading.py">
+      <file leaf-file-name="cascades.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/detection_scripts/cascades.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="329">
-              <caret line="31" column="33" selection-start-line="31" selection-start-column="33" selection-end-line="31" selection-end-column="33" />
-              <folding>
-                <element signature="e#46#62#0" expanded="true" />
-              </folding>
+            <state relative-caret-position="143">
+              <caret line="71" column="42" selection-start-line="71" selection-start-column="42" selection-end-line="71" selection-end-column="42" />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="run_dnnr.sh" pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/scripts/run_dnnr.sh">
+      <file leaf-file-name="queue.py" pinned="false" current-in-tab="false">
+        <entry file="file://$USER_HOME$/Miniconda3/envs/hd_env/Lib/queue.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="102">
-              <caret line="6" lean-forward="true" selection-start-line="6" selection-end-line="6" />
+            <state relative-caret-position="-3145">
+              <caret line="26" column="8" selection-start-line="26" selection-start-column="8" selection-end-line="26" selection-end-column="8" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="communication.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/communication.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="119">
+              <caret line="44" column="75" lean-forward="true" selection-start-line="44" selection-start-column="68" selection-end-line="44" selection-end-column="75" />
+              <folding>
+                <element signature="e#46#61#0" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -55,8 +79,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>Error in serial</find>
-      <find>calc_checksum</find>
       <find>from_byte</find>
       <find>on_setup_message</find>
       <find>Error in handle_message_body</find>
@@ -85,6 +107,8 @@
       <find>warnings_results</find>
       <find>saveimages</find>
       <find>save_images_to_disk</find>
+      <find>type</find>
+      <find>queue</find>
     </findStrings>
     <replaceStrings>
       <replace>logging.info</replace>
@@ -139,7 +163,6 @@
         <option value="$PROJECT_DIR$/protocol/responses/hd_get_setup_config_response.py" />
         <option value="$PROJECT_DIR$/protocol/requests/hd_setup_msg.py" />
         <option value="$PROJECT_DIR$/file_saver.py" />
-        <option value="$PROJECT_DIR$/camera.py" />
         <option value="$PROJECT_DIR$/vision.py" />
         <option value="$PROJECT_DIR$/human_detection.py" />
         <option value="$PROJECT_DIR$/utils/point_in_polygon.py" />
@@ -147,12 +170,13 @@
         <option value="$PROJECT_DIR$/scripts/run_dnnr_w_camera.sh" />
         <option value="$PROJECT_DIR$/messages_receiver_handler.py" />
         <option value="$PROJECT_DIR$/utils/temp/sample.py" />
-        <option value="$PROJECT_DIR$/dnnr.py" />
         <option value="$PROJECT_DIR$/communication.py" />
+        <option value="$PROJECT_DIR$/camera.py" />
+        <option value="$PROJECT_DIR$/dnnr.py" />
       </list>
     </option>
   </component>
-  <component name="ProjectFrameBounds" extendedState="6">
+  <component name="ProjectFrameBounds" extendedState="7">
     <option name="x" value="563" />
     <option name="y" value="8" />
     <option name="width" value="1550" />
@@ -391,7 +415,7 @@
     </todo-panel>
   </component>
   <component name="ToolWindowManager">
-    <frame x="-7" y="-7" width="1550" height="838" extended-state="6" />
+    <frame x="-7" y="-7" width="1550" height="838" extended-state="7" />
     <editor active="true" />
     <layout>
       <window_info anchor="bottom" id="TODO" order="6" sideWeight="0.49932885" weight="0.3298969" />
@@ -574,9 +598,6 @@ binascii.hexlify(response)</expression-string>
     </expressions>
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/protocol/__init__.py">
-      <provider selected="true" editor-type-id="text-editor" />
-    </entry>
     <entry file="file://$USER_HOME$/.PyCharmCE2018.1/system/python_stubs/-804653637/numpy/random/mtrand.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="-378">
@@ -661,13 +682,6 @@ binascii.hexlify(response)</expression-string>
     </entry>
     <entry file="file://$PROJECT_DIR$/utils/hd_thread.py" />
     <entry file="file://$PROJECT_DIR$/debug/waka.jpg" />
-    <entry file="file://$USER_HOME$/Miniconda3/envs/hd_env/Lib/queue.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="17">
-          <caret line="53" column="8" selection-start-line="53" selection-start-column="8" selection-end-line="53" selection-end-column="8" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$USER_HOME$/.PyCharmCE2018.1/system/python_stubs/-804653637/cv2/__init__.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="-60">
@@ -798,16 +812,6 @@ binascii.hexlify(response)</expression-string>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/camera.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-167">
-          <caret line="36" column="8" selection-start-line="36" selection-start-column="8" selection-end-line="36" selection-end-column="8" />
-          <folding>
-            <element signature="e#46#56#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/utils/obstruction_detector.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="210">
@@ -851,36 +855,6 @@ binascii.hexlify(response)</expression-string>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/dnnr.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1666">
-          <caret line="113" column="96" lean-forward="true" selection-start-line="113" selection-start-column="96" selection-end-line="113" selection-end-column="96" />
-          <folding>
-            <element signature="e#46#61#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/utils/hd_threading.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="329">
-          <caret line="31" column="33" selection-start-line="31" selection-start-column="33" selection-end-line="31" selection-end-column="33" />
-          <folding>
-            <element signature="e#46#62#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/communication.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-1928">
-          <caret line="38" lean-forward="true" selection-start-line="38" selection-end-line="38" />
-          <folding>
-            <element signature="e#46#61#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/human_detection.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="110">
@@ -902,6 +876,60 @@ binascii.hexlify(response)</expression-string>
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="102">
           <caret line="6" lean-forward="true" selection-start-line="6" selection-end-line="6" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/utils/hd_threading.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="329">
+          <caret line="31" column="33" selection-start-line="31" selection-start-column="33" selection-end-line="31" selection-end-column="33" />
+          <folding>
+            <element signature="e#46#62#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$USER_HOME$/Miniconda3/envs/hd_env/Lib/queue.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-3145">
+          <caret line="26" column="8" selection-start-line="26" selection-start-column="8" selection-end-line="26" selection-end-column="8" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/detection_scripts/cascades.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="143">
+          <caret line="71" column="42" selection-start-line="71" selection-start-column="42" selection-end-line="71" selection-end-column="42" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/communication.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="119">
+          <caret line="44" column="75" lean-forward="true" selection-start-line="44" selection-start-column="68" selection-end-line="44" selection-end-column="75" />
+          <folding>
+            <element signature="e#46#61#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/camera.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="255">
+          <caret line="39" column="28" lean-forward="true" selection-start-line="39" selection-start-column="28" selection-end-line="39" selection-end-column="28" />
+          <folding>
+            <element signature="e#46#56#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/dnnr.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="307">
+          <caret line="44" column="26" lean-forward="true" selection-start-line="44" selection-start-column="26" selection-end-line="44" selection-end-column="26" />
+          <folding>
+            <element signature="e#46#61#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
