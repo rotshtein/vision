@@ -38,9 +38,6 @@ BAUD_RATE = 115200
 PORT = '/dev/ttyAMA0'  # COM1 / ttyUSB0 for USB port / ttyS0 for IO
 
 
-# ROBOT_STOP_MESSAGE_HEX = "\xAA\x09\x1E\x15\x0F\xAA\x00\xFF\x61"
-# ROBOT_STATUS_MESSAGE_HEX = "\xAA\x09\x1E\x16\x0F\xA7\x00\x04\x5E"
-
 class Communication(HDThread):
     def __init__(self, thread_name, logging, messages_receiver_handler, port=PORT, baudrate=BAUD_RATE):
         super().__init__(thread_name, logging, 0)
@@ -59,8 +56,8 @@ class Communication(HDThread):
             )
             self.logging.info(
                 "{} - Initialized Serial port: port={} baudrate={}".format(thread_name, self.port, self.baudrate))
-            // send bringup to ST slave
-			self.ser.write(bytearray([PREAMBLE_PREFIX, PREAMBLE_PREFIX, PREAMBLE_PREFIX, PREAMBLE_PREFIX]))
+            # send bringup to ST slave
+            # self.ser.write(bytearray([PREAMBLE_PREFIX, PREAMBLE_PREFIX, PREAMBLE_PREFIX, PREAMBLE_PREFIX]))
         except Exception as e:
             self.logging.info("{} - Initializing Serial port failed. {}".format(thread_name, e.__str__()))
             self.exit_thread()
