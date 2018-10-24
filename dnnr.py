@@ -8,6 +8,7 @@ import glob
 import logging
 import os
 import queue
+from multiprocessing import Process
 
 import cv2
 
@@ -21,8 +22,8 @@ from utils.point_in_polygon import Point
 from vision import Vision
 from warning import ObjectClassHolder
 
-SW_VERSION = "0.1"
-FW_VERSION = "0.1"
+SW_VERSION = "0.2"
+FW_VERSION = "0.2"
 
 THREAD_COMMUNICATION = "Thread_Communication"
 THREAD_VISION = "Thread_Vision"
@@ -92,16 +93,10 @@ def start_threads(show, port, baudrate, thread_names, save_images_to_disk, simul
 def create_dummy_warning(hd_thread):
     # set a single warning - start...
     hd_thread.num_of_frames_to_rotate = 9
-    polygon_arr = [Point(0, 0), Point(0, 150), Point(150, 150), Point(150, 0)]
+    polygon_arr = [Point(0, 0), Point(0, 300), Point(300, 300), Point(300, 0)]
     object_class_holder = ObjectClassHolder([False, False, False, False, False, False, False, True])
-    warning_message = HDSetWarningMessage(2, polygon_arr, object_class_holder, 0, 300, 20, 5, 10, True)
+    warning_message = HDSetWarningMessage(2, polygon_arr, object_class_holder, 0, 300, 20, 1, 1, True)
     hd_thread.on_set_warning_msg(warning_message)
-
-    polygon_arr = [Point(150, 150), Point(150, 300), Point(300, 300), Point(300, 150)]
-    object_class_holder = ObjectClassHolder([False, False, False, False, False, False, False, True])
-    warning_message = HDSetWarningMessage(5, polygon_arr, object_class_holder, 0, 300, 20, 5, 10, True)
-    hd_thread.on_set_warning_msg(warning_message)
-
 
 def main():
     # construct the argument parse and parse the arguments

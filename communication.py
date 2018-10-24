@@ -5,11 +5,13 @@ Created on Aug 14, 2018
 """
 import binascii
 from datetime import datetime
+from multiprocessing import Process
 
 import serial
 
 from messages_receiver_handler import MessagesReceiverHandler
 from protocol.bytes_converter import IBytesConverter
+from utils.hd_process import HDProcess
 from utils.hd_threading import HDThread
 
 PREAMBLE_PREFIX = 0xAA
@@ -38,9 +40,11 @@ BAUD_RATE = 115200
 PORT = '/dev/ttyAMA0'  # COM1 / ttyUSB0 for USB port / ttyS0 for IO
 
 
-class Communication(HDThread):
+class Communication(Process):
     def __init__(self, thread_name, logging, messages_receiver_handler, port=PORT, baudrate=BAUD_RATE):
-        super().__init__(thread_name, logging, 0)
+        Process.__init__(self)
+        # super().__init__(thread_name, logging, 0)
+        self.logging = logging
         self.logging.info("{} - Init.".format(thread_name))
         self.messages_receiver_handler = messages_receiver_handler  # type: MessagesReceiverHandler
         self.port = port if port is not None else PORT
@@ -60,10 +64,11 @@ class Communication(HDThread):
             # self.ser.write(bytearray([PREAMBLE_PREFIX, PREAMBLE_PREFIX, PREAMBLE_PREFIX, PREAMBLE_PREFIX]))
         except Exception as e:
             self.logging.info("{} - Initializing Serial port failed. {}".format(thread_name, e.__str__()))
-            self.exit_thread()
+            # self.exit_thread()
 
     def _run(self) -> None:
-        self._communication()
+        pass
+        # self._communication()
 
     def _communication(self):
         self.logging.debug("{} - Start.".format(self.thread_name))
@@ -174,3 +179,10 @@ class Communication(HDThread):
         self.logging.info(
             "{} - Send Response message. message: {}".format(self.thread_name, binascii.hexlify(response)))
         return msg_body, response
+
+
+if __name__ == '__main__':
+    import logging
+    messages_receiver_handler = MessagesReceiverHandler()
+    thread = Communication("comm", logging, messages_receiver_handler, 'COM1', 115200)
+    thread.start()
