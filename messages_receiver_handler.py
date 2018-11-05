@@ -22,7 +22,7 @@ class MessagesReceiverHandler(object):
     This class is used for handling send/receive messages between the HD to the Robot
     """
 
-    def __init__(self) -> None:
+    def __init__(self, Queue) -> None:
         super().__init__()
         self.rx_listeners = []
 

@@ -8,7 +8,7 @@ import glob
 import logging
 import os
 import queue
-from multiprocessing import Process
+from multiprocessing import Process, Queue
 
 import cv2
 
@@ -34,12 +34,13 @@ THREAD_FILES_SAVER = "Thread_Files_Saver"
 
 def start_threads(show, port, baudrate, thread_names, save_images_to_disk, simulate_warnings):
     # max size = 2 - we don't want old images!
+    multiProcessingQueue = Queue()
     detection_queue = queue.Queue(1)
     vision_queue = queue.Queue(1)
     debug_queue = queue.Queue(1)
     debug_save_img_queue = queue.Queue()
     threads = []
-    messages_receiver_handler = MessagesReceiverHandler()
+    messages_receiver_handler = MessagesReceiverHandler(multiProcessingQueue)
     thread = None
     for tName in thread_names:
         if tName == THREAD_CAMERA:
@@ -60,17 +61,22 @@ def start_threads(show, port, baudrate, thread_names, save_images_to_disk, simul
             target_fps = 2
             thread = Vision(tName, logging, vision_queue, target_fps)
             messages_receiver_handler.add_rx_listeners(thread)
-
-        elif tName == THREAD_COMMUNICATION:
-            # no fps since it's blocking
-            thread = Communication(tName, logging, messages_receiver_handler, port, baudrate)
-
+        # elif tName == THREAD_COMMUNICATION:
+        #     # no fps since it's blocking
+        #     my_messages_receiver_handler = MessagesReceiverHandler()
+        #     thread = Communication(tName, logging, my_messages_receiver_handler, port, baudrate)
         elif tName == THREAD_FILES_SAVER:
             # no fps since it's blocking
             thread = FilesSaver(tName, logging, debug_save_img_queue)
 
         thread.start()
         threads.append(thread)
+
+
+    process = Communication(THREAD_COMMUNICATION, multiProcessingQueue, port, baudrate)
+    # process = Communication(THREAD_COMMUNICATION)
+    process.start()
+    # process.join()
 
     is_exit = False
     # if show:
@@ -82,6 +88,7 @@ def start_threads(show, port, baudrate, thread_names, save_images_to_disk, simul
             logging.debug("Escape hit, closing...")
             is_exit = True
             cv2.destroyAllWindows()
+
 
     # Wait for all threads to complete
     for t in threads:
@@ -143,7 +150,7 @@ def main():
         cv2.namedWindow("detect")
 
     if args_image == 'c':
-        thread_names = [THREAD_CAMERA, THREAD_DNN, THREAD_VISION, THREAD_COMMUNICATION, THREAD_FILES_SAVER]
+        thread_names = [THREAD_CAMERA, THREAD_DNN, THREAD_VISION, THREAD_FILES_SAVER]
         start_threads(args_show, args_port, args_baudrate, thread_names, save_images_to_disk, simulate_warnings)
     else:
         filelist = glob.glob(os.path.join(args_image, '*.png'))
@@ -182,4 +189,5 @@ def main():
         print("Exiting Main Thread...")
 
 
-main()
+if __name__ == '__main__':
+    main()

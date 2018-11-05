@@ -5,7 +5,8 @@ Created on Aug 14, 2018
 """
 import binascii
 from datetime import datetime
-from multiprocessing import Process
+from multiprocessing import Process, Queue
+import logging
 
 import serial
 
@@ -41,12 +42,13 @@ PORT = '/dev/ttyAMA0'  # COM1 / ttyUSB0 for USB port / ttyS0 for IO
 
 
 class Communication(Process):
-    def __init__(self, thread_name, logging, messages_receiver_handler, port=PORT, baudrate=BAUD_RATE):
-        Process.__init__(self)
-        # super().__init__(thread_name, logging, 0)
-        self.logging = logging
-        self.logging.info("{} - Init.".format(thread_name))
-        self.messages_receiver_handler = messages_receiver_handler  # type: MessagesReceiverHandler
+    def __init__(self, thread_name, multiProcessingQueue, port=PORT, baudrate=BAUD_RATE):
+        super(Communication, self).__init__(target=self._run, args=(thread_name, port, baudrate, multiProcessingQueue))
+
+    def _run(self, thread_name, port, baudrate, multiProcessingQueue) -> None:
+        self.thread_name = thread_name
+        self.multiProcessingQueue = multiProcessingQueue  # type: Queue
+        logging.info("{} - Init.".format(thread_name))
         self.port = port if port is not None else PORT
         self.baudrate = int(baudrate) if baudrate is not None else BAUD_RATE
         self.ser = None
@@ -58,20 +60,23 @@ class Communication(Process):
                 stopbits=serial.STOPBITS_ONE,
                 bytesize=serial.EIGHTBITS,
             )
-            self.logging.info(
+            logging.info(
                 "{} - Initialized Serial port: port={} baudrate={}".format(thread_name, self.port, self.baudrate))
             # send bringup to ST slave
             # self.ser.write(bytearray([PREAMBLE_PREFIX, PREAMBLE_PREFIX, PREAMBLE_PREFIX, PREAMBLE_PREFIX]))
         except Exception as e:
-            self.logging.info("{} - Initializing Serial port failed. {}".format(thread_name, e.__str__()))
+            logging.info("{} - Initializing Serial port failed. {}".format(thread_name, e.__str__()))
             # self.exit_thread()
 
-    def _run(self) -> None:
-        pass
-        # self._communication()
+        logging.debug("{} - Start.".format(self.thread_name))
+        self.__communication()
+
+    def __communication(self):
+        get = self.multiProcessingQueue.get()
+        self.ser.write(get)
 
     def _communication(self):
-        self.logging.debug("{} - Start.".format(self.thread_name))
+        logging.debug("{} - Start.".format(self.thread_name))
         start_time = datetime.now()
 
         # read message
@@ -122,6 +127,65 @@ class Communication(Process):
         opcode = msg_header[2]
         return msg_header, length, opcode
 
+    def _handle_message_body(self, length, opcode):
+        # continue reading message - minus 3 bytes: preamble + length + opcode
+        msg_body = self.ser.read(length - 3)
+        self.logging.info(
+            "{} - read message body length={}. message: {}".format(self.thread_name, length - 3,
+                                                                   binascii.hexlify(msg_body)))
+
+        self.multiProcessingQueue.put([opcode, msg_body])
+
+        response = None
+        # handle message
+        try:
+            if opcode == OPCODE_SETUP_MSG:
+                self.messages_receiver_handler.handle_setup_msg(msg_body)
+                response = self.messages_receiver_handler.build_response_message(OPCODE_ACK_RESPONSE)
+            elif opcode == OPCODE_SET_WARNING_MSG:
+                self.messages_receiver_handler.handle_set_warning_msg(msg_body)
+                response = self.messages_receiver_handler.build_response_message(OPCODE_ACK_RESPONSE)
+            elif opcode == OPCODE_REMOVE_WARNING_MSG:
+                self.messages_receiver_handler.handle_remove_warning_msg(msg_body)
+                response = self.messages_receiver_handler.build_response_message(OPCODE_ACK_RESPONSE)
+            elif opcode == OPCODE_REMOVE_ALL_WARNINGS_MSG:
+                self.messages_receiver_handler.handle_remove_all_warnings_msg()
+                response = self.messages_receiver_handler.build_response_message(OPCODE_ACK_RESPONSE)
+            elif opcode == OPCODE_REMOVE_ALL_WARNINGS_EXCEPT_DEFAULT_MSG:
+                self.messages_receiver_handler.handle_remove_all_warnings_except_defaults_msg()
+                response = self.messages_receiver_handler.build_response_message(OPCODE_ACK_RESPONSE)
+            elif opcode == OPCODE_SET_WARNING_TO_DEFAULT_MSG:
+                self.messages_receiver_handler.handle_set_warning_to_default_msg(msg_body)
+                response = self.messages_receiver_handler.build_response_message(OPCODE_ACK_RESPONSE)
+            elif opcode == OPCODE_SET_POWER_MSG:
+                self.messages_receiver_handler.handle_set_power_msg(msg_body)
+                response = self.messages_receiver_handler.build_response_message(OPCODE_ACK_RESPONSE)
+
+            # RESPONSE DIFFERENT FROM ACK
+            elif opcode == OPCODE_GET_WARNING_MSG:  # check if there is error in modules - if so throw exception
+                warning_response = self.messages_receiver_handler.handle_get_warning_msg()
+                response = self.messages_receiver_handler.build_response_message(OPCODE_GET_WARNING_RESPONSE,
+                                                                                 warning_response.to_bytes())
+            elif opcode == OPCODE_GET_WARNING_CONFIG_MSG:
+                warning_response = self.messages_receiver_handler.handle_get_warning_config_msg(msg_body)
+                response = self.messages_receiver_handler.build_response_message(OPCODE_GET_WARNING_CONFIG_RESPONSE,
+                                                                                 warning_response.to_bytes())
+            elif opcode == OPCODE_GET_SETUP_CONFIG_MSG:
+                warning_response = self.messages_receiver_handler.handle_get_setup_config_msg()
+                response = self.messages_receiver_handler.build_response_message(OPCODE_GET_SETUP_CONFIG_RESPONSE,
+                                                                                 warning_response.to_bytes())
+            elif opcode == OPCODE_GET_STATUS_MSG:
+                warning_response = self.messages_receiver_handler.handle_get_status_msg()
+                response = self.messages_receiver_handler.build_response_message(OPCODE_GET_STATUS_RESPONSE,
+                                                                                 warning_response.to_bytes())
+
+        except Exception as e:
+            self.logging.info("{} - Error in handle_message_body - {}".format(self.thread_name, e.__str__()))
+            response = self.messages_receiver_handler.build_response_message(OPCODE_NACK_RESPONSE)
+
+        self.logging.info(
+            "{} - Send Response message. message: {}".format(self.thread_name, binascii.hexlify(response)))
+        return msg_body, response
     def handle_message_body(self, length, opcode):
         # continue reading message - minus 3 bytes: preamble + length + opcode
         msg_body = self.ser.read(length - 3)
