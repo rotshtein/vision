@@ -21,8 +21,8 @@ from utils.point_in_polygon import Point
 from vision import Vision
 from warning import ObjectClassHolder
 
-SW_VERSION = "0.1"
-FW_VERSION = "0.1"
+SW_VERSION = "0.3"
+FW_VERSION = "0.3"
 
 THREAD_COMMUNICATION = "Thread_Communication"
 THREAD_VISION = "Thread_Vision"
@@ -94,7 +94,7 @@ def create_dummy_warning(hd_thread):
     hd_thread.num_of_frames_to_rotate = 3
     polygon_arr = [Point(0, 0), Point(0, 300), Point(300, 300), Point(300, 0)]
     object_class_holder = ObjectClassHolder([False, False, False, False, False, False, False, True])
-    warning_message = HDSetWarningMessage(2, polygon_arr, object_class_holder, 0, 300, 20, 1, 1, True)
+    warning_message = HDSetWarningMessage(2, polygon_arr, object_class_holder, 0, 300, 20, 1, 2, True)
     hd_thread.on_set_warning_msg(warning_message)
 
 def main():

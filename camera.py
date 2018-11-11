@@ -64,3 +64,34 @@ class Camera(HDThread):
         self.iteration_time_sec = iteration_time.microseconds / 1000000
         self.logging.debug("{} - End. Total Duration={}".format(self.thread_name, iteration_time))
         return img
+
+
+if __name__ == '__main__':
+    print("{} - Start Testing PiCamera...".format(""))
+    rawCapture = None
+    img = None
+    try:
+        from picamera import PiCamera
+        from picamera.array import PiRGBArray
+
+        camera = PiCamera()
+        camera.resolution = (640, 480)
+        rawCapture = PiRGBArray(camera)
+        picamera_mode = True
+        print("{} - Init PiCamera success".format(""))
+    except:
+        print("{} - Start Init VideoCapture...".format(""))
+        camera = cv2.VideoCapture(0)
+        print("{} - Init VideoCapture success".format(""))
+        picamera_mode = False
+
+    if picamera_mode:
+        camera.capture(rawCapture, format="bgr", use_video_port=True)
+        img = rawCapture.array
+    else:
+        ret, img = camera.read()
+
+    cv2.imshow('detect', img)
+    k = cv2.waitKey(5)
+    from time import sleep
+    sleep(1)
