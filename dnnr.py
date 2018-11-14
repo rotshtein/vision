@@ -21,8 +21,8 @@ from utils.point_in_polygon import Point
 from vision import Vision
 from warning import ObjectClassHolder
 
-SW_VERSION = "0.3"
-FW_VERSION = "0.3"
+SW_VERSION = "0.4"
+FW_VERSION = "0.4"
 
 THREAD_COMMUNICATION = "Thread_Communication"
 THREAD_VISION = "Thread_Vision"
@@ -31,14 +31,14 @@ THREAD_CAMERA = "Thread_Camera"
 THREAD_FILES_SAVER = "Thread_Files_Saver"
 
 
-def start_threads(show, port, baudrate, thread_names, save_images_to_disk, simulate_warnings):
+def start_threads(show, port, baudrate, thread_names, save_images_to_disk, simulate_warnings, draw_polygons_on_image, activate_buzzer):
     # max size = 2 - we don't want old images!
     detection_queue = queue.Queue(1)
     vision_queue = queue.Queue(1)
     debug_queue = queue.Queue(1)
     debug_save_img_queue = queue.Queue()
     threads = []
-    messages_receiver_handler = MessagesReceiverHandler()
+    messages_receiver_handler = MessagesReceiverHandler(activate_buzzer)
     thread = None
     for tName in thread_names:
         if tName == THREAD_CAMERA:
@@ -50,7 +50,7 @@ def start_threads(show, port, baudrate, thread_names, save_images_to_disk, simul
             num_of_frames_to_rotate = 9
             target_fps = 0
             thread = HumanDetection(tName, logging, detection_queue, target_fps, show, num_of_frames_to_rotate, SW_VERSION,
-                                    FW_VERSION, debug_queue, save_images_to_disk, debug_save_img_queue)
+                                    FW_VERSION, debug_queue, save_images_to_disk, debug_save_img_queue, draw_polygons_on_image)
             if simulate_warnings:  # only for debugging purpose - init app with a warning
                 create_dummy_warning(thread)
             messages_receiver_handler.add_rx_listeners(thread)
@@ -100,28 +100,30 @@ def create_dummy_warning(hd_thread):
 def main():
     # construct the argument parse and parse the arguments
     ap = argparse.ArgumentParser()
-    ap.add_argument("-i", "--image", required=True, help="path to input image")
+    ap.add_argument("-i", "--image", required=False, default="c", help="path to input image. if arg==c then the camera will be used instead of an image")
     ap.add_argument("-s", "--show", required=False, default=False, action='store_true',
-                    help="Whether to show the processed image")
-    # ap.add_argument("-c", "--confidence", type=float, default=0.2, help="minimum probability to filter weak detections")
+                    help="show the processed image via X Server")
     ap.add_argument("-d", "--debug", required=False, default=False, action='store_true',
-                    help="change log level to DEBUG")
-    ap.add_argument("-l", "--loggingFileName", required=False, default="", help="log to a file")
+                    help="change the log level to DEBUG. default level is INFO")
+    ap.add_argument("-l", "--loggingFileName", required=False, default="", help="log to a file. Must add the log file path as an argument!")
     ap.add_argument("-p", "--port", required=False, help="serial port")
     ap.add_argument("-b", "--baudrate", required=False, help="serial baudrate")
     ap.add_argument("-v", "--saveimages", required=False, default=False, action='store_true', help="save images to disk")
     ap.add_argument("-m", "--simulate", required=False, default=False, action='store_true', help="simulate warnings on startup")
+    ap.add_argument("-r", "--draw", required=False, default=False, action='store_true', help="draw the detected polygons on the images")
+    ap.add_argument("-z", "--buzzer", required=False, default=False, action='store_true', help="Activate buzzer")
     args = vars(ap.parse_args())
 
     debug_level = logging.INFO
     args_debug = args["debug"]
     args_show = args["show"]
     args_image = args["image"]
-    # args_confidence = args["confidence"]
     args_port = args["port"]
     args_baudrate = args["baudrate"]
     save_images_to_disk = args["saveimages"]
     simulate_warnings = args["simulate"]
+    draw_polygons_on_image = args["draw"]
+    activate_buzzer = args["buzzer"]
 
     if args_debug:
         debug_level = logging.DEBUG
@@ -143,7 +145,7 @@ def main():
 
     if args_image == 'c':
         thread_names = [THREAD_CAMERA, THREAD_DNN, THREAD_VISION, THREAD_COMMUNICATION, THREAD_FILES_SAVER]
-        start_threads(args_show, args_port, args_baudrate, thread_names, save_images_to_disk, simulate_warnings)
+        start_threads(args_show, args_port, args_baudrate, thread_names, save_images_to_disk, simulate_warnings, draw_polygons_on_image, activate_buzzer)
     else:
         filelist = glob.glob(os.path.join(args_image, '*.png'))
         filelist.extend(glob.glob(os.path.join(args_image, '*.jpg')))
@@ -181,4 +183,5 @@ def main():
         print("Exiting Main Thread...")
 
 
-main()
+if __name__ == '__main__':
+    main()

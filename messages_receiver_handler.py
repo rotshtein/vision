@@ -10,7 +10,7 @@ from protocol.responses.hd_get_status_response import HDGetStatusResponse
 from protocol.responses.hd_get_warning_config_response import HDGetWarningConfigResponse
 from protocol.responses.hd_get_warning_response import HDGetWarningResponse
 from rx_message import IRXMessage
-# from utils import buzzer
+from utils import buzzer
 
 PREAMBLE_PREFIX = 0xAA
 
@@ -22,9 +22,10 @@ class MessagesReceiverHandler(object):
     This class is used for handling send/receive messages between the HD to the Robot
     """
 
-    def __init__(self) -> None:
+    def __init__(self, activate_buzzer=False) -> None:
         super().__init__()
         self.rx_listeners = []
+        self.activate_buzzer = activate_buzzer
 
     def add_rx_listeners(self, rx_listener: IRXMessage):
         self.rx_listeners.append(rx_listener)
@@ -77,12 +78,12 @@ class MessagesReceiverHandler(object):
                 response.is_obstructed = data.is_obstructed
             if data.warnings is not None:
                 response.warnings = data.warnings
-                if response.warnings.count(True) != 0:
-                    pass
-                    # buzzer.buzz()
+                if self.activate_buzzer and response.warnings.count(True) != 0:
+                    buzzer.buzz()
 
             # check if there are any errors in all other models - if so throw exception
             if rx_listener.is_module_in_error():
+                rx_listener.in_error = False
                 raise Exception("{} in Error. Send Nack".format(rx_listener.thread_name))
 
         return response

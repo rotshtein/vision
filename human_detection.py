@@ -32,7 +32,7 @@ HEIGHT_THR = 150
 
 class HumanDetection(HDThread):
     def __init__(self, thread_name, logging, img_queue, target_fps, show, num_of_frames_to_rotate, sw_version,
-                 fw_version, debug_img_queue, save_images_to_disk=False, debug_save_img_queue=None):
+                 fw_version, debug_img_queue, save_images_to_disk=False, debug_save_img_queue=None, draw_polygons_on_image=False):
         super().__init__(thread_name, logging, target_fps)
         self.logging.info("{} - Init.".format(thread_name))
         self.rotate_counter = 0
@@ -45,6 +45,7 @@ class HumanDetection(HDThread):
         self.fw_version = fw_version
         self.is_logging_debug = False
         self.save_images_to_disk = save_images_to_disk
+        self.draw_polygons_on_image = draw_polygons_on_image
 
         self.CLASSES = ["background", "aeroplane", "bicycle", "bird", "boat",
                         "bottle", "bus", "car", "cat", "chair", "cow", "diningtable",
@@ -123,7 +124,10 @@ class HumanDetection(HDThread):
                 box = detections[0, 0, i, 3:7] * np.array([300, 300, 300, 300])
                 (startX, startY, endX, endY) = box.astype("int")
                 # display the prediction
-                classes_idx_ = self.CLASSES[idx]
+                try:
+                    classes_idx_ = self.CLASSES[idx]
+                except:
+                    continue
                 label = "{}: {:.2f}%".format(classes_idx_, confidence)
                 self.logging.debug("{} - {}".format(self.thread_name, label))
 
@@ -134,7 +138,7 @@ class HumanDetection(HDThread):
                 if is_rotate:
                     polygon = self.rotate_polygon(polygon)
 
-                if self.show:
+                if self.draw_polygons_on_image:
                     self.draw_warning_polygon(polygon, warning.warning_id, resized_image)
                 # if and polygon inside
                 minimum_confidence = warning.minimum_confidence
@@ -147,7 +151,7 @@ class HumanDetection(HDThread):
                                                                                                         endX, endY,
                                                                                                         polygon)):
                     # set result counter up
-                    if self.show:
+                    if self.draw_polygons_on_image:
                         self.draw_detection(resized_image, startX, startY, endX, endY, idx, label)
                     self.set_result_counter(warning.warning_id, True)
                     self.logging.info("{} - Detection in warning {}".format(self.thread_name, warning.warning_id))
@@ -208,9 +212,6 @@ class HumanDetection(HDThread):
                     self.COLORS[warning_id], 2)
         # 2, cv2.LINE_AA)
 
-    def is_module_in_error(self):
-        return self.in_error
-
     def handle_log_level_change(self):
         level = self.logging.INFO
         if self.is_logging_debug:
@@ -250,7 +251,8 @@ class HumanDetection(HDThread):
                 del self.warnings[message.warning_id]
                 del self.warnings_results[message.warning_id]
             else:
-                raise Exception("{} - on_remove_warning_msg - No warning id to remove {}".format(self.thread_name, message.warning_id))
+                raise Exception("{} - on_remove_warning_msg - No warning id to remove {}".format(self.thread_name,
+                                                                                                 message.warning_id))
         finally:
             self.lock.release()
 

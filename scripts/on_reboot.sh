@@ -8,11 +8,18 @@ if pgrep -f "python dnnr.py" &>/dev/null; then
 fi
 source /home/pi/.profile
 workon cv
-cd ~pi/vision
-python dnnr.py -i c -p "/dev/ttyAMA0" -b "115200" -m
+cd /home/pi/vision
+python dnnr.py -p "/dev/ttyAMA0" -b "115200" -m -r -z
 
 # Optional Arguments:
 #*********************
-# -v - optional argument - If added images will be saved to the Debug folder
-# -l "hd_log.log" - Write to a log file - need to add the file name. without this argument info will be written to the console
-# -d - Debug mode - Log level - debug. default is info.
+# "-i", "--image", required=False, help="path to an input image. if arg==c then the camera will be used instead of an image"
+# "-s", "--show", required=False, default=False, help="show the processed image via X Server"
+# "-d", "--debug", required=False, default=False, help="change the log level to DEBUG. default level is INFO"
+# "-l", "--loggingFileName", required=False, default="", help="log to a file. Must add the log file path as an argument!"
+# "-p", "--port", required=False, help="serial port"
+# "-b", "--baudrate", required=False, help="serial baudrate"
+# "-v", "--saveimages", required=False, default=False, help="save images to disk"
+# "-m", "--simulate", required=False, default=False, help="simulate warnings on startup")
+# "-r", "--draw", required=False, default=False, help="draw the detected polygons on the images"
+# "-z", "--buzzer", required=False, default=False, help="Activate buzzer"
