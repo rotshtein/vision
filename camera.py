@@ -12,10 +12,10 @@ FROM_CAMERA_TH_SLEEP_SEC = 0.12
 
 
 class Camera(HDThread):
-    def __init__(self, thread_name, logging, detection_queue, vision_queue, target_fps):
+    def __init__(self, thread_name, logging, detection_queue, visibility_queue, target_fps):
         super().__init__(thread_name, logging, target_fps)
         self.detection_queue = detection_queue  # type: queue.Queue
-        self.vision_queue = vision_queue
+        self.visibility_queue = visibility_queue
         self.logging.info("{} - Start Init PiCamera...".format(thread_name))
         try:
             from picamera import PiCamera
@@ -37,9 +37,9 @@ class Camera(HDThread):
         if self.detection_queue.full():
             self.detection_queue.get()
         self.detection_queue.put(image)
-        if self.vision_queue.full():
-            self.vision_queue.get()
-        self.vision_queue.put(image)
+        if self.visibility_queue.full():
+            self.visibility_queue.get()
+        self.visibility_queue.put(image)
 
     def is_module_in_error(self):
         return self.in_error

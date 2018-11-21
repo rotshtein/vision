@@ -32,6 +32,7 @@ class MessagesReceiverHandler(object):
 
     def handle_setup_msg(self, message):
         message_from_bytes = HDSetupMessage.from_bytes(message)
+        self.activate_buzzer = message_from_bytes.activate_buzzer
         for rx_listener in self.rx_listeners:
             rx_listener.on_setup_message(message_from_bytes)
 
@@ -78,6 +79,7 @@ class MessagesReceiverHandler(object):
                 response.is_obstructed = data.is_obstructed
             if data.warnings is not None:
                 response.warnings = data.warnings
+                # operate the buzzer
                 if self.activate_buzzer and response.warnings.count(True) != 0:
                     buzzer.buzz()
 
@@ -102,6 +104,7 @@ class MessagesReceiverHandler(object):
         # Both implement the same message but each will update only its relevant fields.
         # non relevant fields will be None!
         response = HDGetSetupConfigResponse()
+        response.activate_buzzer = self.activate_buzzer
         for rx_listener in self.rx_listeners:
             data = rx_listener.on_get_setup_config_msg()
             if data is None:
@@ -123,9 +126,13 @@ class MessagesReceiverHandler(object):
             if data.logging_debug is not None:
                 response.logging_debug = data.logging_debug
             if data.show_images is not None:
-                response.show_images= data.show_images
+                response.show_images = data.show_images
             if data.save_images_to_disk is not None:
                 response.save_images_to_disk = data.save_images_to_disk
+            if data.draw_polygons is not None:
+                response.draw_polygons = data.draw_polygons
+            if data.rotate_degree is not None:
+                response.rotate_degree = data.rotate_degree
         return response
 
     def handle_get_status_msg(self):

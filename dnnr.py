@@ -18,23 +18,23 @@ from human_detection import HumanDetection
 from messages_receiver_handler import MessagesReceiverHandler
 from protocol.requests.hd_set_warning_msg import HDSetWarningMessage
 from utils.point_in_polygon import Point
-from vision import Vision
+from visibility import Visibility
 from warning import ObjectClassHolder
 
-SW_VERSION = "0.4"
-FW_VERSION = "0.4"
+SW_VERSION = "0.5"
+FW_VERSION = "0.5"
 
 THREAD_COMMUNICATION = "Thread_Communication"
-THREAD_VISION = "Thread_Vision"
+THREAD_VISIBILITY = "Thread_Visibility"
 THREAD_DNN = "Thread_DNN"
 THREAD_CAMERA = "Thread_Camera"
 THREAD_FILES_SAVER = "Thread_Files_Saver"
 
 
-def start_threads(show, port, baudrate, thread_names, save_images_to_disk, simulate_warnings, draw_polygons_on_image, activate_buzzer):
+def start_threads(show, port, baudrate, thread_names, save_images_to_disk, simulate_warnings, draw_polygons_on_image, activate_buzzer, rotating_angle):
     # max size = 2 - we don't want old images!
     detection_queue = queue.Queue(1)
-    vision_queue = queue.Queue(1)
+    visibility_queue = queue.Queue(1)
     debug_queue = queue.Queue(1)
     debug_save_img_queue = queue.Queue()
     threads = []
@@ -42,22 +42,22 @@ def start_threads(show, port, baudrate, thread_names, save_images_to_disk, simul
     thread = None
     for tName in thread_names:
         if tName == THREAD_CAMERA:
-            target_fps = 4
-            thread = Camera(tName, logging, detection_queue, vision_queue, target_fps)
+            target_fps = 6
+            thread = Camera(tName, logging, detection_queue, visibility_queue, target_fps)
             messages_receiver_handler.add_rx_listeners(thread)
 
         elif tName == THREAD_DNN:
-            num_of_frames_to_rotate = 9
+            num_of_frames_to_rotate = 3
             target_fps = 0
             thread = HumanDetection(tName, logging, detection_queue, target_fps, show, num_of_frames_to_rotate, SW_VERSION,
-                                    FW_VERSION, debug_queue, save_images_to_disk, debug_save_img_queue, draw_polygons_on_image)
+                                    FW_VERSION, debug_queue, save_images_to_disk, debug_save_img_queue, draw_polygons_on_image, rotating_angle)
             if simulate_warnings:  # only for debugging purpose - init app with a warning
                 create_dummy_warning(thread)
             messages_receiver_handler.add_rx_listeners(thread)
 
-        elif tName == THREAD_VISION:
+        elif tName == THREAD_VISIBILITY:
             target_fps = 2
-            thread = Vision(tName, logging, vision_queue, target_fps)
+            thread = Visibility(tName, logging, visibility_queue, target_fps)
             messages_receiver_handler.add_rx_listeners(thread)
 
         elif tName == THREAD_COMMUNICATION:
@@ -94,7 +94,7 @@ def create_dummy_warning(hd_thread):
     hd_thread.num_of_frames_to_rotate = 3
     polygon_arr = [Point(0, 0), Point(0, 300), Point(300, 300), Point(300, 0)]
     object_class_holder = ObjectClassHolder([False, False, False, False, False, False, False, True])
-    warning_message = HDSetWarningMessage(2, polygon_arr, object_class_holder, 0, 300, 20, 1, 2, True)
+    warning_message = HDSetWarningMessage(2, polygon_arr, object_class_holder, 0, 300, 20, 1, 1, True)
     hd_thread.on_set_warning_msg(warning_message)
 
 def main():
@@ -112,6 +112,7 @@ def main():
     ap.add_argument("-m", "--simulate", required=False, default=False, action='store_true', help="simulate warnings on startup")
     ap.add_argument("-r", "--draw", required=False, default=False, action='store_true', help="draw the detected polygons on the images")
     ap.add_argument("-z", "--buzzer", required=False, default=False, action='store_true', help="Activate buzzer")
+    ap.add_argument("-a", "--angle", required=False, default="90", help="rotating angle")
     args = vars(ap.parse_args())
 
     debug_level = logging.INFO
@@ -124,6 +125,7 @@ def main():
     simulate_warnings = args["simulate"]
     draw_polygons_on_image = args["draw"]
     activate_buzzer = args["buzzer"]
+    rotating_angle = args["angle"]
 
     if args_debug:
         debug_level = logging.DEBUG
@@ -139,13 +141,15 @@ def main():
     logging.info("******  STARTED Human Detection  ***************")
     logging.info("************************************************")
     logging.info("Application Arguments: {}".format(args))
+    arm_freq = os.popen("vcgencmd get_config arm_freq").readline()
+    logging.info(arm_freq)
 
     if args_show:
         cv2.namedWindow("detect")
 
     if args_image == 'c':
-        thread_names = [THREAD_CAMERA, THREAD_DNN, THREAD_VISION, THREAD_COMMUNICATION, THREAD_FILES_SAVER]
-        start_threads(args_show, args_port, args_baudrate, thread_names, save_images_to_disk, simulate_warnings, draw_polygons_on_image, activate_buzzer)
+        thread_names = [THREAD_CAMERA, THREAD_DNN, THREAD_VISIBILITY, THREAD_COMMUNICATION, THREAD_FILES_SAVER]
+        start_threads(args_show, args_port, args_baudrate, thread_names, save_images_to_disk, simulate_warnings, draw_polygons_on_image, activate_buzzer, rotating_angle)
     else:
         filelist = glob.glob(os.path.join(args_image, '*.png'))
         filelist.extend(glob.glob(os.path.join(args_image, '*.jpg')))

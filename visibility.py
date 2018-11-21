@@ -15,7 +15,7 @@ from utils.hd_threading import HDThread
 from utils.obstruction_detector import ObstructionDetector
 
 
-class Vision(HDThread):
+class Visibility(HDThread):
     def __init__(self, thread_name, logging, img_queue, target_fps):
         super().__init__(thread_name, logging, target_fps)
         self.obs_detector = ObstructionDetector(logging)
@@ -27,12 +27,12 @@ class Vision(HDThread):
 
     def _run(self) -> None:
         image = self.img_queue.get()
-        self._vision(image)
+        self._visibility(image)
 
     def is_module_in_error(self):
         return self.in_error
 
-    def _vision(self, img):
+    def _visibility(self, img):
         start_time = datetime.now()
         self.logging.debug("{} - Start.".format(self.thread_name))
         gray_image = cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)
@@ -72,6 +72,9 @@ class Vision(HDThread):
                                             self.obs_detector.max_obstruction_hits,
                                             None,
                                             None,
-                                            None)
+                                            None,
+                                            None,
+                                            None,
+                                            None,)
         self.logging.info("{} - on_get_setup_config_msg={}".format(self.thread_name, response))
         return response

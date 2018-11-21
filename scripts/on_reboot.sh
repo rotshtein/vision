@@ -21,5 +21,6 @@ python dnnr.py -p "/dev/ttyAMA0" -b "115200" -m -r -z
 # "-b", "--baudrate", required=False, help="serial baudrate"
 # "-v", "--saveimages", required=False, default=False, help="save images to disk"
 # "-m", "--simulate", required=False, default=False, help="simulate warnings on startup")
-# "-r", "--draw", required=False, default=False, help="draw the detected polygons on the images"
+# "-r", "--draw", required=False, default=False, help="draw the detections and the warning's polygons on the images"
 # "-z", "--buzzer", required=False, default=False, help="Activate buzzer"
+# "-a", "--angle", required=False, default="90", help="rotating angle"

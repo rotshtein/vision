@@ -32,7 +32,7 @@ HEIGHT_THR = 150
 
 class HumanDetection(HDThread):
     def __init__(self, thread_name, logging, img_queue, target_fps, show, num_of_frames_to_rotate, sw_version,
-                 fw_version, debug_img_queue, save_images_to_disk=False, debug_save_img_queue=None, draw_polygons_on_image=False):
+                 fw_version, debug_img_queue, save_images_to_disk=False, debug_save_img_queue=None, draw_polygons_on_image=False, rotating_angle=90):
         super().__init__(thread_name, logging, target_fps)
         self.logging.info("{} - Init.".format(thread_name))
         self.rotate_counter = 0
@@ -46,6 +46,7 @@ class HumanDetection(HDThread):
         self.is_logging_debug = False
         self.save_images_to_disk = save_images_to_disk
         self.draw_polygons_on_image = draw_polygons_on_image
+        self.rotating_angle = rotating_angle
 
         self.CLASSES = ["background", "aeroplane", "bicycle", "bird", "boat",
                         "bottle", "bus", "car", "cat", "chair", "cow", "diningtable",
@@ -87,15 +88,14 @@ class HumanDetection(HDThread):
         process_start = temp_time = datetime.now()
         (h, w) = image.shape[:2]
         resized_image = cv2.resize(image, (300, 300))
-
         if is_rotate:
-            self.logging.debug("{} - Rotating image by 90 deg...".format(self.thread_name))
+            self.logging.info("{} - Rotating image by 90 deg...".format(self.thread_name))
             temp_time = datetime.now()
             image_rotator = ImageRotator()
-            image_rotated = image_rotator.rotate_image(resized_image, 90)
+            image_rotated = image_rotator.rotate_image(resized_image, self.rotating_angle)
             resized_image = image_rotator.crop_around_center(image_rotated,
                                                              *image_rotator.largest_rotated_rect(w, h,
-                                                                                                 math.radians(90)))
+                                                                                                 math.radians(self.rotating_angle)))
             self.rotate_counter = 0
             self.logging.debug("{} - Rotating image Duration={}".format(self.thread_name, datetime.now() - temp_time))
 
@@ -136,7 +136,7 @@ class HumanDetection(HDThread):
 
                 polygon = warning.polygon
                 if is_rotate:
-                    polygon = self.rotate_polygon(polygon)
+                    polygon = self.rotate_polygon(polygon, self.rotating_angle)
 
                 if self.draw_polygons_on_image:
                     self.draw_warning_polygon(polygon, warning.warning_id, resized_image)
@@ -168,8 +168,8 @@ class HumanDetection(HDThread):
         if self.show:
             self.debug_img_queue.put(resized_image)
 
-    def rotate_polygon(self, polygon):
-        return rotate_and_translate_polygon(polygon, 90)
+    def rotate_polygon(self, polygon, rotating_angle):
+        return rotate_and_translate_polygon(polygon, rotating_angle)
 
     def is_warning_polygon_in_detection_box(self, startX, startY, endX, endY, polygon):
         detected_box = [Point(startX, startY), Point(startX, endY), Point(endX, endY), Point(endX, startY)]
@@ -230,6 +230,8 @@ class HumanDetection(HDThread):
 
         self.show = message.show_images
         self.save_images_to_disk = message.save_images_to_disk
+        self.draw_polygons_on_image = message.draw_polygons
+        self.rotating_angle = message.rotate_degree
 
     def on_set_warning_msg(self, message: HDSetWarningMessage):
         self.logging.info(
@@ -320,7 +322,8 @@ class HumanDetection(HDThread):
 
     def on_get_setup_config_msg(self) -> HDGetSetupConfigResponse:
         config_response = HDGetSetupConfigResponse(self.num_of_frames_to_rotate, None, None, None, None, None, None,
-                                                   self.is_logging_debug, self.show, self.save_images_to_disk)
+                                                   self.is_logging_debug, self.show, self.save_images_to_disk,
+                                                   self.draw_polygons_on_image, None, self.rotating_angle)
         self.logging.info("{} - on_get_setup_config_msg={}".format(self.thread_name, config_response))
         return config_response
 
