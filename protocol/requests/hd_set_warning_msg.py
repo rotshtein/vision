@@ -6,7 +6,7 @@ from warning import ObjectClassConverter, ObjectClassHolder
 class HDSetWarningMessage(IBytesConverter):
     def __init__(self, warning_id, polygon, object_class_holder, object_min_w_h,
                  object_max_w_h, minimum_confidence, minimum_detection_hits, maximum_detection_hits,
-                 is_default) -> None:
+                 is_default, is_rotated) -> None:
         super().__init__()
         self.warning_id = warning_id
         self.polygon = polygon  # type: [Point]
@@ -17,6 +17,7 @@ class HDSetWarningMessage(IBytesConverter):
         self.minimum_detection_hits = minimum_detection_hits
         self.maximum_detection_hits = maximum_detection_hits
         self.is_default = is_default
+        self.is_rotated = is_rotated
         self.opcode = b'xB2'
 
     def __str__(self):
@@ -28,7 +29,8 @@ class HDSetWarningMessage(IBytesConverter):
                     "minimum_confidence={}".format(self.minimum_confidence),
                     "minimum_detection_hits={}".format(self.minimum_detection_hits),
                     "maximum_detection_hits={}".format(self.maximum_detection_hits),
-                    "is_default={}".format(self.is_default)])
+                    "is_default={}".format(self.is_default),
+                    "is_rotated={}".format(self.is_rotated)])
 
     def to_bytes(self):
         # full_visibility_threshold = bytearray(struct.pack("{}f".format(IBytesConverter.LITTLE_ENDIAN_SIGN), self.full_visibility_threshold))
@@ -51,8 +53,9 @@ class HDSetWarningMessage(IBytesConverter):
         maximum_detection_hits = int.to_bytes(self.maximum_detection_hits, 1,
                                               byteorder=IBytesConverter.LITTLE_ENDIAN)
         is_default = bool.to_bytes(self.is_default, 1, byteorder=IBytesConverter.LITTLE_ENDIAN)
+        is_rotated = bool.to_bytes(self.is_rotated, 1, byteorder=IBytesConverter.LITTLE_ENDIAN)
         result = warning_id + polygon + object_class + object_min_w_h + object_max_w_h + minimum_confidence + \
-                 minimum_detection_hits + maximum_detection_hits + is_default
+                 minimum_detection_hits + maximum_detection_hits + is_default + is_rotated
         return result
 
     @classmethod
@@ -118,9 +121,13 @@ class HDSetWarningMessage(IBytesConverter):
                                      byteorder=IBytesConverter.LITTLE_ENDIAN)
         start_index = 30
         num_of_bytes = 1
+        is_rotated = bool.from_bytes(data_bytes[start_index - temp_offset:start_index - temp_offset + num_of_bytes],
+                                     byteorder=IBytesConverter.LITTLE_ENDIAN)
+        start_index = 31
+        num_of_bytes = 1
         checksum = int.from_bytes(data_bytes[start_index - temp_offset:start_index - temp_offset + num_of_bytes],
                                   byteorder=IBytesConverter.LITTLE_ENDIAN)
 
         return cls(warning_id, polygon, object_class_holder, object_min_w_h, object_max_w_h, minimum_confidence,
-                   minimum_detection_hits, maximum_detection_hits, is_default)
+                   minimum_detection_hits, maximum_detection_hits, is_default, is_rotated)
 

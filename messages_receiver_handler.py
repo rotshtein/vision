@@ -73,6 +73,10 @@ class MessagesReceiverHandler(object):
             data = rx_listener.on_get_warning_msg()  # type: HDGetWarningResponse
             if data is None:
                 continue
+            if data.cycle_counter is not None:
+                response.cycle_counter = data.cycle_counter
+            if data.is_rotated is not None:
+                response.is_rotated = data.is_rotated
             if data.visibility_light_level is not None:
                 response.visibility_light_level = data.visibility_light_level
             if data.is_obstructed is not None:

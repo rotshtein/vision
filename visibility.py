@@ -3,6 +3,7 @@ Created on Aug 12, 2018
 
 @author: ziv
 """
+import pickle
 from datetime import datetime
 from queue import Queue
 
@@ -78,3 +79,15 @@ class Visibility(HDThread):
                                             None,)
         self.logging.info("{} - on_get_setup_config_msg={}".format(self.thread_name, response))
         return response
+
+    def load_configuration_from_fs(self):
+        self.load_setup_from_fs()
+
+    def load_setup_from_fs(self):
+        try:
+            with open('setup.pkl', 'rb') as input:
+                setup_message = pickle.load(input)
+            self.on_setup_message(setup_message)
+            self.logging.info("{} - Loaded setup from file Successfully...").format(self.thread_name)
+        except Exception as ex:
+            self.logging.info("{} - Failed to load setup from file... {}".format(self.thread_name, ex.__str__()))

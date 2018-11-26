@@ -31,7 +31,8 @@ THREAD_CAMERA = "Thread_Camera"
 THREAD_FILES_SAVER = "Thread_Files_Saver"
 
 
-def start_threads(show, port, baudrate, thread_names, save_images_to_disk, simulate_warnings, draw_polygons_on_image, activate_buzzer, rotating_angle):
+def start_threads(show, port, baudrate, thread_names, save_images_to_disk, simulate_warnings, draw_polygons_on_image,
+                  activate_buzzer, rotating_angle):
     # max size = 2 - we don't want old images!
     detection_queue = queue.Queue(1)
     visibility_queue = queue.Queue(1)
@@ -49,15 +50,19 @@ def start_threads(show, port, baudrate, thread_names, save_images_to_disk, simul
         elif tName == THREAD_DNN:
             num_of_frames_to_rotate = 3
             target_fps = 0
-            thread = HumanDetection(tName, logging, detection_queue, target_fps, show, num_of_frames_to_rotate, SW_VERSION,
-                                    FW_VERSION, debug_queue, save_images_to_disk, debug_save_img_queue, draw_polygons_on_image, rotating_angle)
+            thread = HumanDetection(tName, logging, detection_queue, target_fps, show, num_of_frames_to_rotate,
+                                    SW_VERSION,
+                                    FW_VERSION, debug_queue, save_images_to_disk, debug_save_img_queue,
+                                    draw_polygons_on_image, rotating_angle)
             if simulate_warnings:  # only for debugging purpose - init app with a warning
                 create_dummy_warning(thread)
+            thread.load_configuration_from_fs()
             messages_receiver_handler.add_rx_listeners(thread)
 
         elif tName == THREAD_VISIBILITY:
             target_fps = 2
             thread = Visibility(tName, logging, visibility_queue, target_fps)
+            thread.load_configuration_from_fs()
             messages_receiver_handler.add_rx_listeners(thread)
 
         elif tName == THREAD_COMMUNICATION:
@@ -89,28 +94,37 @@ def start_threads(show, port, baudrate, thread_names, save_images_to_disk, simul
 
     print("Exiting Main Thread")
 
+
 def create_dummy_warning(hd_thread):
     # set a single warning - start...
     hd_thread.num_of_frames_to_rotate = 3
     polygon_arr = [Point(0, 0), Point(0, 300), Point(300, 300), Point(300, 0)]
     object_class_holder = ObjectClassHolder([False, False, False, False, False, False, False, True])
-    warning_message = HDSetWarningMessage(2, polygon_arr, object_class_holder, 0, 300, 20, 1, 1, True)
+    warning_message = HDSetWarningMessage(2, polygon_arr, object_class_holder, 0, 300, 20, 1, 1, True, False)
     hd_thread.on_set_warning_msg(warning_message)
+    warning_message = HDSetWarningMessage(3, polygon_arr, object_class_holder, 0, 300, 20, 1, 1, True, True)
+    hd_thread.on_set_warning_msg(warning_message)
+
 
 def main():
     # construct the argument parse and parse the arguments
     ap = argparse.ArgumentParser()
-    ap.add_argument("-i", "--image", required=False, default="c", help="path to input image. if arg==c then the camera will be used instead of an image")
+    ap.add_argument("-i", "--image", required=False, default="c",
+                    help="path to input image. if arg==c then the camera will be used instead of an image")
     ap.add_argument("-s", "--show", required=False, default=False, action='store_true',
                     help="show the processed image via X Server")
     ap.add_argument("-d", "--debug", required=False, default=False, action='store_true',
                     help="change the log level to DEBUG. default level is INFO")
-    ap.add_argument("-l", "--loggingFileName", required=False, default="", help="log to a file. Must add the log file path as an argument!")
+    ap.add_argument("-l", "--loggingFileName", required=False, default="",
+                    help="log to a file. Must add the log file path as an argument!")
     ap.add_argument("-p", "--port", required=False, help="serial port")
     ap.add_argument("-b", "--baudrate", required=False, help="serial baudrate")
-    ap.add_argument("-v", "--saveimages", required=False, default=False, action='store_true', help="save images to disk")
-    ap.add_argument("-m", "--simulate", required=False, default=False, action='store_true', help="simulate warnings on startup")
-    ap.add_argument("-r", "--draw", required=False, default=False, action='store_true', help="draw the detected polygons on the images")
+    ap.add_argument("-v", "--saveimages", required=False, default=False, action='store_true',
+                    help="save images to disk")
+    ap.add_argument("-m", "--simulate", required=False, default=False, action='store_true',
+                    help="simulate warnings on startup")
+    ap.add_argument("-r", "--draw", required=False, default=False, action='store_true',
+                    help="draw the detected polygons on the images")
     ap.add_argument("-z", "--buzzer", required=False, default=False, action='store_true', help="Activate buzzer")
     ap.add_argument("-a", "--angle", required=False, default="90", help="rotating angle")
     args = vars(ap.parse_args())
@@ -149,7 +163,8 @@ def main():
 
     if args_image == 'c':
         thread_names = [THREAD_CAMERA, THREAD_DNN, THREAD_VISIBILITY, THREAD_COMMUNICATION, THREAD_FILES_SAVER]
-        start_threads(args_show, args_port, args_baudrate, thread_names, save_images_to_disk, simulate_warnings, draw_polygons_on_image, activate_buzzer, rotating_angle)
+        start_threads(args_show, args_port, args_baudrate, thread_names, save_images_to_disk, simulate_warnings,
+                      draw_polygons_on_image, activate_buzzer, rotating_angle)
     else:
         filelist = glob.glob(os.path.join(args_image, '*.png'))
         filelist.extend(glob.glob(os.path.join(args_image, '*.jpg')))
@@ -182,7 +197,7 @@ def main():
                         # ESC pressed
                         logging.debug("Escape hit, closing...")
                         cv2.destroyAllWindows()
-                #time.sleep(1.0)
+                # time.sleep(1.0)
         hd_thread.join(1)
         print("Exiting Main Thread...")
 

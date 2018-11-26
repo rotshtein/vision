@@ -4,6 +4,7 @@ Created on Aug 12, 2018
 @author: ziv
 """
 import math
+import pickle
 import queue
 import threading
 from datetime import datetime
@@ -26,13 +27,18 @@ from utils.image_rotator import ImageRotator
 from utils.point_in_polygon import is_point_in_polygon, Point, rotate_and_translate_polygon
 from warning import HDWarning, HDWarningResult
 
+SETUP_PKL_FILE_NAME = 'setup.pkl'
+
+WARNINGS_PKL_FILE_NAME = 'warnings.pkl'
+
 DNN_TH_SLEEP_SEC = 0
 HEIGHT_THR = 150
 
 
 class HumanDetection(HDThread):
     def __init__(self, thread_name, logging, img_queue, target_fps, show, num_of_frames_to_rotate, sw_version,
-                 fw_version, debug_img_queue, save_images_to_disk=False, debug_save_img_queue=None, draw_polygons_on_image=False, rotating_angle=90):
+                 fw_version, debug_img_queue, save_images_to_disk=False, debug_save_img_queue=None,
+                 draw_polygons_on_image=False, rotating_angle=90):
         super().__init__(thread_name, logging, target_fps)
         self.logging.info("{} - Init.".format(thread_name))
         self.rotate_counter = 0
@@ -46,7 +52,7 @@ class HumanDetection(HDThread):
         self.is_logging_debug = False
         self.save_images_to_disk = save_images_to_disk
         self.draw_polygons_on_image = draw_polygons_on_image
-        self.rotating_angle = rotating_angle
+        self.rotating_angle = int(rotating_angle)
 
         self.CLASSES = ["background", "aeroplane", "bicycle", "bird", "boat",
                         "bottle", "bus", "car", "cat", "chair", "cow", "diningtable",
@@ -59,6 +65,8 @@ class HumanDetection(HDThread):
                                             'data/caffemodels/MobileNetSSD_deploy.caffemodel')
 
         self.rotate_counter = 0
+        self.is_frame_rotated = False
+        self.cycle_counter = 0
         self.warnings = {}  # type: {} warning_id:HDWarning
 
         # warnings_results does not keep all 16 warnings but only warnings that were set.
@@ -81,21 +89,23 @@ class HumanDetection(HDThread):
             self.logging.debug("{} - Image is none".format(self.thread_name))
             return
 
-        is_rotate = False
-        if self.rotate_counter >= self.num_of_frames_to_rotate:
-            is_rotate = True
+        if self.rotate_counter == self.num_of_frames_to_rotate and self.num_of_frames_to_rotate != 0:
+            self.is_frame_rotated = True
+        else:
+            self.is_frame_rotated = False
 
         process_start = temp_time = datetime.now()
         (h, w) = image.shape[:2]
         resized_image = cv2.resize(image, (300, 300))
-        if is_rotate:
+        if self.is_frame_rotated:
             self.logging.info("{} - Rotating image by 90 deg...".format(self.thread_name))
             temp_time = datetime.now()
             image_rotator = ImageRotator()
             image_rotated = image_rotator.rotate_image(resized_image, self.rotating_angle)
             resized_image = image_rotator.crop_around_center(image_rotated,
                                                              *image_rotator.largest_rotated_rect(w, h,
-                                                                                                 math.radians(self.rotating_angle)))
+                                                                                                 math.radians(
+                                                                                                     self.rotating_angle)))
             self.rotate_counter = 0
             self.logging.debug("{} - Rotating image Duration={}".format(self.thread_name, datetime.now() - temp_time))
 
@@ -113,9 +123,10 @@ class HumanDetection(HDThread):
 
         for warning in self.warnings.values():  # type: HDWarning
             result_is_hit = False
+            # if need to ignore due to is_rotated filter - skip setting the result counter
+            if warning.is_rotated != self.is_frame_rotated:
+                continue
             for i in np.arange(0, detections.shape[2]):
-                if result_is_hit:
-                    break
                 # extract the confidence (i.e., probability) associated with the prediction
                 confidence = 100 * detections[0, 0, i, 2]
                 # extract the index of the class label from the `detections`,
@@ -135,7 +146,7 @@ class HumanDetection(HDThread):
                 object_h = abs(startY - endY)
 
                 polygon = warning.polygon
-                if is_rotate:
+                if self.is_frame_rotated:
                     polygon = self.rotate_polygon(polygon, self.rotating_angle)
 
                 if self.draw_polygons_on_image:
@@ -153,20 +164,24 @@ class HumanDetection(HDThread):
                     # set result counter up
                     if self.draw_polygons_on_image:
                         self.draw_detection(resized_image, startX, startY, endX, endY, idx, label)
-                    self.set_result_counter(warning.warning_id, True)
                     self.logging.info("{} - Detection in warning {}".format(self.thread_name, warning.warning_id))
                     result_is_hit = True
-            if not result_is_hit:
-                self.set_result_counter(warning.warning_id, False)
+                    break
+            self.set_result_counter(warning.warning_id, result_is_hit)
 
         iteration_time = datetime.now() - process_start
         self.iteration_time_sec = iteration_time.microseconds * 1000000
         self.logging.debug("{} - End. Duration={}. ".format(self.thread_name, datetime.now() - process_start))
         self.rotate_counter += 1
+        self.set_cycle_counter()
         if self.save_images_to_disk:
             self.debug_save_img_queue.put(resized_image)
         if self.show:
             self.debug_img_queue.put(resized_image)
+
+    def set_cycle_counter(self):
+        self.cycle_counter += 1
+        self.cycle_counter = self.cycle_counter % 16
 
     def rotate_polygon(self, polygon, rotating_angle):
         return rotate_and_translate_polygon(polygon, rotating_angle)
@@ -221,8 +236,10 @@ class HumanDetection(HDThread):
         for handler in logger.handlers:
             handler.setLevel(level)
 
-    def on_setup_message(self, message: HDSetupMessage):
+    def on_setup_message(self, message: HDSetupMessage, is_save_to_fs=True):
         self.logging.info("{} - on_setup_message={}".format(self.thread_name, message))
+        if is_save_to_fs:
+            self.save_setup_to_fs(message)
         self.num_of_frames_to_rotate = message.rotate_image_cycle
 
         self.is_logging_debug = message.logging_debug
@@ -231,20 +248,52 @@ class HumanDetection(HDThread):
         self.show = message.show_images
         self.save_images_to_disk = message.save_images_to_disk
         self.draw_polygons_on_image = message.draw_polygons
-        self.rotating_angle = message.rotate_degree
+        self.rotating_angle = int(message.rotate_degree)
 
     def on_set_warning_msg(self, message: HDSetWarningMessage):
         self.logging.info(
             "{} - on_set_warning_msg={}".format(self.thread_name, message))
         warning = HDWarning(message.warning_id, message.polygon, message.object_class_holder, message.object_min_w_h,
                             message.object_max_w_h, message.minimum_confidence, message.minimum_detection_hits,
-                            message.maximum_detection_hits, message.is_default)
+                            message.maximum_detection_hits, message.is_default, message.is_rotated)
         self.lock.acquire()
         try:
             self.warnings[message.warning_id] = warning
             self.warnings_results[message.warning_id] = HDWarningResult()
+            self.save_warnings_to_fs()
         finally:
             self.lock.release()
+
+    def save_setup_to_fs(self, message):
+        with open(SETUP_PKL_FILE_NAME, 'wb') as output:
+            pickle.dump(message, output, pickle.HIGHEST_PROTOCOL)
+
+    def save_warnings_to_fs(self):
+        with open(WARNINGS_PKL_FILE_NAME, 'wb') as output:
+            pickle.dump(self.warnings, output, pickle.HIGHEST_PROTOCOL)
+
+    def load_configuration_from_fs(self):
+        self.load_warnings_from_fs()
+        self.load_setup_from_fs()
+
+    def load_warnings_from_fs(self):
+        try:
+            with open(WARNINGS_PKL_FILE_NAME, 'rb') as input:
+                self.warnings = pickle.load(input)
+            for warning in self.warnings:
+                self.warnings_results[warning] = HDWarningResult()
+            self.logging.info("{} - Loaded warnings from file Successfully...").format(self.thread_name)
+        except Exception as ex:
+            self.logging.info("{} - Failed to load warnings from file... {}".format(self.thread_name, ex.__str__()))
+
+    def load_setup_from_fs(self):
+        try:
+            with open(SETUP_PKL_FILE_NAME, 'rb') as input:
+                setup_message = pickle.load(input)
+            self.on_setup_message(setup_message, False)
+            self.logging.info("{} - Loaded setup from file Successfully...").format(self.thread_name)
+        except Exception as ex:
+            self.logging.info("{} - Failed to load setup from file... {}".format(self.thread_name, ex.__str__()))
 
     def on_remove_warning_msg(self, message: HDRemoveWarningMessage):
         self.lock.acquire()
@@ -252,6 +301,7 @@ class HumanDetection(HDThread):
             if message.warning_id in self.warnings:
                 del self.warnings[message.warning_id]
                 del self.warnings_results[message.warning_id]
+                self.save_warnings_to_fs()
             else:
                 raise Exception("{} - on_remove_warning_msg - No warning id to remove {}".format(self.thread_name,
                                                                                                  message.warning_id))
@@ -263,6 +313,7 @@ class HumanDetection(HDThread):
         try:
             self.warnings.clear()
             self.warnings_results.clear()
+            self.save_warnings_to_fs()
         finally:
             self.lock.release()
 
@@ -277,6 +328,7 @@ class HumanDetection(HDThread):
             for id in warnings_id_to_remove:
                 del self.warnings[id]
                 del self.warnings_results[id]
+            self.save_warnings_to_fs()
         finally:
             self.lock.release()
 
@@ -289,6 +341,7 @@ class HumanDetection(HDThread):
             elif message.warning_id in self.warnings:
                 warning = self.warnings[message.warning_id]  # type: HDWarning
                 warning.is_default = True
+            self.save_warnings_to_fs()
         finally:
             self.lock.release()
 
@@ -307,7 +360,7 @@ class HumanDetection(HDThread):
         finally:
             self.lock.release()
         self.logging.info("{} - on_get_warning_msg={}".format(self.thread_name, warning_res))
-        return HDGetWarningResponse(warning_res, None, None)
+        return HDGetWarningResponse(warning_res, None, None, self.is_frame_rotated, self.cycle_counter)
 
     def on_get_warning_config_msg(self, message: HDGetWarningConfigMessage):
         self.lock.acquire()

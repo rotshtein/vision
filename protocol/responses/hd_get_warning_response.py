@@ -6,15 +6,17 @@ from protocol.bytes_converter import IBytesConverter
 
 class HDGetWarningResponse(IBytesConverter):
 
-    def __init__(self, warnings: []=None, visibility_light_level=None, is_obstructed=None) -> None:
+    def __init__(self, warnings: []=None, visibility_light_level=None, is_obstructed=None, is_rotated=None, cycle_counter=None) -> None:
         super().__init__()
         self.warnings = warnings  # type: [bool]
         self.visibility_light_level = visibility_light_level  # type: VisibilityLightLevel
         self.is_obstructed = is_obstructed  # type: bool
+        self.is_rotated = is_rotated  # type: bool
+        self.cycle_counter = cycle_counter
         self.opcode = b'xC1'
 
     def __str__(self):
-        return "warnings={}. visibility_light_level={}. is_obstructed={}".format(self.warnings, self.visibility_light_level, self.is_obstructed)
+        return "warnings={}. visibility_light_level={}. is_obstructed={}.is_rotated={}.cycle_counter={}.".format(self.warnings, self.visibility_light_level, self.is_obstructed, self.is_rotated, self.cycle_counter)
 
     def to_bytes(self):
         warning_bits1 = bitarray(self.warnings[0:8], endian=IBytesConverter.LITTLE_ENDIAN)
@@ -29,7 +31,11 @@ class HDGetWarningResponse(IBytesConverter):
         else:
             is_vision_bit_1 = True
             is_vision_bit_2 = True
-        vision_bits = bitarray([is_vision_bit_1, is_vision_bit_2, self.is_obstructed, None, None, None, None, None], endian=IBytesConverter.LITTLE_ENDIAN)
+
+        vision_bits = bitarray([is_vision_bit_1, is_vision_bit_2, self.is_obstructed, self.is_rotated,
+                                bool(self.cycle_counter & (1 << 0)), bool(self.cycle_counter & (1 << 1)),
+                                bool(self.cycle_counter & (1 << 2)), bool(self.cycle_counter & (1 << 3))],
+                               endian=IBytesConverter.LITTLE_ENDIAN)
         result = warning_bits1 + warning_bits2 + vision_bits
         return result.tobytes()
 
