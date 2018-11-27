@@ -43,7 +43,7 @@ class HDThread(threading.Thread, IRXMessage):
 
     def measure_temp(self):
         temp = os.popen("vcgencmd measure_temp").readline()
-        return (temp.replace("temp=",""))
+        return (temp.replace("temp=","").rstrip("\n\r"))
         
     def _calc_fps(self):
         time = datetime.now() - self.last_measured_time

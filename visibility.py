@@ -88,6 +88,6 @@ class Visibility(HDThread):
             with open('setup.pkl', 'rb') as input:
                 setup_message = pickle.load(input)
             self.on_setup_message(setup_message)
-            self.logging.info("{} - Loaded setup from file Successfully...").format(self.thread_name)
+            self.logging.info("{} - Loaded setup from file Successfully...".format(self.thread_name))
         except Exception as ex:
             self.logging.info("{} - Failed to load setup from file... {}".format(self.thread_name, ex.__str__()))

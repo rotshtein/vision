@@ -28,7 +28,6 @@ from utils.point_in_polygon import is_point_in_polygon, Point, rotate_and_transl
 from warning import HDWarning, HDWarningResult
 
 SETUP_PKL_FILE_NAME = 'setup.pkl'
-
 WARNINGS_PKL_FILE_NAME = 'warnings.pkl'
 
 DNN_TH_SLEEP_SEC = 0
@@ -60,7 +59,7 @@ class HumanDetection(HDThread):
                         "sofa", "train", "tvmonitor"]
         self.COLORS = np.random.uniform(0, 255, size=(len(self.CLASSES), 3))
         # load our serialized protocol from disk
-        logging.debug("loading detection protocol...")
+        logging.debug("{} - Loading the detection protocol - readNetFromCaffe...".format(self.thread_name))
         self.net = cv2.dnn.readNetFromCaffe('data/caffemodels/MobileNetSSD_deploy.prototxt.txt',
                                             'data/caffemodels/MobileNetSSD_deploy.caffemodel')
 
@@ -282,7 +281,7 @@ class HumanDetection(HDThread):
                 self.warnings = pickle.load(input)
             for warning in self.warnings:
                 self.warnings_results[warning] = HDWarningResult()
-            self.logging.info("{} - Loaded warnings from file Successfully...").format(self.thread_name)
+            self.logging.info("{} - Loaded warnings from file Successfully...".format(self.thread_name))
         except Exception as ex:
             self.logging.info("{} - Failed to load warnings from file... {}".format(self.thread_name, ex.__str__()))
 
