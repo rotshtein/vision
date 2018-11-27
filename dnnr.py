@@ -17,6 +17,7 @@ from file_saver import FilesSaver
 from human_detection import HumanDetection
 from messages_receiver_handler import MessagesReceiverHandler
 from protocol.requests.hd_set_warning_msg import HDSetWarningMessage
+from protocol.requests.hd_setup_msg import HDSetupMessage
 from utils.point_in_polygon import Point
 from visibility import Visibility
 from warning import ObjectClassHolder
@@ -104,6 +105,9 @@ def create_dummy_warning(hd_thread):
     hd_thread.on_set_warning_msg(warning_message)
     warning_message = HDSetWarningMessage(3, polygon_arr, object_class_holder, 0, 300, 20, 1, 1, True, True)
     hd_thread.on_set_warning_msg(warning_message)
+
+    setup_message = HDSetupMessage(5, 1000, 63, 128, 190, 2, 3, True, False, True, True, True, 90)
+    hd_thread.on_setup_message(setup_message)
 
 
 def main():
