@@ -3,14 +3,7 @@
   <component name="ChangeListManager">
     <list default="true" id="15741994-b401-49d7-b680-7125fc6fcaa4" name="Default" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dnnr.py" beforeDir="false" afterPath="$PROJECT_DIR$/dnnr.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/human_detection.py" beforeDir="false" afterPath="$PROJECT_DIR$/human_detection.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/messages_receiver_handler.py" beforeDir="false" afterPath="$PROJECT_DIR$/messages_receiver_handler.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/protocol/requests/hd_set_warning_msg.py" beforeDir="false" afterPath="$PROJECT_DIR$/protocol/requests/hd_set_warning_msg.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/protocol/responses/hd_get_warning_config_response.py" beforeDir="false" afterPath="$PROJECT_DIR$/protocol/responses/hd_get_warning_config_response.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/protocol/responses/hd_get_warning_response.py" beforeDir="false" afterPath="$PROJECT_DIR$/protocol/responses/hd_get_warning_response.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/visibility.py" beforeDir="false" afterPath="$PROJECT_DIR$/visibility.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/warning.py" beforeDir="false" afterPath="$PROJECT_DIR$/warning.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/documents/HD Protocol V6.docx" beforeDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -21,11 +14,11 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="dnnr.py" pinned="false" current-in-tab="false">
+      <file leaf-file-name="dnnr.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/dnnr.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1141">
-              <caret line="101" column="63" selection-start-line="101" selection-start-column="63" selection-end-line="101" selection-end-column="63" />
+            <state relative-caret-position="196">
+              <caret line="106" column="44" lean-forward="true" selection-start-line="106" selection-start-column="44" selection-end-line="106" selection-end-column="44" />
               <folding>
                 <element signature="e#46#61#0" expanded="true" />
               </folding>
@@ -33,11 +26,11 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="human_detection.py" pinned="false" current-in-tab="true">
+      <file leaf-file-name="human_detection.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/human_detection.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="26">
-              <caret line="121" column="19" selection-start-line="121" selection-start-column="19" selection-end-line="121" selection-end-column="19" />
+            <state relative-caret-position="332">
+              <caret line="293" column="31" selection-start-line="293" selection-start-column="31" selection-end-line="293" selection-end-column="31" />
               <folding>
                 <element signature="e#46#57#0" expanded="true" />
                 <element signature="e#3480#3500#0" />
@@ -59,20 +52,20 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="hd_get_warning_msg.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/protocol/requests/hd_get_warning_msg.py">
+      <file leaf-file-name="hd_set_warning_msg.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/protocol/requests/hd_set_warning_msg.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="34">
-              <caret line="2" selection-start-line="2" selection-end-line="2" />
+            <state relative-caret-position="68">
+              <caret line="6" column="8" selection-start-line="6" selection-start-column="8" selection-end-line="6" selection-end-column="8" />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="hd_set_warning_msg.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/protocol/requests/hd_set_warning_msg.py">
+      <file leaf-file-name="hd_setup_msg.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/protocol/requests/hd_setup_msg.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="51">
-              <caret line="5" column="17" selection-start-line="5" selection-start-column="17" selection-end-line="5" selection-end-column="17" />
+            <state relative-caret-position="200">
+              <caret line="145" column="45" selection-start-line="145" selection-start-column="21" selection-end-line="145" selection-end-column="45" />
             </state>
           </provider>
         </entry>
@@ -81,7 +74,7 @@
         <entry file="file://$PROJECT_DIR$/messages_receiver_handler.py">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="285">
-              <caret line="96" column="38" lean-forward="true" selection-start-line="96" selection-start-column="38" selection-end-line="96" selection-end-column="38" />
+              <caret line="96" column="38" selection-start-line="96" selection-start-column="38" selection-end-line="96" selection-end-column="38" />
             </state>
           </provider>
         </entry>
@@ -95,20 +88,23 @@
           </provider>
         </entry>
       </file>
+      <file leaf-file-name="visibility.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/visibility.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="156">
+              <caret line="87" column="50" lean-forward="true" selection-start-line="87" selection-start-column="50" selection-end-line="87" selection-end-column="50" />
+              <folding>
+                <element signature="e#46#59#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
       <file leaf-file-name="rx_message.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/rx_message.py">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="119">
               <caret line="22" column="42" selection-start-line="22" selection-start-column="42" selection-end-line="22" selection-end-column="42" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="hd_get_warning_config_response.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/protocol/responses/hd_get_warning_config_response.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="17">
-              <caret line="20" selection-start-line="20" selection-end-line="20" />
             </state>
           </provider>
         </entry>
@@ -223,14 +219,14 @@
         <option value="$PROJECT_DIR$/warning.py" />
         <option value="$PROJECT_DIR$/protocol/requests/hd_set_warning_msg.py" />
         <option value="$PROJECT_DIR$/protocol/responses/hd_get_warning_config_response.py" />
-        <option value="$PROJECT_DIR$/dnnr.py" />
         <option value="$PROJECT_DIR$/protocol/responses/hd_get_warning_response.py" />
         <option value="$PROJECT_DIR$/human_detection.py" />
         <option value="$PROJECT_DIR$/messages_receiver_handler.py" />
+        <option value="$PROJECT_DIR$/dnnr.py" />
       </list>
     </option>
   </component>
-  <component name="ProjectFrameBounds" extendedState="6">
+  <component name="ProjectFrameBounds" extendedState="7">
     <option name="x" value="117" />
     <option name="y" value="58" />
     <option name="width" value="1550" />
@@ -251,6 +247,11 @@
             <path>
               <item name="vision" type="b2602c69:ProjectViewProjectNode" />
               <item name="vision" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="vision" type="b2602c69:ProjectViewProjectNode" />
+              <item name="vision" type="462c0819:PsiDirectoryNode" />
+              <item name="documents" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="vision" type="b2602c69:ProjectViewProjectNode" />
@@ -280,19 +281,19 @@
     <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
   </component>
   <component name="RecentsManager">
-    <key name="MoveFile.RECENT_KEYS">
-      <recent name="C:\Projects\vision\protocol\requests" />
-      <recent name="C:\Projects\vision\protocol\responses" />
-      <recent name="C:\Projects\vision\detection_scripts" />
-      <recent name="C:\Projects\vision\utils\temp" />
-      <recent name="C:\Projects\vision\data\caffemodels" />
-    </key>
     <key name="CopyFile.RECENT_KEYS">
       <recent name="C:\Projects\vision\documents" />
       <recent name="C:\Projects\vision" />
       <recent name="C:\Projects\vision\protocol\responses" />
       <recent name="C:\Projects\vision\protocol\requests" />
       <recent name="C:\Projects\vision\protocol" />
+    </key>
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Projects\vision\documents" />
+      <recent name="C:\Projects\vision\protocol\requests" />
+      <recent name="C:\Projects\vision\protocol\responses" />
+      <recent name="C:\Projects\vision\detection_scripts" />
+      <recent name="C:\Projects\vision\utils\temp" />
     </key>
   </component>
   <component name="RunDashboard">
@@ -474,49 +475,62 @@
     </todo-panel>
   </component>
   <component name="ToolWindowManager">
-    <frame x="-7" y="-7" width="1550" height="838" extended-state="6" />
+    <frame x="-7" y="-7" width="1550" height="838" extended-state="7" />
     <editor active="true" />
     <layout>
       <window_info anchor="bottom" id="TODO" order="6" sideWeight="0.49932885" weight="0.3298969" />
-      <window_info anchor="bottom" id="Event Log" order="10" sideWeight="0.50939596" side_tool="true" weight="0.34462446" />
+      <window_info anchor="bottom" id="Event Log" order="10" sideWeight="0.42483222" side_tool="true" visible="true" weight="0.4388807" />
       <window_info anchor="bottom" id="Run" order="2" sideWeight="0.490604" weight="0.38880706" />
       <window_info anchor="bottom" id="Version Control" order="7" sideWeight="0.49932885" weight="0.3298969" />
       <window_info anchor="bottom" id="Python Console" order="8" sideWeight="0.47449663" weight="0.31958762" />
       <window_info anchor="bottom" id="Terminal" order="9" sideWeight="0.49395972" weight="0.32842416" />
-      <window_info content_ui="combo" id="Project" order="0" sideWeight="0.75" visible="true" weight="0.20872483" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" sideWeight="0.75" visible="true" weight="0.32416108" />
       <window_info anchor="right" id="R Packages" order="4" />
       <window_info anchor="right" id="R Graphics" order="3" />
       <window_info anchor="bottom" id="Find" order="1" sideWeight="0.47583893" weight="0.44919" />
       <window_info id="Structure" order="1" sideWeight="0.25090253" side_tool="true" weight="0.23355705" />
-      <window_info active="true" anchor="bottom" id="Debug" order="3" sideWeight="0.6912752" visible="true" weight="0.34462446" />
+      <window_info anchor="bottom" id="Debug" order="3" sideWeight="0.5751678" visible="true" weight="0.4388807" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" visible="true" weight="0.24966443" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
+      <window_info content_ui="combo" id="Project" order="0" sideWeight="0.75" visible="true" weight="0.20872483" />
+      <window_info id="Structure" order="1" sideWeight="0.25090253" side_tool="true" weight="0.23355705" />
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
+      <window_info anchor="bottom" id="TODO" order="6" sideWeight="0.49932885" weight="0.3298969" />
+      <window_info anchor="bottom" id="Version Control" order="7" sideWeight="0.49932885" weight="0.3298969" />
+      <window_info anchor="bottom" id="Run" order="2" sideWeight="0.490604" weight="0.38880706" />
+      <window_info anchor="right" id="R Packages" order="4" />
+      <window_info anchor="right" id="R Graphics" order="3" />
+      <window_info active="true" anchor="bottom" id="Debug" order="3" sideWeight="0.6912752" visible="true" weight="0.34462446" />
       <window_info anchor="bottom" id="Message" order="0" />
+      <window_info anchor="bottom" id="Event Log" order="10" sideWeight="0.50939596" side_tool="true" weight="0.34462446" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
+      <window_info id="Favorites" order="2" side_tool="true" />
+      <window_info anchor="bottom" id="Find" order="1" sideWeight="0.47583893" weight="0.44919" />
+      <window_info anchor="bottom" id="Terminal" order="9" sideWeight="0.49395972" weight="0.32842416" />
+      <window_info anchor="bottom" id="Python Console" order="8" sideWeight="0.47449663" weight="0.31958762" />
     </layout>
     <layout-to-restore>
-      <window_info anchor="bottom" id="Version Control" order="7" sideWeight="0.49932885" weight="0.3298969" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" visible="true" weight="0.24966443" />
       <window_info anchor="bottom" id="Run" order="2" sideWeight="0.490604" weight="0.5445026" />
+      <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info active="true" content_ui="combo" id="Project" order="0" sideWeight="0.75" visible="true" weight="0.19798657" />
       <window_info id="Structure" order="1" sideWeight="0.25090253" side_tool="true" weight="0.23355705" />
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
       <window_info anchor="bottom" id="TODO" order="6" sideWeight="0.49932885" weight="0.3298969" />
       <window_info anchor="right" id="R Graphics" order="3" />
+      <window_info anchor="bottom" id="Find" order="1" sideWeight="0.47583893" weight="0.44919" />
       <window_info anchor="right" id="R Packages" order="4" />
-      <window_info anchor="bottom" id="Python Console" order="8" sideWeight="0.47449663" weight="0.31958762" />
-      <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Debug" order="3" sideWeight="0.6912752" weight="0.6893543" />
       <window_info anchor="bottom" id="Terminal" order="9" sideWeight="0.49395972" visible="true" weight="0.32842416" />
       <window_info anchor="bottom" id="Event Log" order="10" sideWeight="0.50939596" side_tool="true" weight="0.34462446" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
-      <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
-      <window_info anchor="bottom" id="Find" order="1" sideWeight="0.47583893" weight="0.44919" />
+      <window_info anchor="bottom" id="Version Control" order="7" sideWeight="0.49932885" weight="0.3298969" />
       <window_info id="Favorites" order="2" side_tool="true" />
+      <window_info anchor="bottom" id="Message" order="0" />
+      <window_info anchor="bottom" id="Python Console" order="8" sideWeight="0.47449663" weight="0.31958762" />
     </layout-to-restore>
   </component>
   <component name="VcsContentAnnotationSettings">
@@ -862,8 +876,8 @@ binascii.hexlify(response)</expression-string>
     </entry>
     <entry file="file://$PROJECT_DIR$/protocol/requests/hd_setup_msg.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="17">
-          <caret line="32" lean-forward="true" selection-start-line="32" selection-end-line="32" />
+        <state relative-caret-position="200">
+          <caret line="145" column="45" selection-start-line="145" selection-start-column="21" selection-end-line="145" selection-end-column="45" />
         </state>
       </provider>
     </entry>
@@ -876,8 +890,8 @@ binascii.hexlify(response)</expression-string>
     </entry>
     <entry file="file://$PROJECT_DIR$/visibility.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="207">
-          <caret line="90" selection-start-line="90" selection-end-line="91" />
+        <state relative-caret-position="156">
+          <caret line="87" column="50" lean-forward="true" selection-start-line="87" selection-start-column="50" selection-end-line="87" selection-end-column="50" />
           <folding>
             <element signature="e#46#59#0" expanded="true" />
           </folding>
@@ -928,8 +942,8 @@ binascii.hexlify(response)</expression-string>
     </entry>
     <entry file="file://$PROJECT_DIR$/protocol/requests/hd_set_warning_msg.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="51">
-          <caret line="5" column="17" selection-start-line="5" selection-start-column="17" selection-end-line="5" selection-end-column="17" />
+        <state relative-caret-position="68">
+          <caret line="6" column="8" selection-start-line="6" selection-start-column="8" selection-end-line="6" selection-end-column="8" />
         </state>
       </provider>
     </entry>
@@ -937,16 +951,6 @@ binascii.hexlify(response)</expression-string>
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="119">
           <caret line="22" column="42" selection-start-line="22" selection-start-column="42" selection-end-line="22" selection-end-column="42" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/dnnr.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1141">
-          <caret line="101" column="63" selection-start-line="101" selection-start-column="63" selection-end-line="101" selection-end-column="63" />
-          <folding>
-            <element signature="e#46#61#0" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -967,14 +971,14 @@ binascii.hexlify(response)</expression-string>
     <entry file="file://$PROJECT_DIR$/messages_receiver_handler.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="285">
-          <caret line="96" column="38" lean-forward="true" selection-start-line="96" selection-start-column="38" selection-end-line="96" selection-end-column="38" />
+          <caret line="96" column="38" selection-start-line="96" selection-start-column="38" selection-end-line="96" selection-end-column="38" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/human_detection.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="26">
-          <caret line="121" column="19" selection-start-line="121" selection-start-column="19" selection-end-line="121" selection-end-column="19" />
+        <state relative-caret-position="332">
+          <caret line="293" column="31" selection-start-line="293" selection-start-column="31" selection-end-line="293" selection-end-column="31" />
           <folding>
             <element signature="e#46#57#0" expanded="true" />
             <element signature="e#3480#3500#0" />
@@ -982,6 +986,16 @@ binascii.hexlify(response)</expression-string>
             <element signature="e#14175#14270#0" />
             <element signature="e#14848#15402#0" />
             <element signature="e#15982#16042#0" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/dnnr.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="196">
+          <caret line="106" column="44" lean-forward="true" selection-start-line="106" selection-start-column="44" selection-end-line="106" selection-end-column="44" />
+          <folding>
+            <element signature="e#46#61#0" expanded="true" />
           </folding>
         </state>
       </provider>
