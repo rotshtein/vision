@@ -73,10 +73,17 @@ class Communication(HDThread):
         if self.ser is not None:
             try:
                 msg_header, length, opcode = self.handle_message_header()
-                msg_body, response = self.handle_message_body(length, opcode)
+
+                # continue reading message - minus 3 bytes: preamble + length + opcode
+                msg_body = self.ser.read(length - 3)
+                self.logging.info(
+                    "{} - read message body length={}. message: {}".format(self.thread_name, length - 3,
+                                                                           binascii.hexlify(msg_body)))
 
                 # validate CRC - if error throw exception
                 self.validate_crc(msg_header + msg_body, length)
+
+                response = self.handle_message_body(length, opcode)
 
                 # send reply message
                 msg = self.ser.write(response)
@@ -117,12 +124,7 @@ class Communication(HDThread):
         opcode = msg_header[2]
         return msg_header, length, opcode
 
-    def handle_message_body(self, length, opcode):
-        # continue reading message - minus 3 bytes: preamble + length + opcode
-        msg_body = self.ser.read(length - 3)
-        self.logging.info(
-            "{} - read message body length={}. message: {}".format(self.thread_name, length - 3,
-                                                                   binascii.hexlify(msg_body)))
+    def handle_message_body(self, msg_body, opcode):
 
         response = None
         # handle message
@@ -173,4 +175,4 @@ class Communication(HDThread):
 
         self.logging.info(
             "{} - Send Response message. message: {}".format(self.thread_name, binascii.hexlify(response)))
-        return msg_body, response
+        return response
