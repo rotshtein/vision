@@ -54,7 +54,7 @@ class HDSetupMessage(IBytesConverter):
                                       byteorder=IBytesConverter.LITTLE_ENDIAN)
         activate_buzzer = bool.to_bytes(self.activate_buzzer, 1,
                                         byteorder=IBytesConverter.LITTLE_ENDIAN)
-        rotate_degree = bool.to_bytes(self.rotate_degree, 1,
+        rotate_degree = int.to_bytes(self.rotate_degree, 1,
                                       byteorder=IBytesConverter.LITTLE_ENDIAN)
         result = rotate_image_cycle + obstruction_threshold + no_visibility_threshold + medium_visibility_threshold \
                  + full_visibility_threshold + minimum_obstruction_hits + maximum_obstruction_hits + logging_debug \
@@ -114,12 +114,12 @@ class HDSetupMessage(IBytesConverter):
             byteorder=IBytesConverter.LITTLE_ENDIAN)
         start_index = 15
         num_of_bytes = 1
-        draw_polygons = int.from_bytes(
+        draw_polygons = bool.from_bytes(
             data_bytes[start_index - temp_offset:start_index - temp_offset + num_of_bytes],
             byteorder=IBytesConverter.LITTLE_ENDIAN)
         start_index = 16
         num_of_bytes = 1
-        activate_buzzer = int.from_bytes(
+        activate_buzzer = bool.from_bytes(
             data_bytes[start_index - temp_offset:start_index - temp_offset + num_of_bytes],
             byteorder=IBytesConverter.LITTLE_ENDIAN)
         start_index = 17
