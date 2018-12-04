@@ -208,8 +208,13 @@ class HumanDetection(HDThread):
             return True
         return False
 
+    def get_color(self, idx):
+        if idx > len(self.COLORS) - 1:
+            idx = 0
+        return self.COLORS[idx]
+
     def draw_detection(self, image, startX, startY, endX, endY, idx, label):
-        cv2.rectangle(image, (startX, startY), (endX, endY), self.COLORS[idx], 2)
+        cv2.rectangle(image, (startX, startY), (endX, endY), self.get_color(idx), 2)
         y = startY - 15 if startY - 15 > 15 else startY + 15
         # cv2.putText(image, label, (startX, y), cv2.FONT_HERSHEY_SIMPLEX, 0.5, self.COLORS[idx], 2)
 
@@ -217,13 +222,13 @@ class HumanDetection(HDThread):
         pts = np.array([[polygon[0].x, polygon[0].y], [polygon[1].x, polygon[1].y],
                         [polygon[2].x, polygon[2].y], [polygon[3].x, polygon[3].y]], np.int32)
         pts = pts.reshape((-1, 1, 2))
-        cv2.polylines(image, [pts], True, self.COLORS[warning_id])
+        cv2.polylines(image, [pts], True, self.get_color(warning_id))
         font = cv2.FONT_HERSHEY_SIMPLEX
         x = int((polygon[0].x + polygon[1].x + polygon[2].x + polygon[3].x) / 4) - 20
         y = int((polygon[0].y + polygon[1].y + polygon[2].y + polygon[3].y) / 4)
 
         cv2.putText(image, "w{}".format(warning_id), (x, y), font, 0.5,
-                    self.COLORS[warning_id], 2)
+                    self.get_color(warning_id), 2)
         # 2, cv2.LINE_AA)
 
     def handle_log_level_change(self):
@@ -252,6 +257,9 @@ class HumanDetection(HDThread):
     def on_set_warning_msg(self, message: HDSetWarningMessage):
         self.logging.info(
             "{} - on_set_warning_msg={}".format(self.thread_name, message))
+        if message.warning_id > 15 or message.warning_id < 0:
+            self.logging.info(
+                "{} - Error - warning_id is illegal. warning_id={}".format(self.thread_name, message.warning_id))
         warning = HDWarning(message.warning_id, message.polygon, message.object_class_holder, message.object_min_w_h,
                             message.object_max_w_h, message.minimum_confidence, message.minimum_detection_hits,
                             message.maximum_detection_hits, message.is_default, message.is_rotated)
@@ -346,8 +354,6 @@ class HumanDetection(HDThread):
             self.lock.release()
 
     def on_set_power_msg(self, message: HDSetPowerMessage):
-        # todo - need to implement ????
-        # assuming it will be already parsed by ST
         pass
 
     def on_get_warning_msg(self):
