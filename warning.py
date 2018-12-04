@@ -5,7 +5,7 @@ from bitarray import bitarray
 from protocol.bytes_converter import IBytesConverter
 
 
-class HDWarning():
+class HDWarning(object):
     def __init__(self, warning_id, polygon, object_class_holder, object_min_w_h,
                  object_max_w_h, minimum_confidence, minimum_detection_hits, maximum_detection_hits,
                  is_default, is_rotated) -> None:
@@ -20,6 +20,15 @@ class HDWarning():
         self.maximum_detection_hits = maximum_detection_hits
         self.is_default = is_default
         self.is_rotated = is_rotated
+
+    def __str__(self):
+        return "warning_id={}. polygon={}. object_class_holder={}. object_min_w_h={}. object_max_w_h={}. " \
+               "minimum_confidence={}. minimum_detection_hits={}. maximum_detection_hits={}. " \
+               "is_default={}. is_rotated={}".format(self.warning_id, ', '.join([str(x) for x in self.polygon]),
+                                                     self.object_class_holder,
+                                                     self.object_min_w_h, self.object_max_w_h, self.minimum_confidence,
+                                                     self.minimum_detection_hits, self.maximum_detection_hits,
+                                                     self.is_default, self.is_rotated)
 
 
 class ObjectClass(Enum):

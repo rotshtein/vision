@@ -280,6 +280,7 @@ class HumanDetection(HDThread):
             with open(WARNINGS_PKL_FILE_NAME, 'rb') as input:
                 self.warnings = pickle.load(input)
             for warning in self.warnings:
+                self.logging.info("{} - Loaded warning: {}".format(self.thread_name, self.warnings[warning]))
                 self.warnings_results[warning] = HDWarningResult()
             self.logging.info("{} - Loaded warnings from file Successfully...".format(self.thread_name))
         except Exception as ex:
