@@ -83,7 +83,7 @@ class Communication(HDThread):
                 # validate CRC - if error throw exception
                 self.validate_crc(msg_header + msg_body, length)
 
-                response = self.handle_message_body(length, opcode)
+                response = self.handle_message_body(msg_body, opcode)
 
                 # send reply message
                 msg = self.ser.write(response)
