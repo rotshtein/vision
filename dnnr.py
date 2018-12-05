@@ -23,11 +23,7 @@ from utils.point_in_polygon import Point
 from visibility import Visibility
 from warning import ObjectClassHolder
 
-<<<<<<< HEAD
 SW_VERSION = "0.6"
-=======
-SW_VERSION = "0.5"
->>>>>>> 21540b54183ec22fad33ed88c0539daadc9437d8
 FW_VERSION = "0.4"
 
 THREAD_COMMUNICATION = "Thread_Communication"
