@@ -18,12 +18,18 @@ class CPUController(HDThread):
         self.num_of_cores = os.popen("grep - c ^ processor / proc / cpuinfo").readline()
         self.logging.info("{} - Starting with full CPU usage. Cores#={}".format(thread_name, self.num_of_cores))
         self.start_time = time.time()
+        self.normalized_cpu = 50
+        self.set_cpu_level_normalized(self.normalized_cpu)
 
     def _run(self) -> None:
-        self._print_cpu_and_temp()
+        self.print_cpu_and_temp()
         self._limit_cpu_upon_temperature()
 
-    def _print_cpu_and_temp(self) -> None:
+    def set_cpu_level_normalized(self, cpu_percent):
+        cpu_usage_percent = self.num_of_cores * cpu_percent
+        self._limit_cpu(cpu_usage_percent)
+
+    def print_cpu_and_temp(self) -> None:
         self.logging.info("{} - CPU%={}, Temp={}'C".format(self.thread_name, self._get_cpu(), self._get_temperature()))
 
     def _limit_cpu_upon_temperature(self) -> None:
@@ -36,10 +42,8 @@ class CPUController(HDThread):
                 self.normalized_cpu += 5
 
         if self.normalized_cpu != last_normalized_cpu:
-            self.logging.info(
-                "{} - setting target CPU%={}".format(self.thread_name, self._get_cpu()))
             self.timer = time.time()
-            self._set_cpu_level_normalized(self.normalized_cpu)
+            self.set_cpu_level_normalized(self.normalized_cpu)
 
     def _get_cpu(self) -> float:
         return float(
@@ -52,11 +56,8 @@ class CPUController(HDThread):
     def _get_python_pid(self) -> int:
         return int(os.popen("pgrep -f python").readline())
 
-    def _set_cpu_level_normalized(self, cpu_percent):
-        cpu_usage_percent = self.num_of_cores * cpu_percent
-        self._limit_cpu(cpu_usage_percent)
-
     def _limit_cpu(self, cpu_usage_percent):
-        self.logging.info("Setting CPU")
+        self.logging.info(
+            "{} - setting target CPU%={}".format(self.thread_name, cpu_usage_percent))
         os.popen("sudo killall cpulimit")
         os.popen("sudo cpulimit -l {} -p {}".format(cpu_usage_percent, self._get_python_pid()))
