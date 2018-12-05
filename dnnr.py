@@ -23,7 +23,7 @@ from visibility import Visibility
 from warning import ObjectClassHolder
 
 SW_VERSION = "0.5"
-FW_VERSION = "0.5"
+FW_VERSION = "0.4"
 
 THREAD_COMMUNICATION = "Thread_Communication"
 THREAD_VISIBILITY = "Thread_Visibility"
