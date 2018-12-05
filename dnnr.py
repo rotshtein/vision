@@ -13,6 +13,7 @@ import cv2
 
 from camera import Camera
 from communication import Communication
+from cpu_controller import CPUController
 from file_saver import FilesSaver
 from human_detection import HumanDetection
 from messages_receiver_handler import MessagesReceiverHandler
@@ -22,19 +23,20 @@ from utils.point_in_polygon import Point
 from visibility import Visibility
 from warning import ObjectClassHolder
 
-SW_VERSION = "0.5"
-FW_VERSION = "0.5"
+SW_VERSION = "0.6"
+FW_VERSION = "0.4"
 
 THREAD_COMMUNICATION = "Thread_Communication"
 THREAD_VISIBILITY = "Thread_Visibility"
 THREAD_DNN = "Thread_DNN"
 THREAD_CAMERA = "Thread_Camera"
 THREAD_FILES_SAVER = "Thread_Files_Saver"
+THREAD_CPU_CONTROLLER = "Thread_CPU_Controller"
 
 
 def start_threads(show, port, baudrate, thread_names, save_images_to_disk, simulate_warnings, draw_polygons_on_image,
                   activate_buzzer, rotating_angle):
-    # max size = 2 - we don't want old images!
+    # max size = 1 - we don't want old images!
     detection_queue = queue.Queue(1)
     visibility_queue = queue.Queue(1)
     debug_queue = queue.Queue(1)
@@ -67,12 +69,16 @@ def start_threads(show, port, baudrate, thread_names, save_images_to_disk, simul
             messages_receiver_handler.add_rx_listeners(thread)
 
         elif tName == THREAD_COMMUNICATION:
-            # no fps since it's blocking
+            # no fps since serial is a blocking method
             thread = Communication(tName, logging, messages_receiver_handler, port, baudrate)
 
         elif tName == THREAD_FILES_SAVER:
-            # no fps since it's blocking
+            # no fps since queue.get is a blocking method
             thread = FilesSaver(tName, logging, debug_save_img_queue)
+
+        elif tName == THREAD_CPU_CONTROLLER:
+            target_fps = 1
+            thread = CPUController(tName, logging, target_fps)
 
         thread.start()
         threads.append(thread)
@@ -97,7 +103,6 @@ def start_threads(show, port, baudrate, thread_names, save_images_to_disk, simul
 
 
 def create_dummy_warning(hd_thread):
-    # set a single warning - start...
     hd_thread.num_of_frames_to_rotate = 3
     polygon_arr = [Point(0, 0), Point(0, 300), Point(300, 300), Point(300, 0)]
     object_class_holder = ObjectClassHolder([False, False, False, False, False, False, False, True])
@@ -114,7 +119,8 @@ def main():
     # construct the argument parse and parse the arguments
     ap = argparse.ArgumentParser()
     ap.add_argument("-i", "--image", required=False, default="c",
-                    help="path to input image. if arg==c then the camera will be used instead of an image")
+                    help="path to input image. if arg==c then the camera will be used instead of an image. "
+                         "other wise need to specify the path to the images folder. e.g. data")
     ap.add_argument("-s", "--show", required=False, default=False, action='store_true',
                     help="show the processed image via X Server")
     ap.add_argument("-d", "--debug", required=False, default=False, action='store_true',
@@ -166,44 +172,50 @@ def main():
         cv2.namedWindow("detect")
 
     if args_image == 'c':
-        thread_names = [THREAD_CAMERA, THREAD_DNN, THREAD_VISIBILITY, THREAD_COMMUNICATION, THREAD_FILES_SAVER]
+        thread_names = [THREAD_CAMERA, THREAD_DNN, THREAD_VISIBILITY, THREAD_COMMUNICATION, THREAD_FILES_SAVER,
+                        THREAD_CPU_CONTROLLER]
         start_threads(args_show, args_port, args_baudrate, thread_names, save_images_to_disk, simulate_warnings,
                       draw_polygons_on_image, activate_buzzer, rotating_angle)
     else:
-        filelist = glob.glob(os.path.join(args_image, '*.png'))
-        filelist.extend(glob.glob(os.path.join(args_image, '*.jpg')))
-        filelist.extend(glob.glob(os.path.join(args_image, '*.bmp')))
-        list_of_images = []
-        for file in filelist:
-            logging.info('********** ' + str(file) + ' ************')
-            img = cv2.imread(file)
-            list_of_images.append(img)
-        _img_queue = queue.Queue()
-        debug_queue = queue.Queue()
-        target_fps = 0
-        num_of_frames_to_rotate = 9
-        logging.info("Creating HD Thread")
-        hd_thread = HumanDetection(THREAD_DNN, logging, _img_queue, target_fps, True, num_of_frames_to_rotate,
-                                   SW_VERSION,
-                                   FW_VERSION, debug_queue)
-        create_dummy_warning(hd_thread)
-        hd_thread.start()
-        while True:
-            for i in range(len(list_of_images)):
-                logging.info("Prepare to fetch an image")
-                _img_queue.put(list_of_images.__getitem__(i))
-                image = debug_queue.get()
-                logging.info("Got an image")
-                if args_show:
-                    cv2.imshow('detect', image)
-                    k = cv2.waitKey(1)
-                    if k % 256 == 27:
-                        # ESC pressed
-                        logging.debug("Escape hit, closing...")
-                        cv2.destroyAllWindows()
-                # time.sleep(1.0)
-        hd_thread.join(1)
-        print("Exiting Main Thread...")
+        simulate_images(args_image, args_show)
+
+
+def simulate_images(args_image, args_show):
+    filelist = glob.glob(os.path.join(args_image, '*.png'))
+    filelist.extend(glob.glob(os.path.join(args_image, '*.jpg')))
+    filelist.extend(glob.glob(os.path.join(args_image, '*.bmp')))
+    list_of_images = []
+    for file in filelist:
+        logging.info('********** ' + str(file) + ' ************')
+        img = cv2.imread(file)
+        list_of_images.append(img)
+    _img_queue = queue.Queue()
+    debug_queue = queue.Queue()
+    target_fps = 0
+    num_of_frames_to_rotate = 9
+    logging.info("Creating HD Thread")
+
+    hd_thread = HumanDetection(THREAD_DNN, logging, _img_queue, target_fps, True, num_of_frames_to_rotate,
+                               SW_VERSION,
+                               FW_VERSION, debug_queue)
+    create_dummy_warning(hd_thread)
+    hd_thread.start()
+    while True:
+        for i in range(len(list_of_images)):
+            logging.info("Prepare to fetch an image")
+            _img_queue.put(list_of_images.__getitem__(i))
+            image = debug_queue.get()
+            logging.info("Got an image")
+            if args_show:
+                cv2.imshow('detect', image)
+                k = cv2.waitKey(1)
+                if k % 256 == 27:
+                    # ESC pressed
+                    logging.debug("Escape hit, closing...")
+                    cv2.destroyAllWindows()
+            # time.sleep(1.0)
+    hd_thread.join(1)
+    print("Exiting Main Thread...")
 
 
 if __name__ == '__main__':

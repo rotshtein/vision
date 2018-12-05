@@ -48,7 +48,7 @@ class HumanDetection(HDThread):
         self.num_of_frames_to_rotate = num_of_frames_to_rotate
         self.sw_version = sw_version
         self.fw_version = fw_version
-        self.is_logging_debug = False
+        self.is_logging_debug = self.logging.getLogger().level == self.logging.DEBUG
         self.save_images_to_disk = save_images_to_disk
         self.draw_polygons_on_image = draw_polygons_on_image
         self.rotating_angle = int(rotating_angle)
