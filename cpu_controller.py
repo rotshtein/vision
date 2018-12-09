@@ -127,10 +127,10 @@ class CPUController(HDThread):
 
     def save_temp_avg_cpu_to_list(self):
         global dnn_fps
-        self.logging.info(
-            "{} - save temp_cpu to list".format(self.thread_name))
         average_cpu = mean(self.cpu_average_list)
         self.cpu_average_list.clear()
+        self.logging.info(
+            "{} - save to list: temp={}, target_cpu={}, avg_cpu={}, DNN_fps={}".format(self.thread_name, self._get_temperature(), self.normalized_cpu, average_cpu/self.num_of_cores, dnn_fps))
         self.temperature_cpu_list.append((self._get_temperature(), self.normalized_cpu, average_cpu, dnn_fps))
 
     def set_cpu_level_normalized(self, cpu_percent):
@@ -138,7 +138,7 @@ class CPUController(HDThread):
         self._limit_cpu(cpu_usage_percent)
 
     def print_cpu_and_temp(self) -> None:
-        self.logging.info("{} - CPU%={}, Temp={}'C".format(self.thread_name, self._get_cpu(), self._get_temperature()))
+        self.logging.info("{} - CPU%={}, Temp={}'C".format(self.thread_name, self._get_cpu()/self.num_of_cores, self._get_temperature()))
 
     def _get_cpu(self) -> float:
         return psutil.cpu_percent()
