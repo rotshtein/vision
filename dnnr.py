@@ -111,7 +111,7 @@ def create_dummy_warning(hd_thread):
     warning_message = HDSetWarningMessage(3, polygon_arr, object_class_holder, 0, 300, 20, 1, 1, True, True)
     hd_thread.on_set_warning_msg(warning_message)
 
-    setup_message = HDSetupMessage(5, 1000, 63, 128, 190, 2, 3, False, False, False, True, True, 90)
+    setup_message = HDSetupMessage(5, 1000, 63, 128, 190, 2, 3, logging.getLogger().level == logging.DEBUG, False, False, True, True, 90)
     hd_thread.on_setup_message(setup_message)
 
 

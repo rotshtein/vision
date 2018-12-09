@@ -78,6 +78,10 @@ class HumanDetection(HDThread):
         image = self.img_queue.get()
         self.__dnn(image)
 
+    def _calc_fps(self):
+        global dnn_fps
+        dnn_fps = super()._calc_fps()
+
     def is_module_in_error(self):
         return self.in_error
 

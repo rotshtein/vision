@@ -51,6 +51,7 @@ class HDThread(threading.Thread, IRXMessage):
         last_measured_fps = 1.0 if cycle_sec == 0 else 1 / cycle_sec
         self.logging.info("{0:s} - last measured fps={1:.2f}. Temperature={2:s}".format(self.thread_name, last_measured_fps, self.measure_temp()))
         self.last_measured_time = datetime.now()
+        return last_measured_fps
 
     def _run(self):
         pass
