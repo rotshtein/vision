@@ -16,8 +16,8 @@ class Camera(HDThread):
         super().__init__(thread_name, logging, target_fps)
         self.detection_queue = detection_queue  # type: queue.Queue
         self.visibility_queue = visibility_queue
-        self.logging.info("{} - Start Init PiCamera...".format(thread_name))
         try:
+            self.logging.info("{} - Init PiCamera...".format(thread_name))
             from picamera import PiCamera
             from picamera.array import PiRGBArray
             self.camera = PiCamera()
@@ -26,7 +26,7 @@ class Camera(HDThread):
             self.picamera_mode = True
             self.logging.info("{} - Init PiCamera success".format(thread_name))
         except:
-            self.logging.info("{} - Start Init VideoCapture...".format(thread_name))
+            self.logging.info("{} - Init VideoCapture...".format(thread_name))
             self.camera = cv2.VideoCapture(0)
             self.logging.info("{} - Init VideoCapture success".format(thread_name))
             self.picamera_mode = False

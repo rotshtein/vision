@@ -41,7 +41,6 @@ PORT = '/dev/ttyAMA0'  # COM1 / ttyUSB0 for USB port / ttyS0 for IO
 class Communication(HDThread):
     def __init__(self, thread_name, logging, messages_receiver_handler, port=PORT, baudrate=BAUD_RATE):
         super().__init__(thread_name, logging, 0)
-        self.logging.info("{} - Init.".format(thread_name))
         self.messages_receiver_handler = messages_receiver_handler  # type: MessagesReceiverHandler
         self.port = port if port is not None else PORT
         self.baudrate = int(baudrate) if baudrate is not None else BAUD_RATE

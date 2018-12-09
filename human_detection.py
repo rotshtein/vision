@@ -39,7 +39,6 @@ class HumanDetection(HDThread):
                  fw_version, debug_img_queue, save_images_to_disk=False, debug_save_img_queue=None,
                  draw_polygons_on_image=False, rotating_angle=90):
         super().__init__(thread_name, logging, target_fps)
-        self.logging.info("{} - Init.".format(thread_name))
         self.rotate_counter = 0
         self.img_queue = img_queue  # type: queue.Queue
         self.debug_img_queue = debug_img_queue  # type: queue.Queue

@@ -20,8 +20,6 @@ class Visibility(HDThread):
     def __init__(self, thread_name, logging, img_queue, target_fps):
         super().__init__(thread_name, logging, target_fps)
         self.obs_detector = ObstructionDetector(logging)
-        self.logging.info(
-            "{} - Init. ".format(thread_name))
         self.img_queue = img_queue  # type: Queue
         self.is_obstructed = True
         self.visibility_light_level = VisibilityLightLevel.FULL_VISIBILITY

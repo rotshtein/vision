@@ -27,7 +27,7 @@ class CPUController(HDThread):
             self.num_of_cores = int(os.popen("nproc").readline().replace("\n", ""))
         except:
             pass
-        self.logging.info("{} - Starting with full CPU usage. Cores#={}. target_fps={}".format(thread_name, self.num_of_cores, target_fps))
+        self.logging.info("{} - Starting with full CPU usage. Cores#={}".format(thread_name, self.num_of_cores))
         self.temperature_cpu_list = []
         self.cpu_average_list = []
 
@@ -138,7 +138,7 @@ class CPUController(HDThread):
         self._limit_cpu(cpu_usage_percent)
 
     def print_cpu_and_temp(self) -> None:
-        self.logging.info("{} - CPU%={}, Temp={}'C".format(self.thread_name, self._get_cpu()/self.num_of_cores, self._get_temperature()))
+        self.logging.info("{} - CPU%={}, Temp={}'C".format(self.thread_name, self._get_cpu(), self._get_temperature()))
 
     def _get_cpu(self) -> float:
         return psutil.cpu_percent()

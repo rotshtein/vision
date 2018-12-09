@@ -23,6 +23,7 @@ class HDThread(threading.Thread, IRXMessage):
         self.in_error = False
 
     def run(self) -> None:
+        self.logging.info("{} - Started with target fps: {}".format(self.thread_name, self.target_fps))
         while not self.is_exit:
             self._calc_fps()
             try:

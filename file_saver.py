@@ -17,10 +17,9 @@ DEBUG_FOLDER_NAME = 'debug'
 class FilesSaver(HDThread):
     def __init__(self, thread_name, logging, debug_save_img_queue):
         super().__init__(thread_name, logging, 0)
-        self.logging.info("{} - Init. Max files={}".format(thread_name, MAX_FILES))
         self.debug_save_img_queue = debug_save_img_queue  # type: queue.Queue
         num_of_files = len(os.listdir(DEBUG_FOLDER_NAME))
-        self.logging.info("{} - Counted {} images.".format(thread_name, num_of_files))
+        self.logging.info("{} - Max files={}. Counted {} images.".format(thread_name, MAX_FILES, num_of_files))
         counter = num_of_files
 
         while counter > MAX_FILES:
