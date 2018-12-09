@@ -14,15 +14,15 @@ from utils.hd_threading import HDThread
 
 FILE_NAME_CSV = 'temp_cpu.csv'
 
-WAITING_TIME_MIN = 10 * 60
-SAVE_CPU_TIME_MIN = 1 * 60
+WAITING_TIME_SEC = 10 * 60
+SAVE_CPU_TIME_SEC = 1 * 60
 
 
 class CPUController(HDThread):
     def __init__(self, thread_name, logging, target_fps):
         super().__init__(thread_name, logging, target_fps)
         self.thread_name = thread_name
-        self.num_of_cores = 0
+        self.num_of_cores = -1
         try:
             self.num_of_cores = int(os.popen("nproc").readline().replace("\n", ""))
         except:
@@ -57,7 +57,7 @@ class CPUController(HDThread):
         self.cpu_average_list.append(self._get_cpu())
 
         # save result to list every 1 min.
-        if time.time() - self.save_temp_cpu_time > SAVE_CPU_TIME_MIN and (not self.test_ended_state or not self.stop_test_state):
+        if time.time() - self.save_temp_cpu_time > SAVE_CPU_TIME_SEC and (not self.test_ended_state or not self.stop_test_state):
             self.save_temp_avg_cpu_to_list()
             # reset timer
             self.save_temp_cpu_time = time.time()
@@ -73,19 +73,19 @@ class CPUController(HDThread):
             return
 
         if self.test_ended_state:
-            # wait 1 min.
+            # wait another x minutes and save result to csv. and end the test
             self.logging.info(
                 "{} - Entered Test Ended state".format(self.thread_name))
             if self.end_test_timer is None:
                 self.end_test_timer = time.time()
-            if time.time() - self.end_test_timer > WAITING_TIME_MIN:
+            if time.time() - self.end_test_timer > WAITING_TIME_SEC:
                 self.save_temp_avg_cpu_to_list()
                 self.write_to_csv()
                 self.stop_test_state = True
         else:
             if temperature > 80:
                 self.logging.info(
-                    "{} - Temp exceeded 80 deg. Decreasing CPU to 50%".format(self.thread_name))
+                    "{} - Temp exceeded 80 deg while target CPU%={}. Decreasing CPU to 50%".format(self.thread_name, self.normalized_cpu))
                 self.cpu_get_stuck_value = self.normalized_cpu
                 self.normalized_cpu = 50
                 self.cool_down_state = True
@@ -93,44 +93,46 @@ class CPUController(HDThread):
             if self.cool_down_state:
                 self.logging.info(
                     "{} - Entered Cool Down (from 80deg) state".format(self.thread_name))
-                # wait 1 min
+                # wait x min and begin decreasing
                 if self.cool_down_timer is None:
                     self.cool_down_timer = time.time()
-                if time.time() - self.cool_down_timer > WAITING_TIME_MIN:
+                if time.time() - self.cool_down_timer > WAITING_TIME_SEC:
+                    self.cool_down_timer = None
                     self.logging.info(
-                        "{} - Ended cool down state".format(self.thread_name))
-                    self.cool_down_state = False
+                        "{} - Ended cool down state. Check if Temp is below 80 - Test will continue...".format(self.thread_name))
                     if self.increase_cpu_state:
                         self.increase_cpu_state = False
                         self.normalized_cpu = self.cpu_get_stuck_value - 5
-                    else:
-                        self.test_ended_state = True
-
-            if self.increase_cpu_state:
-                # stop condition
-                if self.normalized_cpu == 100:
-                    self.increase_cpu_state = False
-                else:
-                    if time.time() - self.cpu_change_start_timer > WAITING_TIME_MIN:
-                        self.normalized_cpu += 5
             else:
-                # stop condition
-                if self.normalized_cpu == 50:
-                    self.test_ended_state = True
+                if self.increase_cpu_state:
+                    # stop condition
+                    if self.normalized_cpu == 100:
+                        self.increase_cpu_state = False
+                    else:
+                        if time.time() - self.cpu_change_start_timer > WAITING_TIME_SEC:
+                            self.normalized_cpu += 5
                 else:
-                    if time.time() - self.cpu_change_start_timer > WAITING_TIME_MIN:
-                        self.normalized_cpu -= 5
+                    # stop condition
+                    if self.normalized_cpu == 50:
+                        self.test_ended_state = True
+                    else:
+                        if time.time() - self.cpu_change_start_timer > WAITING_TIME_SEC:
+                            self.normalized_cpu -= 5
 
         if self.normalized_cpu != last_normalized_cpu:
             self.cpu_change_start_timer = time.time()
             self.set_cpu_level_normalized(self.normalized_cpu)
 
     def save_temp_avg_cpu_to_list(self):
-        global dnn_fps
+        from utils import global_vars
+        self.logging.info("{} - average_list_cpu={}".format(self.thread_name, self.cpu_average_list))
         average_cpu = mean(self.cpu_average_list)
         self.cpu_average_list.clear()
+        dnn_fps = mean(global_vars.dnn_fps)
+        global_vars.dnn_fps.clear()
         self.logging.info(
-            "{} - save to list: temp={}, target_cpu={}, avg_cpu={}, DNN_fps={}".format(self.thread_name, self._get_temperature(), self.normalized_cpu, average_cpu/self.num_of_cores, dnn_fps))
+            "{} - save to list: temp={}, target_cpu={}, avg_cpu={}, DNN_fps={}".format(self.thread_name, self._get_temperature(), self.normalized_cpu, average_cpu,
+                                                                                       dnn_fps))
         self.temperature_cpu_list.append((self._get_temperature(), self.normalized_cpu, average_cpu, dnn_fps))
 
     def set_cpu_level_normalized(self, cpu_percent):
@@ -162,7 +164,7 @@ class CPUController(HDThread):
 
     def _limit_cpu(self, cpu_usage_percent):
         self.logging.info(
-            "{} - setting target CPU%={}".format(self.thread_name, cpu_usage_percent))
+            "{} - setting target CPU%={}".format(self.thread_name, cpu_usage_percent/self.num_of_cores))
         os.popen("sudo killall cpulimit")
         os.popen("sudo cpulimit -l {} -p {}".format(cpu_usage_percent, self._get_python_pid()))
 
