@@ -275,12 +275,18 @@ class HumanDetection(HDThread):
             self.lock.release()
 
     def save_setup_to_fs(self, message):
-        with open(SETUP_PKL_FILE_NAME, 'wb') as output:
-            pickle.dump(message, output, pickle.HIGHEST_PROTOCOL)
+        try:
+            with open(SETUP_PKL_FILE_NAME, 'wb') as output:
+                pickle.dump(message, output, pickle.HIGHEST_PROTOCOL)
+        except Exception as ex:
+            self.logging.info("{} - Failed to save setup to file... {}".format(self.thread_name, ex.__str__()))
 
     def save_warnings_to_fs(self):
-        with open(WARNINGS_PKL_FILE_NAME, 'wb') as output:
-            pickle.dump(self.warnings, output, pickle.HIGHEST_PROTOCOL)
+        try:
+            with open(WARNINGS_PKL_FILE_NAME, 'wb') as output:
+                pickle.dump(self.warnings, output, pickle.HIGHEST_PROTOCOL)
+        except Exception as ex:
+            self.logging.info("{} - Failed to save warnings to file... {}".format(self.thread_name, ex.__str__()))
 
     def load_configuration_from_fs(self):
         self.load_warnings_from_fs()

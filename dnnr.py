@@ -172,8 +172,8 @@ def main():
         cv2.namedWindow("detect")
 
     if args_image == 'c':
-        thread_names = [THREAD_CAMERA, THREAD_DNN, THREAD_VISIBILITY, THREAD_COMMUNICATION, THREAD_FILES_SAVER,
-                        THREAD_CPU_CONTROLLER]
+        thread_names = [THREAD_CAMERA, THREAD_DNN, THREAD_VISIBILITY, THREAD_COMMUNICATION, THREAD_FILES_SAVER]
+            # , THREAD_CPU_CONTROLLER]
         start_threads(args_show, args_port, args_baudrate, thread_names, save_images_to_disk, simulate_warnings,
                       draw_polygons_on_image, activate_buzzer, rotating_angle)
     else:

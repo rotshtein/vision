@@ -103,6 +103,7 @@ class CPUController(HDThread):
                     if self.increase_cpu_state:
                         self.increase_cpu_state = False
                         self.normalized_cpu = self.cpu_get_stuck_value - 5
+                    self.cool_down_state = False
             else:
                 if self.increase_cpu_state:
                     # stop condition
@@ -113,7 +114,7 @@ class CPUController(HDThread):
                             self.normalized_cpu += 5
                 else:
                     # stop condition
-                    if self.normalized_cpu == 50:
+                    if self.normalized_cpu <= 50:
                         self.test_ended_state = True
                     else:
                         if time.time() - self.cpu_change_start_timer > WAITING_TIME_SEC:
@@ -140,7 +141,7 @@ class CPUController(HDThread):
         self._limit_cpu(cpu_usage_percent)
 
     def print_cpu_and_temp(self) -> None:
-        self.logging.info("{} - CPU%={}, Temp={}'C".format(self.thread_name, self._get_cpu(), self._get_temperature()))
+        self.logging.info("{} - CPU={}%, Temp={}'C, Target CPU={}%".format(self.thread_name, self._get_cpu(), self._get_temperature(), self.normalized_cpu))
 
     def _get_cpu(self) -> float:
         return psutil.cpu_percent()
